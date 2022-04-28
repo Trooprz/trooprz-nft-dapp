@@ -18,9 +18,10 @@ const Mint: React.FC<IProps> = () => {
     const [amount, setAmount] = useState('');
     const cost = BigNumber.from("5000000000000000000");
     const [tokensInWallet, setTokensInWallet] = useState([]);
+    const [id, setId] = useState('');
 
     const fetchAmountOfTokensInWallet = async () => {
-        return await utils.getTokens(state.wallet.browserWeb3Provider, state.wallet.address);
+        return await utils.getTokens(state.wallet.browserWeb3Provider, state.wallet.address, state.queryResults.erc20Balance);
     }
 
     const claimMicrobe = async () => {
@@ -32,7 +33,7 @@ const Mint: React.FC<IProps> = () => {
             state.wallet.browserWeb3Provider
         );
         const tx = await bacteriaWriteContractInstance["claim"](
-            1
+            id
         );
         updateRefreshingAction(dispatch, {
             status: false,
@@ -105,17 +106,21 @@ const Mint: React.FC<IProps> = () => {
     };
 
     const renderOwnedSuperTrooprz = () => {
-        fetchAmountOfTokensInWallet().then(result => setTokensInWallet(result));
-        return (
-            <div>
-                {
-                    tokensInWallet && tokensInWallet.length > 0 && tokensInWallet.map((item) => <Image key={item}
-                                                                                                       width='150'
-                                                                                                       height='150'
-                                                                                                       src={"https://ipfs.io/ipfs/bafybeigokmkefpxuco3f4demdre3rnuixvrkcgru6cxosyo3eat5xbelem/" + item + ".png"}/>)
-                }
-            </div>
-        );
+        if (state.wallet.address) {
+            fetchAmountOfTokensInWallet().then(result => setTokensInWallet(result));
+            return (
+                <div>
+                    {
+                        tokensInWallet && tokensInWallet.length > 0 && tokensInWallet.map((item) => <div key={item} onClick={() => { setId(item) }}><Image key={item}
+                                                                                                           width='150'
+                                                                                                           height='150'
+                                                                                                           src={"https://ipfs.io/ipfs/bafybeigokmkefpxuco3f4demdre3rnuixvrkcgru6cxosyo3eat5xbelem/" + item + ".png"}
+                        /></div>)
+                    }
+                </div>
+            );
+        }
+        else return 'not connected';
     }
 
     // This is used to display more details about the Redux state on the web page, for debugging purposes

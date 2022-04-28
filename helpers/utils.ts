@@ -80,22 +80,21 @@ export const getBalance = async (
 
 export const getTokens = async (
     serverWeb3Provider: ethers.providers.JsonRpcProvider,
-    address: string
-): Promise<any[]> => {
+    address: string,
+    amount
+): Promise<String[]> => {
   const contractAbi = SuperMonkehz.abi;
   const readContractInstance = new ethers.Contract(
       config.configVars.erc20.superMonkehzAddress,
       contractAbi,
       serverWeb3Provider
   );
-  const amount = await getBalance(serverWeb3Provider, address);
-  console.log("The amount is: " + BigNumber.from(amount).toString());
+  console.log("The amount is: " + amount);
   for (let i = 0; i < amount; i++) {
-    tokensInWallet.push(BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toString());
+    tokensInWallet[i] = BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toString();
     console.log("In my wallet: " + tokensInWallet);
     console.log("Counter: " + i);
   }
-  console.log(tokensInWallet);
   return tokensInWallet;
 }
 
