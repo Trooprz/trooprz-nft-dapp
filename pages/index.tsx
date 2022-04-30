@@ -129,29 +129,25 @@ const Home: React.FC<IProps> = () => {
         if (state.wallet.connected) {
             return (
                 <div>
-                    <Center>
-                        <Button onClick={result => {
-                            setClaim(true);
-                            setMint(false)
-                        }}>
-                            I want to claim miCRObes
-                        </Button>
-                        <Button onClick={result => {
-                            setMint(true);
-                            setClaim(false)
-                        }}>
-                            I want to mint miCRObes
-                        </Button>
-                    </Center>
+                    <Button onClick={result => {
+                        setClaim(true);
+                        setMint(false)
+                    }}>
+                        I want to claim miCRObes
+                    </Button>
+                    <Button onClick={result => {
+                        setMint(true);
+                        setClaim(false)
+                    }}>
+                        I want to mint miCRObes
+                    </Button>
                     {claim &&
-                        <Center>
-                            <Button onClick={claimMicrobe}>
-                                Claim 2 miCRObes per SuperTroopr
-                            </Button>
-                            <Button onClick={claimAllMicrobes}>
-                                Claim all your miCRObes
-                            </Button>
-                        </Center>}
+                        <><Button onClick={claimMicrobe}>
+                            Claim 2 miCRObes per SuperTroopr
+                        </Button><Button onClick={claimAllMicrobes}>
+                            Claim all your miCRObes
+                        </Button></>
+                    }
                     {mint &&
                         <><NumberInput defaultValue={1} min={1} max={10}>
                             <NumberInputField id="amountOfTokensToBeMinted" value={amount}
@@ -160,16 +156,13 @@ const Home: React.FC<IProps> = () => {
                                 <NumberIncrementStepper/>
                                 <NumberDecrementStepper/>
                             </NumberInputStepper>
-                        </NumberInput><Center>
-                            <Button onClick={mintMicrobe}>
-                                Mint 1 Bacteria for some tCRO
-                            </Button>
-                        </Center></>}
-                    <Center>
-                        <Button onClick={result => setShowTrooprz(true)}>
-                            Show available SuperTrooprz
-                        </Button>
-                    </Center>
+                        </NumberInput><Button onClick={mintMicrobe}>
+                            Mint 1 Bacteria for some tCRO
+                        </Button></>
+                    }
+                    <Button onClick={result => setShowTrooprz(true)}>
+                        Show available SuperTrooprz
+                    </Button>
                 </div>
             );
         } else {
@@ -181,7 +174,7 @@ const Home: React.FC<IProps> = () => {
         if (state.wallet.connected) {
             if (tokensInWallet && tokensInWallet.length == 0 && showTrooprz) {
                 return <Center>
-                    <Spinner />
+                    <Spinner/>
                 </Center>
             }
             if (tokensInWallet && tokensInWallet.length > 0) {
@@ -208,8 +201,7 @@ const Home: React.FC<IProps> = () => {
                     </SimpleGrid>
                 );
             }
-        }
-        else return "not connected";
+        } else return "not connected";
     }
 
     // This is used to display more details about the Redux state on the web page, for debugging purposes
@@ -239,40 +231,42 @@ const Home: React.FC<IProps> = () => {
                 <meta name="description" content="Troopz dApp"/>
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
-
-            <main className={styles.main}>
-                <Image src="/images/header-graphic.png" width="1291" height="738"/>
-                <h1 className={styles.title}>
-                    The Trooprz minting platform!
-                </h1>
-                <div>
-                    <Header/>
+            <Center>
+                <main className={styles.main}>
+                    <Image src="/images/header-graphic.png" width="1291" height="738"/>
+                    <h1 className={styles.title}>
+                        The Trooprz minting platform!
+                    </h1>
                     <div>
-                        <p>
-                            Welcome!
-                        </p>
-                        <p>
-                            Cronos address:{" "}
-                            {state.wallet.address ? state.wallet.address : "Not connected"}
-                        </p>
-                        <p>
-                            Wallet provider:{" "}
-                            {state.wallet.walletProviderName
-                                ? state.wallet.walletProviderName
-                                : "Not connected"}
-                        </p>
-                        <p>
-                            Balance: {state.queryResults.croBalance}
-                        </p>
-                        <p>
-                            SuperTroopr token balance: {state.queryResults.erc20Balance}
-                        </p>
-                        {renderActionButtons()}
-                        {renderOwnedSuperTrooprz()}
+                        <Header/>
+                        <div>
+                            <p>
+                                Welcome!
+                            </p>
+                            <p>
+                                Cronos address:{" "}
+                                {state.wallet.address ? state.wallet.address : "Not connected"}
+                            </p>
+                            <p>
+                                Wallet provider:{" "}
+                                {state.wallet.walletProviderName
+                                    ? state.wallet.walletProviderName
+                                    : "Not connected"}
+                            </p>
+                            <p>
+                                Balance: {state.queryResults.croBalance}
+                            </p>
+                            <p>
+                                SuperTroopr token balance: {state.queryResults.erc20Balance}
+                            </p>
+                            {renderActionButtons()}
+                            {renderOwnedSuperTrooprz()}
+                        </div>
                     </div>
-                </div>
 
-            </main>
+
+                </main>
+            </Center>
 
             <footer className={styles.footer}>
                 <a
