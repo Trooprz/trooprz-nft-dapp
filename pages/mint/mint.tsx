@@ -8,13 +8,20 @@ import * as utils from "../../helpers/utils";
 import Header from "./Header";
 import {BigNumber} from "ethers";
 import Image from "next/image";
+import {
+    Button,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper
+} from "@chakra-ui/react";
 
 interface IProps {
 }
 
 const Mint: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
-    const [provider, setProvider] = useState()
     const [amount, setAmount] = useState('');
     const cost = BigNumber.from("5000000000000000000");
     const [tokensInWallet, setTokensInWallet] = useState([]);
@@ -34,6 +41,28 @@ const Mint: React.FC<IProps> = () => {
         );
         const tx = await bacteriaWriteContractInstance["claim"](
             id
+        );
+        updateRefreshingAction(dispatch, {
+            status: false,
+            message: "Complete",
+        });
+        updateQueryResultsAction(dispatch, {
+            ...state.queryResults,
+            lastTxHash: tx.hash,
+        });
+    };
+
+
+    const claimAllMicrobes = async () => {
+        updateRefreshingAction(dispatch, {
+            status: true,
+            message: "Sending transaction...",
+        });
+        const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
+            state.wallet.browserWeb3Provider
+        );
+        const tx = await bacteriaWriteContractInstance["claimAll"](
+            tokensInWallet
         );
         updateRefreshingAction(dispatch, {
             status: false,
@@ -91,13 +120,22 @@ const Mint: React.FC<IProps> = () => {
         if (state.wallet.connected) {
             return (
                 <div>
-                    <button onClick={claimMicrobe}>
+                    <Button onClick={claimMicrobe}>
                         Claim 2 Bacteria per SuperTroopr
-                    </button>
-                    <input id="amountOfTokensToBeMinted" value={amount} onChange={(e) => setAmount(e.target.value)}/>
-                    <button onClick={mintMicrobe}>
+                    </Button>
+                    <Button onClick={claimAllMicrobes}>
+                        Claim all your miCRObes
+                    </Button>
+                    <NumberInput defaultValue={1} min={1} max={10}>
+                        <NumberInputField id="amountOfTokensToBeMinted" value={amount} onChange={(e) => setAmount(e.target.value)} />
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
+                    <Button onClick={mintMicrobe}>
                         Mint 1 Bacteria for some tCRO
-                    </button>
+                    </Button>
                 </div>
             );
         } else {
