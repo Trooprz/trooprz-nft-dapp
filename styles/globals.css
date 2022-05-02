@@ -34,3 +34,43 @@ a {
   position: relative !important;
   height: unset !important;
 }
+
+.container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+
+.provider {
+  flex: 25%;
+  max-width: 100%;
+  padding: 25px;
+  border-right: 1px solid black;
+  cursor: pointer;
+}
+
+.provider-right {
+  flex: 25%;
+  max-width: 100%;
+  padding: 25px;
+  cursor: pointer;
+}
+
+
+@media (max-width: 800px) {
+  .provider {
+    flex: 50%;
+    max-width: 50%;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .provider {
+    flex: 100%;
+    max-width: 100%;
+  }
+}
+
+

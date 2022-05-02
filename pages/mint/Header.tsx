@@ -22,7 +22,16 @@ import {
     MenuItemOption,
     MenuGroup,
     MenuOptionGroup,
-    MenuDivider, Button,
+    MenuDivider,
+    Button,
+    ModalOverlay,
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
+    useDisclosure, Image,
 } from '@chakra-ui/react'
 
 declare global {
@@ -38,6 +47,7 @@ const Header: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
     // Uncomment this to auto-connect in MetaMask in-app browser
     // React.useEffect(() => {
@@ -138,20 +148,44 @@ const Header: React.FC<IProps> = () => {
         } else {
             return (
                 <div>
-                    <Menu>
-                        <MenuButton as={Button}>Connect</MenuButton>
-                        <MenuList>
-                            <MenuItem onClick={() => {
-                                handleClickConnect("metamask-injected");
-                            }}>Metamask</MenuItem>
-                            <MenuItem onClick={() => {
-                                handleClickConnect("wallet-connect");
-                            }}>Wallet-Connect</MenuItem>
-                            <MenuItem onClick={() => {
-                                handleClickConnect("defiwallet");
-                            }}>Defi Wallet</MenuItem>
-                        </MenuList>
-                    </Menu>
+                    <>
+                        <Button onClick={onOpen}>Connect</Button>
+
+                        <Modal isOpen={isOpen} onClose={onClose}>
+                            <ModalOverlay />
+                            <ModalContent>
+                                <ModalHeader>Choose Your Wallet</ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody>
+                                    <div className="container">
+                                    <div className="provider">
+                                    <Image onClick={() => (handleClickConnect("metamask-injected"))} src="./images/metamask.png" />
+                                    </div>
+                                    <div className="provider">
+                                    <Image onClick={() => (handleClickConnect("defiwallet"))} src="./images/defiwallet.png" />
+                                    </div>
+                                    <div className="provider-right">
+                                    <Image onClick={() => (handleClickConnect("wallet-connect"))} src="./images/walletconnect-icon.png" />
+                                    </div>
+                                    </div>
+                                </ModalBody>
+                            </ModalContent>
+                        </Modal>
+                    </>
+                    {/*<Menu>*/}
+                    {/*    <MenuButton as={Button}>Connect</MenuButton>*/}
+                    {/*    <MenuList>*/}
+                    {/*        <MenuItem onClick={() => {*/}
+                    {/*            handleClickConnect("metamask-injected");*/}
+                    {/*        }}>Metamask</MenuItem>*/}
+                    {/*        <MenuItem onClick={() => {*/}
+                    {/*            handleClickConnect("wallet-connect");*/}
+                    {/*        }}>Wallet-Connect</MenuItem>*/}
+                    {/*        <MenuItem onClick={() => {*/}
+                    {/*            handleClickConnect("defiwallet");*/}
+                    {/*        }}>Defi Wallet</MenuItem>*/}
+                    {/*    </MenuList>*/}
+                    {/*</Menu>*/}
                 </div>
             );
         }
