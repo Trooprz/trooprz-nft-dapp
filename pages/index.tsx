@@ -4,11 +4,12 @@ import React, {useEffect, useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction} from "../store/actions";
 import Link from "next/link";
+import { Image } from '@chakra-ui/react'
+
 
 import * as config from "../config/config";
 import * as utils from "../helpers/utils";
 import {BigNumber} from "ethers";
-import Image from "next/image";
 import {
     Box,
     Button, Center,
@@ -32,6 +33,7 @@ const Home: React.FC<IProps> = () => {
     const [claim, setClaim] = useState(false);
     const [mint, setMint] = useState(false);
     const [showTrooprz, setShowTrooprz] = useState(false);
+    const [ineligibleTokensInWallet, setIneligibleTokensInWallet] = useState([]);
 
     useEffect(() => {
         const fetchAmountOfTokensInWallet = async () => {
@@ -39,7 +41,14 @@ const Home: React.FC<IProps> = () => {
             setTokensInWallet(data);
         }
         fetchAmountOfTokensInWallet().catch(console.error);
+
+        const fetchIneligibleTokensInWallet = async () => {
+            const data = await utils.getIneligibleTokens(state.wallet.browserWeb3Provider, state.wallet.address, state.queryResults.erc20Balance);
+            setIneligibleTokensInWallet(data);
+        }
+        fetchIneligibleTokensInWallet().catch(console.error);
     }, [showTrooprz])
+
 
     const claimMicrobe = async () => {
         updateRefreshingAction(dispatch, {
@@ -172,7 +181,7 @@ const Home: React.FC<IProps> = () => {
 
     const renderOwnedSuperTrooprz = () => {
         if (state.wallet.connected) {
-            if (tokensInWallet && tokensInWallet.length == 0 && showTrooprz) {
+            if (tokensInWallet && tokensInWallet.length == 0 && showTrooprz && ineligibleTokensInWallet && ineligibleTokensInWallet.length == 0) {
                 return <Center>
                     <Spinner/>
                 </Center>
@@ -192,6 +201,36 @@ const Home: React.FC<IProps> = () => {
                                                               onClick={() => {
                                                                   setId(item)
                                                               }}><Image
+                                key={item}
+                                width='150'
+                                height='150'
+                                src={"https://ipfs.io/ipfs/bafybeigokmkefpxuco3f4demdre3rnuixvrkcgru6cxosyo3eat5xbelem/" + item + ".png"}
+                            /></div>)
+                        }
+                    </SimpleGrid>
+                );
+            }
+        } else return "not connected";
+    }
+
+    const renderIneligibleSuperTrooprz = () => {
+        if (state.wallet.connected) {
+            if (ineligibleTokensInWallet && ineligibleTokensInWallet.length > 0) {
+                return (
+                    <SimpleGrid
+                        bg='gray.50'
+                        columns={{sm: 2, md: 4}}
+                        spacing='8'
+                        p='10'
+                        textAlign='center'
+                        rounded='lg'
+                        color='gray.400'>
+                        {
+                            ineligibleTokensInWallet.map((item) => <div key={item}
+                                                              onClick={() => {
+                                                                  setId(item)
+                                                              }}><Image className="grayscale"
+                                boxSize="50px"
                                 key={item}
                                 width='150'
                                 height='150'
@@ -261,6 +300,7 @@ const Home: React.FC<IProps> = () => {
                             </p>
                             {renderActionButtons()}
                             {renderOwnedSuperTrooprz()}
+                            {renderIneligibleSuperTrooprz()}
                         </div>
                     </div>
 

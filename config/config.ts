@@ -28,7 +28,7 @@ export const configVars = {
     blockExplorerUrl: "https://cronoscan.com/",
   },
   erc20: {
-    address: "0x38939af9e32EB981F433598149591c6db936008E", // on Cronos Testnet
+    address: "0x96628048830a499b156aBdC04cC169C18c3A17f2", // on Cronos Testnet
     superMonkehzAddress: "0x7B281B5045e43D14590C57468f78c722a350A461",
     address_mainnet: "0xecee7183cb41f382972d436862d690a71520318a", // on Cronos Mainnet
   },

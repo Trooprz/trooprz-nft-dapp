@@ -6,10 +6,11 @@ import SuperMonkehz from "../artifacts/Monkehz.json";
 import {forEachToken} from "tsutils";
 
 // NOTE: Make sure to change this to the contract address you deployed
-const bacteriaAddress = '0x38939af9e32EB981F433598149591c6db936008E'
+const bacteriaAddress = '0x96628048830a499b156aBdC04cC169C18c3A17f2'
 // ABI so the web3 library knows how to interact with our contract
 const bacteriaABI = Bacteria.abi
 let tokensInWallet = [];
+let ineligibleTokensInWallet = [];
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -105,6 +106,36 @@ export const getTokens = async (
         }
     }
     let filtered = tokensInWallet.filter(x => x != null);
+    console.log(filtered);
+    return filtered;
+};
+
+export const getIneligibleTokens = async (
+    serverWeb3Provider: ethers.providers.JsonRpcProvider,
+    address: string,
+    amount
+): Promise<String[]> => {
+    const contractAbi = Bacteria.abi;
+    const smContractAbi = SuperMonkehz.abi;
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.superMonkehzAddress,
+        smContractAbi,
+        serverWeb3Provider
+    );
+    const readBacteriaContractInstance = new ethers.Contract(
+        config.configVars.erc20.address,
+        contractAbi,
+        serverWeb3Provider
+    );
+    for (let i = 0; i < amount; i++) {
+        ineligibleTokensInWallet[i] = BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toString();
+    }
+    for (let i = 0; i < tokensInWallet.length; i++) {
+        if (await readBacteriaContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i]) == false) {
+            ineligibleTokensInWallet[i] = null;
+        }
+    }
+    let filtered = ineligibleTokensInWallet.filter(x => x != null);
     console.log(filtered);
     return filtered;
 };
