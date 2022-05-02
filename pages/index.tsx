@@ -264,7 +264,7 @@ const Home: React.FC<IProps> = () => {
         }
     };
     return (
-        <div className={styles.container}>
+        <div className={'image-container'}>
             <Head>
                 <title>Troopz dApp</title>
                 <meta name="description" content="Troopz dApp"/>
@@ -272,7 +272,7 @@ const Home: React.FC<IProps> = () => {
             </Head>
             <Center>
                 <main className={styles.main}>
-                    <Image src="/images/header-graphic.png" width="1291" height="738"/>
+                    <Image src="/images/header-graphic.png" />
                     <h1 className={styles.title}>
                         The Trooprz minting platform!
                     </h1>
