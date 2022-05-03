@@ -11,13 +11,12 @@ import * as config from "../config/config";
 import * as utils from "../helpers/utils";
 import {BigNumber} from "ethers";
 import {
-    Box,
     Button, Center,
     NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInput,
     NumberInputField,
-    NumberInputStepper, SimpleGrid, Spinner
+    NumberInputStepper, Spinner
 } from "@chakra-ui/react";
 import Header from "./mint/Header";
 
@@ -111,51 +110,31 @@ const Home: React.FC<IProps> = () => {
         });
     };
 
-    const renderLastTransaction = () => {
-        if (state.queryResults.lastTxHash) {
-            return (
-                <div>
-                    <p>
-                        Last transaction:{" "}
-                        <Link
-                            href={
-                                config.configVars.rpcNetwork.blockExplorerUrl +
-                                "tx/" +
-                                state.queryResults.lastTxHash
-                            }
-                        >
-                            <a target="_blank"
-                               rel="noopener"
-                               color="inherit"> View in block explorer</a>
-                        </Link>
-                    </p>
-                </div>
-            );
-        }
-    };
-
     const renderActionButtons = () => {
         if (state.wallet.connected) {
             return (
+                <div>
                 <div>
                     <Button onClick={result => {
                         setClaim(true);
                         setMint(false)
                     }}>
                         I want to claim miCRObes
-                    </Button>
+                    </Button>{' '}
                     <Button onClick={result => {
                         setMint(true);
                         setClaim(false)
                     }}>
                         I want to mint miCRObes
                     </Button>
+                </div><br/>
+                <div>
                     {claim &&
                         <><Button onClick={claimMicrobe}>
                             Claim 2 miCRObes per SuperTroopr
-                        </Button><Button onClick={claimAllMicrobes}>
+                        </Button>{' '}<Button onClick={claimAllMicrobes}>
                             Claim all your miCRObes
-                        </Button></>
+                        </Button>{' '}</>
                     }
                     {mint &&
                         <><NumberInput defaultValue={1} min={1} max={10}>
@@ -165,13 +144,12 @@ const Home: React.FC<IProps> = () => {
                                 <NumberIncrementStepper/>
                                 <NumberDecrementStepper/>
                             </NumberInputStepper>
-                        </NumberInput><Button onClick={mintMicrobe}>
-                            Mint 1 Bacteria for some tCRO
+                        </NumberInput><br/>
+                            <Button onClick={mintMicrobe}>
+                            Mint Bacteria for CRO
                         </Button></>
                     }
-                    <Button onClick={result => setShowTrooprz(true)}>
-                        Show available SuperTrooprz
-                    </Button>
+                </div>
                 </div>
             );
         } else {
@@ -186,28 +164,29 @@ const Home: React.FC<IProps> = () => {
                     <Spinner/>
                 </Center>
             }
-            if (tokensInWallet && tokensInWallet.length > 0) {
+            if (claim && tokensInWallet && tokensInWallet.length > 0) {
                 return (
-                    <SimpleGrid
-                        bg='gray.50'
-                        columns={{sm: 2, md: 4}}
-                        spacing='8'
-                        p='10'
-                        textAlign='center'
-                        rounded='lg'
-                        color='gray.400'>
-                        {
-                            tokensInWallet.map((item) => <div key={item}
-                                                              onClick={() => {
-                                                                  setId(item)
-                                                              }}><Image
-                                key={item}
-                                width='150'
-                                height='150'
-                                src={"https://ipfs.io/ipfs/bafybeigokmkefpxuco3f4demdre3rnuixvrkcgru6cxosyo3eat5xbelem/" + item + ".png"}
-                            /></div>)
-                        }
-                    </SimpleGrid>
+                    <p>You have {tokensInWallet.length} eligible tokens in your wallet</p>
+                    // <SimpleGrid
+                    //     bg='gray.50'
+                    //     columns={{sm: 2, md: 4}}
+                    //     spacing='8'
+                    //     p='10'
+                    //     textAlign='center'
+                    //     rounded='lg'
+                    //     color='gray.400'>
+                    //     {
+                    //         tokensInWallet.map((item) => <div key={item}
+                    //                                           onClick={() => {
+                    //                                               setId(item)
+                    //                                           }}><Image
+                    //             key={item}
+                    //             width='150'
+                    //             height='150'
+                    //             src={"https://ipfs.io/ipfs/bafybeigokmkefpxuco3f4demdre3rnuixvrkcgru6cxosyo3eat5xbelem/" + item + ".png"}
+                    //         /></div>)
+                    //     }
+                    // </SimpleGrid>
                 );
             }
         } else return "not connected";
@@ -217,27 +196,28 @@ const Home: React.FC<IProps> = () => {
         if (state.wallet.connected) {
             if (ineligibleTokensInWallet && ineligibleTokensInWallet.length > 0) {
                 return (
-                    <SimpleGrid
-                        bg='gray.50'
-                        columns={{sm: 2, md: 4}}
-                        spacing='8'
-                        p='10'
-                        textAlign='center'
-                        rounded='lg'
-                        color='gray.400'>
-                        {
-                            ineligibleTokensInWallet.map((item) => <div key={item}
-                                                              onClick={() => {
-                                                                  setId(item)
-                                                              }}><Image className="grayscale"
-                                boxSize="50px"
-                                key={item}
-                                width='150'
-                                height='150'
-                                src={"https://ipfs.io/ipfs/bafybeigokmkefpxuco3f4demdre3rnuixvrkcgru6cxosyo3eat5xbelem/" + item + ".png"}
-                            /></div>)
-                        }
-                    </SimpleGrid>
+                    <p>You have {ineligibleTokensInWallet.length} in your wallet</p>
+                    // <SimpleGrid
+                    //     bg='gray.50'
+                    //     columns={{sm: 2, md: 4}}
+                    //     spacing='8'
+                    //     p='10'
+                    //     textAlign='center'
+                    //     rounded='lg'
+                    //     color='gray.400'>
+                    //     {
+                    //         ineligibleTokensInWallet.map((item) => <div key={item}
+                    //                                           onClick={() => {
+                    //                                               setId(item)
+                    //                                           }}><Image className="grayscale"
+                    //             boxSize="50px"
+                    //             key={item}
+                    //             width='150'
+                    //             height='150'
+                    //             src={"https://ipfs.io/ipfs/bafybeigokmkefpxuco3f4demdre3rnuixvrkcgru6cxosyo3eat5xbelem/" + item + ".png"}
+                    //         /></div>)
+                    //     }
+                    // </SimpleGrid>
                 );
             }
         } else return "not connected";
@@ -276,32 +256,34 @@ const Home: React.FC<IProps> = () => {
                     <h1 className={styles.title}>
                         The Trooprz minting platform!
                     </h1>
-                    <div>
+                    <div><br/>
                         <Header/>
-                        <div>
-                            <p>
-                                Welcome!
-                            </p>
-                            <p>
-                                Cronos address:{" "}
-                                {state.wallet.address ? state.wallet.address : "Not connected"}
-                            </p>
-                            <p>
-                                Wallet provider:{" "}
-                                {state.wallet.walletProviderName
-                                    ? state.wallet.walletProviderName
-                                    : "Not connected"}
-                            </p>
-                            <p>
-                                Balance: {state.queryResults.croBalance}
-                            </p>
-                            <p>
-                                SuperTroopr token balance: {state.queryResults.erc20Balance}
-                            </p>
-                            {renderActionButtons()}
-                            {renderOwnedSuperTrooprz()}
-                            {renderIneligibleSuperTrooprz()}
-                        </div>
+                        {state.wallet.connected &&
+                            <div>
+                                <p>
+                                    Welcome!
+                                </p>
+                                <p>
+                                    Cronos address:{" "}
+                                    {state.wallet.address ? state.wallet.address : "Not connected"}
+                                </p>
+                                <p>
+                                    Wallet provider:{" "}
+                                    {state.wallet.walletProviderName
+                                        ? state.wallet.walletProviderName
+                                        : "Not connected"}
+                                </p>
+                                <p>
+                                    Balance: {state.queryResults.croBalance}
+                                </p>
+                                <p>
+                                    SuperTroopr token balance: {state.queryResults.erc20Balance}
+                                </p>
+                                {renderActionButtons()}
+                                {renderOwnedSuperTrooprz()}
+                                {renderIneligibleSuperTrooprz()}
+                            </div>
+                        }
                     </div>
 
 

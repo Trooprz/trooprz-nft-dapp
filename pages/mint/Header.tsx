@@ -148,30 +148,31 @@ const Header: React.FC<IProps> = () => {
         } else {
             return (
                 <div>
-                    <>
-                        <Button onClick={onOpen}>Connect</Button>
+                        <Button onClick={() => {handleClickConnect("metamask-injected");}}>Metamask</Button>{' '}
+                        <Button onClick={() => {handleClickConnect("defiwallet");}}>CDC Defi Wallet</Button>{' '}
+                        <Button onClick={() => {handleClickConnect("wallet-connect");}}>WalletConnect (mobile)</Button>
+                        {/*<Button onClick={onOpen}>Connect</Button>*/}
 
-                        <Modal isOpen={isOpen} onClose={onClose}>
-                            <ModalOverlay />
-                            <ModalContent>
-                                <ModalHeader>Choose Your Wallet</ModalHeader>
-                                <ModalCloseButton />
-                                <ModalBody>
-                                    <div className="container">
-                                    <div className="provider">
-                                    <Image onClick={() => (handleClickConnect("metamask-injected"))} src="./images/metamask.png" />
-                                    </div>
-                                    <div className="provider">
-                                    <Image onClick={() => (handleClickConnect("defiwallet"))} src="./images/defiwallet.png" />
-                                    </div>
-                                    <div className="provider-right">
-                                    <Image onClick={() => (handleClickConnect("wallet-connect"))} src="./images/walletconnect-icon.png" />
-                                    </div>
-                                    </div>
-                                </ModalBody>
-                            </ModalContent>
-                        </Modal>
-                    </>
+                        {/*<Modal isOpen={isOpen} onClose={onClose}>*/}
+                        {/*    <ModalOverlay />*/}
+                        {/*    <ModalContent>*/}
+                        {/*        <ModalHeader>Choose Your Wallet</ModalHeader>*/}
+                        {/*        <ModalCloseButton />*/}
+                        {/*        <ModalBody>*/}
+                        {/*            <div className="container">*/}
+                        {/*            <div className="provider">*/}
+                        {/*            <Image onClick={() => (handleClickConnect("metamask-injected"))} src="./images/metamask.png" />*/}
+                        {/*            </div>*/}
+                        {/*            <div className="provider">*/}
+                        {/*            <Image onClick={() => (handleClickConnect("defiwallet"))} src="./images/defiwallet.png" />*/}
+                        {/*            </div>*/}
+                        {/*            <div className="provider-right">*/}
+                        {/*            <Image onClick={() => (handleClickConnect("wallet-connect"))} src="./images/walletconnect-icon.png" />*/}
+                        {/*            </div>*/}
+                        {/*            </div>*/}
+                        {/*        </ModalBody>*/}
+                        {/*    </ModalContent>*/}
+                        {/*</Modal>*/}
                     {/*<Menu>*/}
                     {/*    <MenuButton as={Button}>Connect</MenuButton>*/}
                     {/*    <MenuList>*/}
