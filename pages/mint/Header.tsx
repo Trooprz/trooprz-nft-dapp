@@ -7,6 +7,8 @@ import * as utils from "../../helpers/utils";
 import * as walletMetamask from "../../helpers/wallet-metamask";
 import * as walletDefiwallet from "../../helpers/wallet-defiwallet";
 import * as walletConnect from "../../helpers/wallet-connect";
+import * as walletWeb3Modal from "../../helpers/web3modal-connect"
+import providerOptions from "../../config/ProviderOptions"
 
 import {
     updateQueryResultsAction,
@@ -36,7 +38,6 @@ import {
 import {ethers} from "ethers";
 import {useEffect, useState} from "react";
 import Web3Modal from "web3modal";
-import providerOptions from "../../config/ProviderOptions";
 
 declare global {
     interface Window {
@@ -53,7 +54,9 @@ const Header: React.FC<IProps> = () => {
     const open = Boolean(anchorEl);
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [provider, setProvider] = useState();
-    const [library, setLibrary] = useState();
+    const [library, setLibrary] = useState(null);
+    const [userAddress, setAddress] = useState("")
+
     let web3Modal;
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
@@ -62,12 +65,12 @@ const Header: React.FC<IProps> = () => {
         })
     }
 
-    useEffect(() => {
-
-        if (web3Modal.cachedProvider) {
-            connect();
-        }
-    })
+    // useEffect(() => {
+    //
+    //     if (web3Modal.cachedProvider) {
+    //         walletWeb3Modal.connect();
+    //     }
+    // })
     // Uncomment this to auto-connect in MetaMask in-app browser
     // React.useEffect(() => {
     //   async function initialLoad() {
@@ -76,15 +79,41 @@ const Header: React.FC<IProps> = () => {
     //   initialLoad();
     // }, []);
 
-    async function connect() {
-        try {
-            const provider = await web3Modal.connect();
-            const library = new ethers.providers.Web3Provider(provider);
-            setProvider(provider);
-            setLibrary(library);
-        } catch (error) {
-            console.error(error);
+    const handleConnect = async () => {
+        let newWallet: any;
+        newWallet = await walletWeb3Modal.connect();
+        if (newWallet.connected) {
+            const croBalance = await utils.getCroBalance(
+                newWallet.browserWeb3Provider,
+                newWallet.address
+            );
+            const erc20Balance = await utils.getBalance(
+                newWallet.browserWeb3Provider,
+                newWallet.address
+            );
+            updateWalletAction(dispatch, newWallet);
+            updateQueryResultsAction(dispatch, {
+                ...defaultQueryResults,
+                croBalance: croBalance,
+                erc20Balance: erc20Balance,
+            });
         }
+        updateRefreshingAction(dispatch, {
+            status: false,
+            message: "Complete",
+        });
+        handleClose();
+        // try {
+        //     const provider = await web3Modal.connect();
+        //     await web3Modal.toggleModal();
+        //     const ethersProvider = new ethers.providers.Web3Provider(provider);
+        //     const userAddress = await ethersProvider.getSigner().getAddress();
+        //     setAddress(userAddress);
+        //     setProvider(provider);
+        //     setLibrary(library);
+        // } catch (error) {
+        //     console.error(error);
+        // }
     }
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -119,9 +148,6 @@ const Header: React.FC<IProps> = () => {
         }
         // If wallet is connected, query the blockchain and update stored values
         if (newWallet.connected) {
-            const lastBlockNumber = await utils.getLastBlockNumber(
-                newWallet.serverWeb3Provider
-            );
             const croBalance = await utils.getCroBalance(
                 newWallet.serverWeb3Provider,
                 newWallet.address
@@ -133,7 +159,6 @@ const Header: React.FC<IProps> = () => {
             updateWalletAction(dispatch, newWallet);
             updateQueryResultsAction(dispatch, {
                 ...defaultQueryResults,
-                lastBlockNumber: lastBlockNumber,
                 croBalance: croBalance,
                 erc20Balance: erc20Balance,
             });
@@ -178,16 +203,17 @@ const Header: React.FC<IProps> = () => {
         } else {
             return (
                 <div>
-                    <Button onClick={connect}>Connect</Button>
-                    <Button onClick={() => {
-                        handleClickConnect("metamask-injected");
-                    }}>Metamask</Button>{' '}
-                    <Button onClick={() => {
-                        handleClickConnect("defiwallet");
-                    }}>CDC Defi Wallet</Button>{' '}
-                    <Button onClick={() => {
-                        handleClickConnect("wallet-connect");
-                    }}>WalletConnect (mobile)</Button>
+                    <Button onClick={() => handleConnect()}>Connect</Button>
+                    {/*<Button onClick={() => {*/}
+                    {/*    handleClickConnect("metamask-injected");*/}
+                    {/*}}>Metamask</Button>{' '}*/}
+                    {/*<Button onClick={() => {*/}
+                    {/*    handleClickConnect("defiwallet");*/}
+                    {/*}}>CDC Defi Wallet</Button>{' '}*/}
+                    {/*<Button onClick={() => {*/}
+                    {/*    handleClickConnect("wallet-connect");*/}
+                    {/*}}>WalletConnect (mobile)</Button><br/>*/}
+                    <p>{userAddress}</p>
                     {/*<Button onClick={onOpen}>Connect</Button>*/}
 
                     {/*<Modal isOpen={isOpen} onClose={onClose}>*/}

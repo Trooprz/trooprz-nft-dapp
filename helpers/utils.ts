@@ -23,14 +23,9 @@ export const reloadApp = () => {
     window.location.reload();
 };
 
-// Get the last block number
-export const getLastBlockNumber = async (ethersProvider: any): Promise<any> => {
-    return ethersProvider.getBlockNumber();
-};
-
 // Get the CRO balance of address
 export const getCroBalance = async (
-    serverWeb3Provider: ethers.providers.JsonRpcProvider,
+    serverWeb3Provider,
     address: string
 ): Promise<number> => {
     const balance = await serverWeb3Provider.getBalance(address);

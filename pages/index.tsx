@@ -3,9 +3,7 @@ import styles from '../styles/Home.module.css'
 import React, {useEffect, useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction} from "../store/actions";
-import Link from "next/link";
 import { Image } from '@chakra-ui/react';
-import Web3Modal from "web3modal";
 
 
 import * as config from "../config/config";
@@ -20,7 +18,6 @@ import {
     NumberInputStepper, Spinner
 } from "@chakra-ui/react";
 import Header from "./mint/Header";
-import providerOptions from "../config/ProviderOptions";
 
 interface IProps {
 }
@@ -269,12 +266,6 @@ const Home: React.FC<IProps> = () => {
                                 <p>
                                     Cronos address:{" "}
                                     {state.wallet.address ? state.wallet.address : "Not connected"}
-                                </p>
-                                <p>
-                                    Wallet provider:{" "}
-                                    {state.wallet.walletProviderName
-                                        ? state.wallet.walletProviderName
-                                        : "Not connected"}
                                 </p>
                                 <p>
                                     Balance: {state.queryResults.croBalance}
