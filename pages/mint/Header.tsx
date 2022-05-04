@@ -33,6 +33,10 @@ import {
     ModalFooter,
     useDisclosure, Image,
 } from '@chakra-ui/react'
+import {ethers} from "ethers";
+import {useEffect, useState} from "react";
+import Web3Modal from "web3modal";
+import providerOptions from "../../config/ProviderOptions";
 
 declare global {
     interface Window {
@@ -47,8 +51,23 @@ const Header: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const [provider, setProvider] = useState();
+    const [library, setLibrary] = useState();
+    let web3Modal;
+    if (typeof window !== 'undefined') {
+        web3Modal = new Web3Modal({
+            cacheProvider: true,
+            providerOptions
+        })
+    }
 
+    useEffect(() => {
+
+        if (web3Modal.cachedProvider) {
+            connect();
+        }
+    })
     // Uncomment this to auto-connect in MetaMask in-app browser
     // React.useEffect(() => {
     //   async function initialLoad() {
@@ -56,6 +75,17 @@ const Header: React.FC<IProps> = () => {
     //   }
     //   initialLoad();
     // }, []);
+
+    async function connect() {
+        try {
+            const provider = await web3Modal.connect();
+            const library = new ethers.providers.Web3Provider(provider);
+            setProvider(provider);
+            setLibrary(library);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -148,31 +178,38 @@ const Header: React.FC<IProps> = () => {
         } else {
             return (
                 <div>
-                        <Button onClick={() => {handleClickConnect("metamask-injected");}}>Metamask</Button>{' '}
-                        <Button onClick={() => {handleClickConnect("defiwallet");}}>CDC Defi Wallet</Button>{' '}
-                        <Button onClick={() => {handleClickConnect("wallet-connect");}}>WalletConnect (mobile)</Button>
-                        {/*<Button onClick={onOpen}>Connect</Button>*/}
+                    <Button onClick={connect}>Connect</Button>
+                    <Button onClick={() => {
+                        handleClickConnect("metamask-injected");
+                    }}>Metamask</Button>{' '}
+                    <Button onClick={() => {
+                        handleClickConnect("defiwallet");
+                    }}>CDC Defi Wallet</Button>{' '}
+                    <Button onClick={() => {
+                        handleClickConnect("wallet-connect");
+                    }}>WalletConnect (mobile)</Button>
+                    {/*<Button onClick={onOpen}>Connect</Button>*/}
 
-                        {/*<Modal isOpen={isOpen} onClose={onClose}>*/}
-                        {/*    <ModalOverlay />*/}
-                        {/*    <ModalContent>*/}
-                        {/*        <ModalHeader>Choose Your Wallet</ModalHeader>*/}
-                        {/*        <ModalCloseButton />*/}
-                        {/*        <ModalBody>*/}
-                        {/*            <div className="container">*/}
-                        {/*            <div className="provider">*/}
-                        {/*            <Image onClick={() => (handleClickConnect("metamask-injected"))} src="./images/metamask.png" />*/}
-                        {/*            </div>*/}
-                        {/*            <div className="provider">*/}
-                        {/*            <Image onClick={() => (handleClickConnect("defiwallet"))} src="./images/defiwallet.png" />*/}
-                        {/*            </div>*/}
-                        {/*            <div className="provider-right">*/}
-                        {/*            <Image onClick={() => (handleClickConnect("wallet-connect"))} src="./images/walletconnect-icon.png" />*/}
-                        {/*            </div>*/}
-                        {/*            </div>*/}
-                        {/*        </ModalBody>*/}
-                        {/*    </ModalContent>*/}
-                        {/*</Modal>*/}
+                    {/*<Modal isOpen={isOpen} onClose={onClose}>*/}
+                    {/*    <ModalOverlay />*/}
+                    {/*    <ModalContent>*/}
+                    {/*        <ModalHeader>Choose Your Wallet</ModalHeader>*/}
+                    {/*        <ModalCloseButton />*/}
+                    {/*        <ModalBody>*/}
+                    {/*            <div className="container">*/}
+                    {/*            <div className="provider">*/}
+                    {/*            <Image onClick={() => (handleClickConnect("metamask-injected"))} src="./images/metamask.png" />*/}
+                    {/*            </div>*/}
+                    {/*            <div className="provider">*/}
+                    {/*            <Image onClick={() => (handleClickConnect("defiwallet"))} src="./images/defiwallet.png" />*/}
+                    {/*            </div>*/}
+                    {/*            <div className="provider-right">*/}
+                    {/*            <Image onClick={() => (handleClickConnect("wallet-connect"))} src="./images/walletconnect-icon.png" />*/}
+                    {/*            </div>*/}
+                    {/*            </div>*/}
+                    {/*        </ModalBody>*/}
+                    {/*    </ModalContent>*/}
+                    {/*</Modal>*/}
                     {/*<Menu>*/}
                     {/*    <MenuButton as={Button}>Connect</MenuButton>*/}
                     {/*    <MenuList>*/}

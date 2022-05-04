@@ -4,12 +4,13 @@ import React, {useEffect, useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction} from "../store/actions";
 import Link from "next/link";
-import { Image } from '@chakra-ui/react'
+import { Image } from '@chakra-ui/react';
+import Web3Modal from "web3modal";
 
 
 import * as config from "../config/config";
 import * as utils from "../helpers/utils";
-import {BigNumber} from "ethers";
+import {BigNumber, ethers} from "ethers";
 import {
     Button, Center,
     NumberDecrementStepper,
@@ -19,6 +20,7 @@ import {
     NumberInputStepper, Spinner
 } from "@chakra-ui/react";
 import Header from "./mint/Header";
+import providerOptions from "../config/ProviderOptions";
 
 interface IProps {
 }
@@ -33,6 +35,7 @@ const Home: React.FC<IProps> = () => {
     const [mint, setMint] = useState(false);
     const [showTrooprz, setShowTrooprz] = useState(false);
     const [ineligibleTokensInWallet, setIneligibleTokensInWallet] = useState([]);
+
 
     useEffect(() => {
         const fetchAmountOfTokensInWallet = async () => {
