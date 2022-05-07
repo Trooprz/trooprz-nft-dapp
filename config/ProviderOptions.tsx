@@ -9,12 +9,6 @@ const providerOptions = {
             rpc: {
                 25: "https://evm.cronos.org/",
             },
-            qrcodeModalOptions: {
-                mobileLinks: [
-                    "defiwallet",
-                    "metamask"
-                ],
-            },
             chainId: 25,
             network: "cronos",
             qrcode: true
