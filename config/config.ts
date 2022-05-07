@@ -28,9 +28,9 @@ export const configVars = {
     blockExplorerUrl: "https://cronoscan.com/",
   },
   erc20: {
-    address: "0x96628048830a499b156aBdC04cC169C18c3A17f2", // on Cronos Testnet
-    superMonkehzAddress: "0x7B281B5045e43D14590C57468f78c722a350A461",
-    address_mainnet: "0xecee7183cb41f382972d436862d690a71520318a", // on Cronos Mainnet
+    address: "0xb086E2De2893b1e5d9b9A0b4F028dEfdaa2fE393", // on Cronos Testnet
+    superMonkehzAddress: "0xea4DF145322ec9dFCE037b062b08083141c6af8f",
+    address_mainnet: "0xb086E2De2893b1e5d9b9A0b4F028dEfdaa2fE393", // on Cronos Mainnet
   },
   logo: {
     defiwallet:

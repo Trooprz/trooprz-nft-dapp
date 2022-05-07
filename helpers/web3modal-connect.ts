@@ -19,6 +19,7 @@ export const connect = async (): Promise<IWalletWeb3Modal> => {
         localStorage.clear();
         web3Modal.clearCachedProvider();
         const provider = await web3Modal.connect();
+        await web3Modal.toggleModal();
         const ethersProvider = new ethers.providers.Web3Provider(provider);
         const signer = ethersProvider.getSigner();
         console.log(signer)

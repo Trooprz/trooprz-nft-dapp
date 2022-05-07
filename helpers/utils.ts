@@ -5,7 +5,7 @@ import Bacteria from "../artifacts/Bacteria.json";
 import SuperMonkehz from "../artifacts/Monkehz.json";
 
 // NOTE: Make sure to change this to the contract address you deployed
-const bacteriaAddress = '0x96628048830a499b156aBdC04cC169C18c3A17f2'
+const bacteriaAddress = '0xb086E2De2893b1e5d9b9A0b4F028dEfdaa2fE393'
 // ABI so the web3 library knows how to interact with our contract
 const bacteriaABI = Bacteria.abi
 let tokensInWallet = [];

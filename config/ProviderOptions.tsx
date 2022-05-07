@@ -7,10 +7,10 @@ const providerOptions = {
         package: WalletConnect,
         options: {
             rpc: {
-                338: "https://cronos-testnet-3.crypto.org:8545/",
+                25: "https://evm.cronos.org/",
             },
-            chainId: 338,
-            network: "cronos-testnet",
+            chainId: 25,
+            network: "cronos",
             qrcode: true
         }
     },
@@ -23,13 +23,13 @@ const providerOptions = {
         options: {
             rpc: {
                 25: "https://evm.cronos.org/",
-                338: "https://cronos-testnet-3.crypto.org:8545/",}
+                }
         },
         package: DefiWalletConnectProvider,
         connector: async () => {
             const connector = new DeFiWeb3Connector({
-                supportedChainIds: [338],
-                rpc: { 338: 'https://cronos-testnet-3.crypto.org:8545/' },
+                supportedChainIds: [25],
+                rpc: { 25: 'https://evm.cronos.org/' },
                 pollingInterval: 15000,
             });
             await connector.activate();
