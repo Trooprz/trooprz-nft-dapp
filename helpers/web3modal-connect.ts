@@ -1,4 +1,3 @@
-// wallet-connect.ts
 import { ethers } from "ethers"; // npm install ethers
 import providerOptions from "../config/ProviderOptions"
 import Web3Modal from "web3modal";
