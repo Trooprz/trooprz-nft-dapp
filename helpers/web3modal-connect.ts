@@ -4,7 +4,6 @@ import Web3Modal from "web3modal";
 
 import * as utils from "./utils";
 import {IWallet, defaultWallet, defaultWalletWeb3Modal, IWalletWeb3Modal} from "../store/interfaces";
-import {sign} from "crypto";
 
 export const connect = async (): Promise<IWalletWeb3Modal> => {
 
@@ -18,6 +17,7 @@ export const connect = async (): Promise<IWalletWeb3Modal> => {
     try {
         // Reset cache
         localStorage.clear();
+        web3Modal.clearCachedProvider();
         const provider = await web3Modal.connect();
         const ethersProvider = new ethers.providers.Web3Provider(provider);
         const signer = ethersProvider.getSigner();
