@@ -78,7 +78,7 @@ const Home: React.FC<IProps> = () => {
             message: "Sending transaction...",
         });
         const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
-            state.walletWeb3Modal.browserWeb3Provider,
+            state.walletWeb3Modal.provider,
         );
         const tx = await bacteriaWriteContractInstance["claimAll"](
             tokensInWallet
