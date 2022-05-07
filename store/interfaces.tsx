@@ -53,6 +53,8 @@ export interface IWalletWeb3Modal {
   address: string;
   web3: any;
   provider: any;
+  wcProvider: any;
+  signer: any;
   connected: boolean;
   chainId: number;
   networkId: number;
@@ -67,6 +69,8 @@ export const defaultWalletWeb3Modal: IWalletWeb3Modal = {
   address: "",
   web3: null,
   provider: null,
+  wcProvider: null,
+  signer: null,
   connected: false,
   chainId: 1,
   networkId: 1,
@@ -89,6 +93,8 @@ export interface IQueryResults {
   croBalance: number;
   erc20Balance: number;
   lastTxHash: string;
+  provider: null,
+  signer: null
 }
 
 export const defaultQueryResults: IQueryResults = {
@@ -96,4 +102,6 @@ export const defaultQueryResults: IQueryResults = {
   croBalance: 0,
   erc20Balance: 0,
   lastTxHash: "",
+  provider: null,
+  signer: null
 };

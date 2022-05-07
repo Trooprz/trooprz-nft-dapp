@@ -1,20 +1,13 @@
 // wallet-connect.ts
 import { ethers } from "ethers"; // npm install ethers
 import providerOptions from "../config/ProviderOptions"
-import {useEffect, useState} from "react";
 import Web3Modal from "web3modal";
 
-// This is the SDK provided by Wallet Connect
-import WalletConnectProvider from "@walletconnect/web3-provider";
-
-import * as config from "../config/config";
 import * as utils from "./utils";
-import { IWallet, defaultWallet } from "../store/interfaces";
+import {IWallet, defaultWallet, defaultWalletWeb3Modal, IWalletWeb3Modal} from "../store/interfaces";
+import {sign} from "crypto";
 
-// Main login flow for Crypto.com DeFi Wallet with Wallet Extension
-// The connector must be activated, then it exposes a provider
-// that is used by the ethers Web3Provider constructor.
-export const connect = async (): Promise<IWallet> => {
+export const connect = async (): Promise<IWalletWeb3Modal> => {
 
     let web3Modal;
     if (typeof window !== 'undefined') {
@@ -27,8 +20,9 @@ export const connect = async (): Promise<IWallet> => {
         // Reset cache
         localStorage.clear();
         const provider = await web3Modal.connect();
-        await web3Modal.toggleModal();
         const ethersProvider = new ethers.providers.Web3Provider(provider);
+        const signer = ethersProvider.getSigner();
+        console.log(signer)
         ethersProvider.on("accountsChanged", utils.reloadApp);
         ethersProvider.on("chainChanged", utils.reloadApp);
         ethersProvider.on("disconnect", utils.reloadApp);
@@ -55,15 +49,15 @@ export const connect = async (): Promise<IWallet> => {
 
         // Subscribe to events that reload the app
         return {
-            ...defaultWallet,
-            walletProviderName: ethers.providers.Web3Provider.toString(),
-            address: (await ethersProvider.listAccounts())[0],
-            browserWeb3Provider: ethersProvider,
-            wcProvider: provider,
+            ...defaultWalletWeb3Modal,
+            address: await signer.getAddress(),
+             // address: ethers.utils.getAddress("0x14B778414f5af90ec78bc6475E587A344b99db1f"),
+            provider: ethersProvider,
+            signer: signer,
             connected: true,
         };
     } catch (e) {
         window.alert(e);
-        return defaultWallet;
+        return defaultWalletWeb3Modal;
     }
 };

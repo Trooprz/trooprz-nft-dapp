@@ -1,15 +1,18 @@
-import WalletConnectProvider from "@walletconnect/web3-provider";
+import WalletConnect from "@walletconnect/web3-provider";
 import {DeFiWeb3Connector} from "deficonnect";
 import DefiWalletConnectProvider from "@deficonnect/web3-provider";
 
 const providerOptions = {
     walletconnect: {
-        package: WalletConnectProvider, // required
+        package: WalletConnect,
         options: {
             rpc: {
-                25: "https://evm.cronos.org/"}
-        },
-        chainId: 25
+                338: "https://cronos-testnet-3.crypto.org:8545/",
+            },
+            chainId: 338,
+            network: "cronos-testnet",
+            qrcode: true
+        }
     },
     'custom-defiwallet': {
         display: {
@@ -17,17 +20,20 @@ const providerOptions = {
             name: 'Crypto.com DeFi Wallet',
             description: 'Connect with the CDC DeFi Wallet',
         },
-        options: {},
+        options: {
+            rpc: {
+                25: "https://evm.cronos.org/",
+                338: "https://cronos-testnet-3.crypto.org:8545/",}
+        },
         package: DefiWalletConnectProvider,
-        connector: async (ProviderPackage, options) => {
+        connector: async () => {
             const connector = new DeFiWeb3Connector({
-                supportedChainIds: [25],
-                rpc: { 25: 'https://gateway.nebkas.ro' },
+                supportedChainIds: [338],
+                rpc: { 338: 'https://cronos-testnet-3.crypto.org:8545/' },
                 pollingInterval: 15000,
             });
             await connector.activate();
-            let provider = await connector.getProvider();
-            return provider;
+            return await connector.getProvider();
         },
     },
 };

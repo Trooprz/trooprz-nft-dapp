@@ -3,7 +3,9 @@ import styles from '../styles/Home.module.css'
 import React, {useEffect, useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction} from "../store/actions";
-import { Image } from '@chakra-ui/react';
+import {Box, Image} from '@chakra-ui/react';
+import bgWrap from '../styles/Home.module.css';
+
 
 
 import * as config from "../config/config";
@@ -36,13 +38,13 @@ const Home: React.FC<IProps> = () => {
 
     useEffect(() => {
         const fetchAmountOfTokensInWallet = async () => {
-            const data = await utils.getTokens(state.wallet.browserWeb3Provider, state.wallet.address, state.queryResults.erc20Balance);
+            const data = await utils.getTokens(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
             setTokensInWallet(data);
         }
         fetchAmountOfTokensInWallet().catch(console.error);
 
         const fetchIneligibleTokensInWallet = async () => {
-            const data = await utils.getIneligibleTokens(state.wallet.browserWeb3Provider, state.wallet.address, state.queryResults.erc20Balance);
+            const data = await utils.getIneligibleTokens(state.walletWeb3Modal.browserWeb3Provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
             setIneligibleTokensInWallet(data);
         }
         fetchIneligibleTokensInWallet().catch(console.error);
@@ -55,7 +57,7 @@ const Home: React.FC<IProps> = () => {
             message: "Sending transaction...",
         });
         const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
-            state.wallet.browserWeb3Provider
+            state.walletWeb3Modal.browserWeb3Provider
         );
         const tx = await bacteriaWriteContractInstance["claim"](
             id
@@ -76,7 +78,7 @@ const Home: React.FC<IProps> = () => {
             message: "Sending transaction...",
         });
         const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
-            state.wallet.browserWeb3Provider
+            state.walletWeb3Modal.browserWeb3Provider,
         );
         const tx = await bacteriaWriteContractInstance["claimAll"](
             tokensInWallet
@@ -97,7 +99,7 @@ const Home: React.FC<IProps> = () => {
             message: "Sending transaction...",
         });
         const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
-            state.wallet.browserWeb3Provider
+            state.walletWeb3Modal.provider,
         );
         const tx = await bacteriaWriteContractInstance["mint"](amount, {value: cost.mul(amount)});
         updateRefreshingAction(dispatch, {
@@ -111,7 +113,7 @@ const Home: React.FC<IProps> = () => {
     };
 
     const renderActionButtons = () => {
-        if (state.wallet.connected) {
+        if (state.walletWeb3Modal.connected) {
             return (
                 <div>
                 <div>
@@ -158,7 +160,7 @@ const Home: React.FC<IProps> = () => {
     };
 
     const renderOwnedSuperTrooprz = () => {
-        if (state.wallet.connected) {
+        if (state.walletWeb3Modal.connected) {
             if (tokensInWallet && tokensInWallet.length == 0 && showTrooprz && ineligibleTokensInWallet && ineligibleTokensInWallet.length == 0) {
                 return <Center>
                     <Spinner/>
@@ -193,7 +195,7 @@ const Home: React.FC<IProps> = () => {
     }
 
     const renderIneligibleSuperTrooprz = () => {
-        if (state.wallet.connected) {
+        if (state.walletWeb3Modal.connected) {
             if (ineligibleTokensInWallet && ineligibleTokensInWallet.length > 0) {
                 return (
                     <p>You have {ineligibleTokensInWallet.length} in your wallet</p>
@@ -225,25 +227,30 @@ const Home: React.FC<IProps> = () => {
 
     // This is used to display more details about the Redux state on the web page, for debugging purposes
     // You can activate by changing the mode to "debug" in config/config.ts
-    const renderDebugInfo = () => {
-        if (config.configVars.mode === "debug") {
-            return (
-                <p>
-                    Debug info:{" "}
-                    {JSON.stringify({
-                        walletProviderName: state.wallet.walletProviderName,
-                        address: state.wallet.address,
-                        chainId: state.wallet.chaindId,
-                        connected: state.wallet.connected,
-                        ...state.queryResults,
-                    })}
-                </p>
-            );
-        } else {
-            return null;
-        }
-    };
+    // const renderDebugInfo = () => {
+    //     if (config.configVars.mode === "debug") {
+    //         return (
+    //             <p>
+    //                 Debug info:{" "}
+    //                 {JSON.stringify({
+    //                     walletProviderName: state.wallet.walletProviderName,
+    //                     address: state.wallet.address,
+    //                     chainId: state.wallet.chaindId,
+    //                     connected: state.wallet.connected,
+    //                     ...state.queryResults,
+    //                 })}
+    //             </p>
+    //         );
+    //     } else {
+    //         return null;
+    //     }
+    // };
     return (
+        <Box
+            backgroundImage="url('/images/miCRObe-tile_background.png')"
+            backgroundPosition="center"
+            backgroundRepeat="repeat"
+        >
         <div className={'image-container'}>
             <Head>
                 <title>Troopz dApp</title>
@@ -252,20 +259,20 @@ const Home: React.FC<IProps> = () => {
             </Head>
             <Center>
                 <main className={styles.main}>
-                    <Image src="/images/header-graphic.png" />
+                    <Image src="/images/Microbes_Logo_Green.png" />
                     <h1 className={styles.title}>
                         The Trooprz minting platform!
                     </h1>
                     <div><br/>
                         <Header/>
-                        {state.wallet.connected &&
+                        {state.walletWeb3Modal.connected &&
                             <div>
                                 <p>
                                     Welcome!
                                 </p>
                                 <p>
                                     Cronos address:{" "}
-                                    {state.wallet.address ? state.wallet.address : "Not connected"}
+                                    {state.walletWeb3Modal.address ? state.walletWeb3Modal.address : "Not connected"}
                                 </p>
                                 <p>
                                     Balance: {state.queryResults.croBalance}
@@ -296,7 +303,8 @@ const Home: React.FC<IProps> = () => {
           </span>
                 </a>
             </footer>
-        </div>
+                </div>
+        </Box>
     );
 }
 export default Home;

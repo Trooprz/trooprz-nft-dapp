@@ -3,7 +3,6 @@ import {BigNumber, ethers} from "ethers"; // npm install ethers
 import * as config from "../config/config";
 import Bacteria from "../artifacts/Bacteria.json";
 import SuperMonkehz from "../artifacts/Monkehz.json";
-import {forEachToken} from "tsutils";
 
 // NOTE: Make sure to change this to the contract address you deployed
 const bacteriaAddress = '0x96628048830a499b156aBdC04cC169C18c3A17f2'
@@ -26,6 +25,7 @@ export const reloadApp = () => {
 // Get the CRO balance of address
 export const getCroBalance = async (
     serverWeb3Provider,
+    signer,
     address: string
 ): Promise<number> => {
     const balance = await serverWeb3Provider.getBalance(address);
@@ -39,7 +39,7 @@ export const getCroBalance = async (
 
 // Get the amount of Bacteria of address
 export const getTokenBalance = async (
-    serverWeb3Provider: ethers.providers.JsonRpcProvider,
+    serverWeb3Provider,
 ): Promise<number> => {
     const contract = new ethers.Contract(
         bacteriaAddress,
@@ -58,7 +58,7 @@ export const getTokenBalance = async (
 // the config/config.ts file
 // and the ABI from config/contracts/Bacteria.json
 export const getBalance = async (
-    serverWeb3Provider: ethers.providers.JsonRpcProvider,
+    serverWeb3Provider,
     address: string
 ): Promise<number> => {
     // Create ethers.Contract object using the smart contract's ABI
@@ -76,7 +76,7 @@ export const getBalance = async (
 };
 
 export const getTokens = async (
-    serverWeb3Provider: ethers.providers.JsonRpcProvider,
+    serverWeb3Provider,
     address: string,
     amount
 ): Promise<String[]> => {
@@ -106,7 +106,7 @@ export const getTokens = async (
 };
 
 export const getIneligibleTokens = async (
-    serverWeb3Provider: ethers.providers.JsonRpcProvider,
+    serverWeb3Provider,
     address: string,
     amount
 ): Promise<String[]> => {
@@ -139,17 +139,18 @@ export const getIneligibleTokens = async (
 // together with a signer that will trigger a transaction
 // approval in the wallet whenever it is called by the Dapp
 export const getWriteContractInstance = async (
-    browserWeb3Provider: any
+    browserWeb3Provider: any,
 ): Promise<ethers.Contract> => {
-    const ethersProvider = browserWeb3Provider;
     // Create ethers.Contract object using the smart contract's ABI
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.address,
         bacteriaABI,
-        ethersProvider
+        browserWeb3Provider
     );
+    console.log(browserWeb3Provider)
+    const signer = browserWeb3Provider.getSigner();
+
     // Add a signer to make the ethers.Contract object able
     // to craft transactions
-    const fromSigner = ethersProvider.getSigner();
-    return readContractInstance.connect(fromSigner);
+    return readContractInstance.connect(signer);
 };
