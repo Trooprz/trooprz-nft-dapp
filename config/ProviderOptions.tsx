@@ -11,7 +11,7 @@ const providerOptions = {
             },
             qrcodeModalOptions: {
                 mobileLinks: [
-                    "custom-defiwallet",
+                    "defiwallet",
                     "metamask"
                 ],
             },
@@ -26,13 +26,9 @@ const providerOptions = {
             name: 'Crypto.com DeFi Wallet',
             description: 'Connect with the CDC DeFi Wallet',
         },
-        options: {
-            rpc: {
-                25: "https://evm.cronos.org/",
-                }
-        },
+        options: {},
         package: DefiWalletConnectProvider,
-        connector: async () => {
+        connector: async (ProviderPackage, options) => {
             const connector = new DeFiWeb3Connector({
                 supportedChainIds: [25],
                 rpc: { 25: 'https://evm.cronos.org/' },
