@@ -29,7 +29,7 @@ export const configVars = {
   },
   erc20: {
     address: "0xb086E2De2893b1e5d9b9A0b4F028dEfdaa2fE393", // on Cronos Testnet
-    superMonkehzAddress: "0xea4DF145322ec9dFCE037b062b08083141c6af8f",
+    superTrooprzAddress: "0xea4DF145322ec9dFCE037b062b08083141c6af8f",
     address_mainnet: "0xb086E2De2893b1e5d9b9A0b4F028dEfdaa2fE393", // on Cronos Mainnet
   },
   logo: {

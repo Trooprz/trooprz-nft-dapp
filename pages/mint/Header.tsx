@@ -9,15 +9,14 @@ import providerOptions from "../../config/ProviderOptions"
 import {
     updateQueryResultsAction,
     updateRefreshingAction,
-    updateWalletAction, updateWalletWeb3ModalAction,
+    updateWalletWeb3ModalAction,
 } from "../../store/actions";
-import {defaultQueryResults, defaultWallet, defaultWalletWeb3Modal} from "../../store/interfaces";
+import {defaultQueryResults, defaultWalletWeb3Modal} from "../../store/interfaces";
 import {
     Button,
-    useDisclosure, Image,
+    Center,
 } from '@chakra-ui/react'
-import {ethers} from "ethers";
-import {useEffect, useState} from "react";
+
 import Web3Modal from "web3modal";
 
 declare global {
@@ -31,46 +30,24 @@ interface IProps {
 
 const Header: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const {isOpen, onOpen, onClose} = useDisclosure();
-    const [provider, setProvider] = useState();
-    const [library, setLibrary] = useState(null);
-    const [userAddress, setAddress] = useState("")
 
     let web3Modal;
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
-            cacheProvider: true,
             providerOptions
         })
     }
 
-    // useEffect(() => {
-    //
-    //     if (web3Modal.cachedProvider) {
-    //         walletWeb3Modal.connect();
-    //     }
-    // })
-    // Uncomment this to auto-connect in MetaMask in-app browser
-    // React.useEffect(() => {
-    //   async function initialLoad() {
-    //     activate(injectedConnector);
-    //   }
-    //   initialLoad();
-    // }, []);
-
     const handleConnect = async () => {
         let newWallet: any;
+        web3Modal.clearCachedProvider();
         newWallet = await walletWeb3Modal.connect();
         if (newWallet.connected) {
-                const croBalance = await utils.getCroBalance(
+            const croBalance = await utils.getCroBalance(
                     newWallet.provider,
                     newWallet.signer,
                     newWallet.address
                 );
-                console.log(newWallet.address);
-            console.log(croBalance);
             const erc20Balance = await utils.getBalance(
                 newWallet.provider,
                 newWallet.address
@@ -88,153 +65,49 @@ const Header: React.FC<IProps> = () => {
                 status: false,
                 message: "Complete",
             });
-            handleClose();
-            try {
-                const provider = await web3Modal.connect();
-                const ethersProvider = new ethers.providers.Web3Provider(provider);
-                const userAddress = await ethersProvider.getSigner().getAddress();
-                setAddress(userAddress);
-                setProvider(provider);
-                setLibrary(library);
-            } catch (error) {
-                console.error(error);
-            }
     }
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    // const handleClickConnect = async (option: string) => {
-    //     updateRefreshingAction(dispatch, {
-    //         status: true,
-    //         message: "Connecting wallet...",
-    //     });
-    //     let newWallet: any;
-    //     switch (option) {
-    //         // Wallet injected within browser (MetaMask)
-    //         case "metamask-injected":
-    //             newWallet = await walletMetamask.connect();
-    //             break;
-    //         // Crypto.com DeFi Wallet Extension (browser)
-    //         case "defiwallet":
-    //             newWallet = await walletDefiwallet.connect();
-    //             break;
-    //         // Crypto.com DeFi Wallet mobile app (via Wallet Connect)
-    //         case "wallet-connect":
-    //             newWallet = await walletConnect.connect();
-    //             break;
-    //         default:
-    //             newWallet = await walletMetamask.connect();
-    //     }
-    //     // If wallet is connected, query the blockchain and update stored values
-    //     if (newWallet.connected) {
-    //         const croBalance = await utils.getCroBalance(
-    //             newWallet.serverWeb3Provider,
-    //             newWallet.address
-    //         );
-    //         const erc20Balance = await utils.getBalance(
-    //             newWallet.serverWeb3Provider,
-    //             newWallet.address
-    //         );
-    //         updateWalletAction(dispatch, newWallet);
-    //         updateQueryResultsAction(dispatch, {
-    //             ...defaultQueryResults,
-    //             croBalance: croBalance,
-    //             erc20Balance: erc20Balance,
-    //         });
-    //     }
-    //     updateRefreshingAction(dispatch, {
-    //         status: false,
-    //         message: "Complete",
-    //     });
-    //     handleClose();
-    // };
-
-    // Disconnect wallet clears the data stored by the front-end app
-    // Some wallets can be asked to actually disconnect from the app, but most cannot.
-    // The recommended secure approach is for the user to disconnect their wallet
-    // themselves in the wallet app or browser extension.
     const disconnectWallet = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Disconnecting wallet...",
         });
-        // switch (state.walletWeb3Modal.walletProviderName) {
-        //     case "defiwallet":
-        //         await state.wallet.wcConnector.deactivate();
-        //         break;
-        //     default:
-        // }
         updateRefreshingAction(dispatch, {
             status: false,
             message: "Complete",
         });
         updateWalletWeb3ModalAction(dispatch, {...defaultWalletWeb3Modal});
         updateQueryResultsAction(dispatch, {...defaultQueryResults});
+        web3Modal.clearCachedProvider();
     };
 
     const renderLoginbutton = () => {
         if (state.walletWeb3Modal.connected) {
             return (
-                <Button color="inherit" onClick={disconnectWallet}>
+                <Center>
+                <Button size='md'
+                        height='48px'
+                        width='200px'
+                        border='2px'
+                        bg='#C2DCA5'
+                        borderColor='#4E6840'
+                        _hover={{ bg: '#D6E9CF' }} onClick={disconnectWallet}>
                     Disconnect
                 </Button>
+                </Center>
             );
         } else {
             return (
                 <div>
-                    <Button onClick={() => handleConnect()}>Connect</Button>
-                    {/*<Button onClick={() => {*/}
-                    {/*    handleClickConnect("metamask-injected");*/}
-                    {/*}}>Metamask</Button>{' '}*/}
-                    {/*<Button onClick={() => {*/}
-                    {/*    handleClickConnect("defiwallet");*/}
-                    {/*}}>CDC Defi Wallet</Button>{' '}*/}
-                    {/*<Button onClick={() => {*/}
-                    {/*    handleClickConnect("wallet-connect");*/}
-                    {/*}}>WalletConnect (mobile)</Button><br/>*/}
-                    <p>{userAddress}</p>
-                    {/*<Button onClick={onOpen}>Connect</Button>*/}
-
-                    {/*<Modal isOpen={isOpen} onClose={onClose}>*/}
-                    {/*    <ModalOverlay />*/}
-                    {/*    <ModalContent>*/}
-                    {/*        <ModalHeader>Choose Your Wallet</ModalHeader>*/}
-                    {/*        <ModalCloseButton />*/}
-                    {/*        <ModalBody>*/}
-                    {/*            <div className="container">*/}
-                    {/*            <div className="provider">*/}
-                    {/*            <Image onClick={() => (handleClickConnect("metamask-injected"))} src="./images/metamask.png" />*/}
-                    {/*            </div>*/}
-                    {/*            <div className="provider">*/}
-                    {/*            <Image onClick={() => (handleClickConnect("defiwallet"))} src="./images/defiwallet.png" />*/}
-                    {/*            </div>*/}
-                    {/*            <div className="provider-right">*/}
-                    {/*            <Image onClick={() => (handleClickConnect("wallet-connect"))} src="./images/walletconnect-icon.png" />*/}
-                    {/*            </div>*/}
-                    {/*            </div>*/}
-                    {/*        </ModalBody>*/}
-                    {/*    </ModalContent>*/}
-                    {/*</Modal>*/}
-                    {/*<Menu>*/}
-                    {/*    <MenuButton as={Button}>Connect</MenuButton>*/}
-                    {/*    <MenuList>*/}
-                    {/*        <MenuItem onClick={() => {*/}
-                    {/*            handleClickConnect("metamask-injected");*/}
-                    {/*        }}>Metamask</MenuItem>*/}
-                    {/*        <MenuItem onClick={() => {*/}
-                    {/*            handleClickConnect("wallet-connect");*/}
-                    {/*        }}>Wallet-Connect</MenuItem>*/}
-                    {/*        <MenuItem onClick={() => {*/}
-                    {/*            handleClickConnect("defiwallet");*/}
-                    {/*        }}>Defi Wallet</MenuItem>*/}
-                    {/*    </MenuList>*/}
-                    {/*</Menu>*/}
+                    <Center>
+                    <Button size='md'
+                            height='48px'
+                            width='200px'
+                            border='2px'
+                            bg='#C2DCA5'
+                            borderColor='#4E6840'
+                            _hover={{ bg: '#D6E9CF' }} onClick={() => handleConnect()}>Connect</Button>
+                    </Center>
                 </div>
             );
         }

@@ -20,10 +20,10 @@ a {
 }
 
 .image-container {
-  height: 100vh;
   position: relative;
   background-size: cover;
   background-image: url("../public/images/miCRObe-tile_background.png");
+  background-repeat: space;
   width: 100%;
 }
 
