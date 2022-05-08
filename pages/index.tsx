@@ -27,6 +27,8 @@ const Home: React.FC<IProps> = () => {
     const [usedBefore, setUsedBefore] = useState(false);
     const [idChecked, setIdChecked] = useState(false);
 
+    let claimWallet: any[];
+
 
     useEffect(() => {
         const fetchAmountOfTokensInWallet = async () => {
@@ -63,6 +65,29 @@ const Home: React.FC<IProps> = () => {
         });
     };
 
+    const claimMaxTenMicrobesPerTurn = async () => {
+        updateRefreshingAction(dispatch, {
+            status: true,
+            message: "Sending transaction...",
+        });
+        const microbesWriteContractInstance = await utils.getWriteContractInstance(
+            state.walletWeb3Modal.provider,
+        );
+        const firstTenTokensInWallet = tokensInWallet.slice(0, 10);
+        tokensInWallet.splice(0, 10)
+        const tx = await microbesWriteContractInstance["claimAll"](
+            firstTenTokensInWallet
+        );
+        updateRefreshingAction(dispatch, {
+            status: false,
+            message: "Complete",
+        });
+        updateQueryResultsAction(dispatch, {
+            ...state.queryResults,
+            lastTxHash: tx.hash,
+        });
+    }
+
     const claimAllMicrobes = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
@@ -71,8 +96,17 @@ const Home: React.FC<IProps> = () => {
         const microbesWriteContractInstance = await utils.getWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
+        if (tokensInWallet.length > 20) {
+            for (let i = 0; i < 20; i++) {
+                claimWallet[i] = tokensInWallet[i];
+                tokensInWallet.splice(i, 1);
+            }
+            const slicedTokensInWallet = tokensInWallet.slice(0, 19);
+        } else {
+            claimWallet = tokensInWallet;
+        }
         const tx = await microbesWriteContractInstance["claimAll"](
-            tokensInWallet
+            claimWallet
         );
         updateRefreshingAction(dispatch, {
             status: false,
@@ -121,32 +155,37 @@ const Home: React.FC<IProps> = () => {
             return (
                     <div>
                         <Center>
-                        <Button size='md'
-                                height='48px'
-                                width='200px'
-                                border='2px'
-                                bg='#C2DCA5'
-                                borderColor='#4E6840'
-                                _hover={{ bg: '#D6E9CF' }}onClick={claimAllMicrobes} disabled={canClaim()}>
-                            Claim your miCRObes
-                        </Button></Center><br/>
-                        <NumberInput bg='white'>
-                            <NumberInputField id="idToBeChecked" value={id} onChange={(e) => setId(e.target.value)}/>
-                        </NumberInput><br/>
+                            <Button size='md'
+                                    height='48px'
+                                    width='200px'
+                                    border='2px'
+                                    bg='#C2DCA5'
+                                    borderColor='#4E6840'
+                                    _hover={{bg: '#D6E9CF'}} onClick={claimMaxTenMicrobesPerTurn} disabled={canClaim()}>
+                                Claim your miCRObes
+                            </Button></Center><br/>
                         <Center>
-                        <Button size='md'
-                                height='48px'
-                                width='200px'
-                                border='2px'
-                                bg='#C2DCA5'
-                                borderColor='#4E6840'
-                                _hover={{ bg: '#D6E9CF' }} onClick={() => {checkIfTokenUsedBefore(); setIdChecked(true)}}>Click to check ID</Button>
-                        {idChecked && usedBefore &&
-                            <p>SuperTroopr {id} is eligible for claim</p>}
-                        {idChecked && !usedBefore &&
-                            <p>SuperTroopr {id} is not eligible for claim</p>}
+                            <NumberInput bg='white' width="200px">
+                                <NumberInputField id="idToBeChecked" value={id}
+                                                  onChange={(e) => setId(e.target.value)}/>
+                            </NumberInput><br/><br/>
                         </Center>
-
+                        <Center>
+                            <Button size='md'
+                                    height='48px'
+                                    width='200px'
+                                    border='2px'
+                                    bg='#C2DCA5'
+                                    borderColor='#4E6840'
+                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                checkIfTokenUsedBefore();
+                                setIdChecked(true)
+                            }}>Click to check ID</Button>
+                            {idChecked && usedBefore &&
+                                <p>This SuperTroopr is eligible for claim</p>}
+                            {idChecked && !usedBefore &&
+                                <p>This SuperTroopr is not eligible for claim</p>}
+                        </Center>
                     </div>
             )
                 ;
@@ -174,8 +213,12 @@ const Home: React.FC<IProps> = () => {
                                 <p>
                                     Welcome!
                                 </p>
+                                <p>For performance reasons, we limited the amount of SuperTrooprz used per claim to max
+                                    10.</p>
+                                <p>If you have more, you&lsquo;ll have to claim multiple times. The counter will show
+                                    you how many eligible SuperTrooprz you have left.</p><br/>
                                 <p>
-                                    SuperTroopr amount: {state.queryResults.erc20Balance}
+                                    SuperTrooprz amount: {state.queryResults.erc20Balance}
                                 </p>
                                 {tokensInWallet && tokensInWallet.length > 0 &&
                                     <p>
@@ -184,7 +227,7 @@ const Home: React.FC<IProps> = () => {
                                     </p>}
                                 {tokensInWallet && tokensInWallet.length == 0 &&
                                     <p>You have no eligible SuperTrooprz left (loading this might take a while, hang
-                                        tight!)</p>}
+                                        tight! Contact us if you think it&lsquo;s not correct.)</p>}
                                 {renderActionButtons()}
 
                             </div>}
