@@ -133,7 +133,7 @@ const Home: React.FC<IProps> = () => {
                                 _hover={{ bg: '#D6E9CF' }}onClick={claimAllMicrobes} disabled={canClaim()}>
                             Claim your miCRObes
                         </Button></Center><br/>
-                        <NumberInput bg='white' defaultValue={"Enter the id you want to check"}>
+                        <NumberInput bg='white'>
                             <NumberInputField id="idToBeChecked" value={id} onChange={(e) => setId(e.target.value)}/>
                         </NumberInput><br/>
                         <Center>
@@ -145,9 +145,9 @@ const Home: React.FC<IProps> = () => {
                                 borderColor='#4E6840'
                                 _hover={{ bg: '#D6E9CF' }} onClick={() => {checkIfTokenUsedBefore(); setIdChecked(true)}}>Click to check ID</Button>
                         {idChecked && usedBefore &&
-                        <p>This token is eligible for claim</p>}
+                            <p>SuperTroopr {id} is eligible for claim</p>}
                         {idChecked && !usedBefore &&
-                            <p>This token is not eligible for claim</p>}
+                            <p>SuperTroopr {id} is not eligible for claim</p>}
                         </Center>
 
                     </div>
@@ -167,7 +167,9 @@ const Home: React.FC<IProps> = () => {
                     <link rel="icon" href="/favicon.ico"/>
                 </Head>
                 <main className={styles.main}>
+                    <Box w="50%">
                     <Image src="/images/Microbes_Logo_Green.png"/>
+                    </Box>
                     <div><br/>
                         <Header/>
                         {state.walletWeb3Modal.connected &&
@@ -176,14 +178,7 @@ const Home: React.FC<IProps> = () => {
                                     Welcome!
                                 </p>
                                 <p>
-                                    Cronos address:{" "}
-                                    {state.walletWeb3Modal.address ? state.walletWeb3Modal.address : "Not connected"}
-                                </p>
-                                <p>
-                                    Balance: {state.queryResults.croBalance} CRO
-                                </p>
-                                <p>
-                                    SuperTroopr token balance: {state.queryResults.erc20Balance}
+                                    SuperTroopr amount: {state.queryResults.erc20Balance}
                                 </p>
                                 {tokensInWallet && tokensInWallet.length > 0 &&
                                     <p>
