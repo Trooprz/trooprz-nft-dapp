@@ -1,13 +1,10 @@
-// helper/utils.ts
-import {BigNumber, ethers} from "ethers"; // npm install ethers
+import {BigNumber, ethers} from "ethers";
 import * as config from "../config/config";
-import Virus from "../artifacts/Virus.json";
+import Microbes from "../artifacts/Microbes.json";
 import SuperTrooprz from "../artifacts/SuperTrooprz.json";
 
-// NOTE: Make sure to change this to the contract address you deployed
-const virusAddress = '0xb086E2De2893b1e5d9b9A0b4F028dEfdaa2fE393'
-// ABI so the web3 library knows how to interact with our contract
-const virusABI = Virus.abi
+const microbesAddress = '0xbabdFDD5f88035C9FbA58Be1b5c76DcFC6A847f3'
+const microbesABI = Microbes.abi
 let tokensInWallet = [];
 let ineligibleTokensInWallet = [];
 
@@ -37,13 +34,12 @@ export const getCroBalance = async (
     );
 };
 
-// Get the amount of Virus of address
 export const getTokenBalance = async (
     serverWeb3Provider,
 ): Promise<number> => {
     const contract = new ethers.Contract(
-        virusAddress,
-        virusABI,
+        microbesAddress,
+        microbesABI,
         serverWeb3Provider
     )
     await serverWeb3Provider.send("eth_requestAccounts", []);
@@ -53,10 +49,6 @@ export const getTokenBalance = async (
     return await contractWithSigner.balanceOf(address);
 }
 
-// Get the Virus token balance of address
-// This is a ERC20 smart contract, its address is retrieved from
-// the config/config.ts file
-// and the ABI from config/contracts/Virus.json
 export const getBalance = async (
     serverWeb3Provider,
     address: string
@@ -80,14 +72,14 @@ export const getEligibleTokens = async (
     address: string,
     amount
 ): Promise<String[]> => {
-    const contractAbi = Virus.abi;
+    const contractAbi = Microbes.abi;
     const smContractAbi = SuperTrooprz.abi;
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.superTrooprzAddress,
         smContractAbi,
         serverWeb3Provider
     );
-    const readVirusContractInstance = new ethers.Contract(
+    const readMicrobesContractInstance = new ethers.Contract(
         config.configVars.erc20.address,
         contractAbi,
         serverWeb3Provider
@@ -96,12 +88,11 @@ export const getEligibleTokens = async (
         tokensInWallet[i] = BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toString();
     }
     for (let i = 0; i < tokensInWallet.length; i++) {
-        if (await readVirusContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
+        if (await readMicrobesContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
             tokensInWallet[i] = null;
         }
     }
-    let filtered = tokensInWallet.filter(x => x != null);
-    return filtered;
+    return tokensInWallet.filter(x => x != null);
 };
 
 export const checkIfTokenIsEligible = async (
@@ -109,13 +100,13 @@ export const checkIfTokenIsEligible = async (
     address: string,
     id
 ): Promise<Boolean> => {
-    const contractAbi = Virus.abi;
-    const readVirusContractInstance = new ethers.Contract(
+    const contractAbi = Microbes.abi;
+    const readMicrobesContractInstance = new ethers.Contract(
         config.configVars.erc20.address,
         contractAbi,
         serverWeb3Provider
     );
-    return !!(await readVirusContractInstance["checkIfTokenUsedBefore"](id));
+    return !!(await readMicrobesContractInstance["checkIfTokenUsedBefore"](id));
 };
 
 export const getIneligibleTokens = async (
@@ -123,7 +114,7 @@ export const getIneligibleTokens = async (
     address: string,
     amount
 ): Promise<String[]> => {
-    const contractAbi = Virus.abi;
+    const contractAbi = Microbes.abi;
     const smContractAbi = SuperTrooprz.abi;
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.superTrooprzAddress,
@@ -143,25 +134,18 @@ export const getIneligibleTokens = async (
             ineligibleTokensInWallet[i] = null;
         }
     }
-    let filtered = ineligibleTokensInWallet.filter(x => x != null);
-    return filtered;
+    return ineligibleTokensInWallet.filter(x => x != null);
 };
 
-// Generate a ethers.Contract instance of the contract object
-// together with a signer that will trigger a transaction
-// approval in the wallet whenever it is called by the Dapp
 export const getWriteContractInstance = async (
     browserWeb3Provider: any,
 ): Promise<ethers.Contract> => {
-    // Create ethers.Contract object using the smart contract's ABI
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.address,
-        virusABI,
+        microbesABI,
         browserWeb3Provider
     );
     const signer = browserWeb3Provider.getSigner();
 
-    // Add a signer to make the ethers.Contract object able
-    // to craft transactions
     return readContractInstance.connect(signer);
 };

@@ -23,9 +23,6 @@ const Home: React.FC<IProps> = () => {
     const cost = BigNumber.from("5000000000000000000");
     const [tokensInWallet, setTokensInWallet] = useState([]);
     const [id, setId] = useState('');
-    const [claim, setClaim] = useState(false);
-    const [mint, setMint] = useState(false);
-    const [showTrooprz, setShowTrooprz] = useState(false);
     const [ineligibleTokensInWallet, setIneligibleTokensInWallet] = useState([]);
     const [usedBefore, setUsedBefore] = useState(false);
     const [idChecked, setIdChecked] = useState(false);
@@ -50,10 +47,10 @@ const Home: React.FC<IProps> = () => {
             status: true,
             message: "Sending transaction...",
         });
-        const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
+        const microbesWriteContractInstance = await utils.getWriteContractInstance(
             state.walletWeb3Modal.provider
         );
-        const tx = await bacteriaWriteContractInstance["claim"](
+        const tx = await microbesWriteContractInstance["claim"](
             id
         );
         updateRefreshingAction(dispatch, {
@@ -71,10 +68,10 @@ const Home: React.FC<IProps> = () => {
             status: true,
             message: "Sending transaction...",
         });
-        const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
+        const microbesWriteContractInstance = await utils.getWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
-        const tx = await bacteriaWriteContractInstance["claimAll"](
+        const tx = await microbesWriteContractInstance["claimAll"](
             tokensInWallet
         );
         updateRefreshingAction(dispatch, {
@@ -92,10 +89,10 @@ const Home: React.FC<IProps> = () => {
             status: true,
             message: "Sending transaction...",
         });
-        const bacteriaWriteContractInstance = await utils.getWriteContractInstance(
+        const microbesWriteContractInstance = await utils.getWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
-        const tx = await bacteriaWriteContractInstance["mint"](amount, {value: cost.mul(amount)});
+        const tx = await microbesWriteContractInstance["mint"](amount, {value: cost.mul(amount)});
         updateRefreshingAction(dispatch, {
             status: false,
             message: "Complete",
@@ -186,7 +183,8 @@ const Home: React.FC<IProps> = () => {
                                         claim {tokensInWallet.length * 2} miCRObes.
                                     </p>}
                                 {tokensInWallet && tokensInWallet.length == 0 &&
-                                    <p>You have no eligible SuperTrooprz left</p>}
+                                    <p>You have no eligible SuperTrooprz left (loading this might take a while, hang
+                                        tight!)</p>}
                                 {renderActionButtons()}
 
                             </div>}
