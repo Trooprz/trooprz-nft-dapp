@@ -22,7 +22,6 @@ export const switchNetwork = async () => {
       params: [{ chainId: config.configVars.rpcNetwork.chainIdHex }],
     });
   } catch (e) {
-    console.log(e);
     await window.ethereum.request({
       method: "wallet_addEthereumChain",
       params: [

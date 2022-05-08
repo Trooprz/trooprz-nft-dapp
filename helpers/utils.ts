@@ -94,17 +94,13 @@ export const getEligibleTokens = async (
     );
     for (let i = 0; i < amount; i++) {
         tokensInWallet[i] = BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toString();
-        console.log(tokensInWallet[i]);
     }
-    console.log(tokensInWallet.length);
     for (let i = 0; i < tokensInWallet.length; i++) {
         if (await readVirusContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
             tokensInWallet[i] = null;
         }
     }
-    console.log(tokensInWallet);
     let filtered = tokensInWallet.filter(x => x != null);
-    console.log(filtered);
     return filtered;
 };
 
@@ -148,7 +144,6 @@ export const getIneligibleTokens = async (
         }
     }
     let filtered = ineligibleTokensInWallet.filter(x => x != null);
-    console.log(filtered);
     return filtered;
 };
 
@@ -164,7 +159,6 @@ export const getWriteContractInstance = async (
         virusABI,
         browserWeb3Provider
     );
-    console.log(browserWeb3Provider)
     const signer = browserWeb3Provider.getSigner();
 
     // Add a signer to make the ethers.Contract object able
