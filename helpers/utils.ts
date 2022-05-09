@@ -97,7 +97,6 @@ export const getEligibleTokens = async (
 
 export const checkIfTokenIsEligible = async (
     serverWeb3Provider,
-    address: string,
     id
 ): Promise<Boolean> => {
     const contractAbi = Microbes.abi;
@@ -106,7 +105,7 @@ export const checkIfTokenIsEligible = async (
         contractAbi,
         serverWeb3Provider
     );
-    return !!(await readMicrobesContractInstance["checkIfTokenUsedBefore"](id));
+    return (await readMicrobesContractInstance["checkIfTokenUsedBefore"](id));
 };
 
 export const getIneligibleTokens = async (

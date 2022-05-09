@@ -40,14 +40,15 @@ const Header: React.FC<IProps> = () => {
 
     const handleConnect = async () => {
         let newWallet: any;
-        web3Modal.clearCachedProvider();
+        await web3Modal.clearCachedProvider();
+        localStorage.clear();
         newWallet = await walletWeb3Modal.connect();
         if (newWallet.connected) {
             const croBalance = await utils.getCroBalance(
-                    newWallet.provider,
-                    newWallet.signer,
-                    newWallet.address
-                );
+                newWallet.provider,
+                newWallet.signer,
+                newWallet.address
+            );
             const erc20Balance = await utils.getBalance(
                 newWallet.provider,
                 newWallet.address
@@ -67,46 +68,18 @@ const Header: React.FC<IProps> = () => {
             });
     }
 
-    const disconnectWallet = async () => {
-        updateRefreshingAction(dispatch, {
-            status: true,
-            message: "Disconnecting wallet...",
-        });
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-        updateWalletWeb3ModalAction(dispatch, {...defaultWalletWeb3Modal});
-        updateQueryResultsAction(dispatch, {...defaultQueryResults});
-        web3Modal.clearCachedProvider();
-    };
-
     const renderLoginbutton = () => {
-        if (state.walletWeb3Modal.connected) {
-            return (
-                <Center>
-                <Button size='md'
-                        height='48px'
-                        width='200px'
-                        border='2px'
-                        bg='#C2DCA5'
-                        borderColor='#4E6840'
-                        _hover={{ bg: '#D6E9CF' }} onClick={disconnectWallet}>
-                    Disconnect
-                </Button>
-                </Center>
-            );
-        } else {
+        if (!state.walletWeb3Modal.connected) {
             return (
                 <div>
                     <Center>
-                    <Button size='md'
-                            height='48px'
-                            width='200px'
-                            border='2px'
-                            bg='#C2DCA5'
-                            borderColor='#4E6840'
-                            _hover={{ bg: '#D6E9CF' }} onClick={() => handleConnect()}>Connect</Button>
+                        <Button size='md'
+                                height='48px'
+                                width='200px'
+                                border='2px'
+                                bg='#C2DCA5'
+                                borderColor='#4E6840'
+                                _hover={{bg: '#D6E9CF'}} onClick={() => handleConnect()}>Connect</Button>
                     </Center>
                 </div>
             );
