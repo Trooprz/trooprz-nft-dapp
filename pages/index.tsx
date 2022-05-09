@@ -153,14 +153,13 @@ const Home: React.FC<IProps> = () => {
         }
     };
 
-    // const isTokenEligible = async () => {
-    //     if (await checkIfTokenIsEligible(state.walletWeb3Modal.provider, id)) {
-    //         setIsEligible(true);
-    //     }
-    //     else {
-    //         setIsEligible(false);
-    //     }
-    // }
+    const isTokenEligible = async () => {
+        if (await checkIfTokenIsEligible(state.walletWeb3Modal.provider, id)) {
+            setIsEligible(true);
+        } else {
+            setIsEligible(false);
+        }
+    }
 
 
     const renderActionButtons = () => {
@@ -170,7 +169,7 @@ const Home: React.FC<IProps> = () => {
                     <Center>
                         <Button size='md'
                                 height='48px'
-                                width='200px'
+                                width='220px'
                                 border='2px'
                                 bg='#C2DCA5'
                                 borderColor='#4E6840'
@@ -273,39 +272,44 @@ const Home: React.FC<IProps> = () => {
                                     }
                                     {renderActionButtons()}
                                 </Box>}
-                            {/*{state.walletWeb3Modal.connected &&*/}
-                            {/*    <Box w="75%"  borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed' paddingBottom='20px'>*/}
-                            {/*        <Center>*/}
-                            {/*            <NumberInput bg='white' width="200px">*/}
-                            {/*                <NumberInputField value={id}*/}
-                            {/*                                  onChange={(e) => setId(e.target.value)}/>*/}
-                            {/*            </NumberInput><br/><br/>*/}
-                            {/*        </Center>*/}
-                            {/*    <Center>*/}
-                            {/*        <Button size='md'*/}
-                            {/*                height='48px'*/}
-                            {/*                width='200px'*/}
-                            {/*                border='2px'*/}
-                            {/*                bg='#C2DCA5'*/}
-                            {/*                borderColor='#4E6840'*/}
-                            {/*                _hover={{bg: '#D6E9CF'}} onClick={() => {isTokenEligible().then(() => {setShow(true)})}}>*/}
-                            {/*            Check if Token is eligible*/}
-                            {/*        </Button></Center>*/}
-                            {/*    </Box>*/}
-                            {/*}*/}
-                            {/*{state.walletWeb3Modal.connected &&*/}
-                            {/*    <Box>*/}
-                            {/*        {show && isEligible &&*/}
-                            {/*            <p>This token is not eligible</p>}*/}
-                            {/*        {show && !isEligible &&*/}
-                            {/*            <p>This token is eligible</p>}*/}
-                            {/*    </Box>}*/}
+                            {state.walletWeb3Modal.connected &&
+                                <Box>
+                                    <Center>
+                                        <NumberInput bg='white' width="200px">
+                                            <NumberInputField value={id}
+                                                              onChange={(e) => setId(e.target.value)}/>
+                                        </NumberInput><br/><br/>
+                                    </Center>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            isTokenEligible().then(() => {
+                                                setShow(true)
+                                            })
+                                        }}>
+                                            Check if Token is eligible
+                                        </Button></Center>
+                                </Box>
+                            }
+                            {state.walletWeb3Modal.connected &&
+                                <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'
+                                     paddingBottom='20px'>
+                                    {show && isEligible &&
+                                        <Center><p>This token is not eligible</p></Center>}
+                                    {show && !isEligible &&
+                                        <Center><p>This token is eligible</p></Center>}
+                                </Box>}
                             <Box>
                                 {state.walletWeb3Modal.connected &&
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
-                                                width='200px'
+                                                width='220px'
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
