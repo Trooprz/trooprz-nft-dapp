@@ -214,7 +214,7 @@ const Home: React.FC<IProps> = () => {
                 </Head>
                 <main className={styles.main}>
                     <Center>
-                        <VStack spacing='24px' width='50%'>
+                        <VStack spacing='24px' width='100%'>
                             <Box w="75%">
                                 <Image src="/images/Microbes_Logo_Green.png"/>
                             </Box>
@@ -226,49 +226,51 @@ const Home: React.FC<IProps> = () => {
                                     <><Center><Text fontSize="5xl">
                                         Pew! Pew! Pew!
                                     </Text></Center>
-                                        <UnorderedList>
-                                            <ListItem>
-                                                Press &lsquo;Claim your miCRObes&lsquo; to claim
-                                            </ListItem>
-                                            <ListItem>
-                                                The system will tell you how many miCRObes you have left to claim
-                                            </ListItem>
-                                            <ListItem>
-                                                You can claim max. 10 per transaction (performance optimisation)
-                                            </ListItem>
-                                            <ListItem>
-                                                Example: If you have 34 miCRObes to claim, you will need to do 4
-                                                separate claim transactions: 10, 10, 10 and 4
-                                            </ListItem>
-                                            <ListItem>
-                                                The system will handle the number each time you claim and increment
-                                                your &lsquo;Total No. of Eligible Super Trooprz&lsquo; and
-                                                your &lsquo;Total No. of miCRObes left to claim&lsquo; each time
-                                            </ListItem>
-                                            <ListItem>
-                                                You can use the &lsquo;Eligibility Check&lsquo; function to check if a
-                                                Super Trooprz ID has claimed miCRObes already (before you buy!)
-                                            </ListItem>
-                                            <ListItem>
-                                                Don&lsquo;t forget to disconnect your wallet - Safety First!
-                                            </ListItem><br/>
+                                        <Center>
+                                            <UnorderedList>
+                                                <ListItem>
+                                                    Press &lsquo;Claim your miCRObes&lsquo; to claim
+                                                </ListItem>
+                                                <ListItem>
+                                                    The system will tell you how many miCRObes you have left to claim
+                                                </ListItem>
+                                                <ListItem>
+                                                    You can claim max. 10 per transaction (performance optimisation)
+                                                </ListItem>
+                                                <ListItem>
+                                                    Example: If you have 34 miCRObes to claim, you will need to do 4
+                                                    separate claim transactions: 10, 10, 10 and 4
+                                                </ListItem>
+                                                <ListItem>
+                                                    The system will handle the number each time you claim and increment
+                                                    your &lsquo;Total No. of Eligible Super Trooprz&lsquo; and
+                                                    your &lsquo;Total No. of miCRObes left to claim&lsquo; each time
+                                                </ListItem>
+                                                <ListItem>
+                                                    You can use the &lsquo;Eligibility Check&lsquo; function to check if
+                                                    a
+                                                    Super Trooprz ID has claimed miCRObes already (before you buy!)
+                                                </ListItem>
+                                                <ListItem>
+                                                    Don&lsquo;t forget to disconnect your wallet - Safety First!
+                                                </ListItem><br/>
 
-                                        </UnorderedList>
+                                            </UnorderedList></Center>
                                     </>
 
                                 </Box>}
                             {state.walletWeb3Modal.connected &&
                                 <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
                                     {state.walletWeb3Modal.connected &&
-                                        <Text fontWeight='bold'>
+                                        <Center><Text fontWeight='bold'>
                                             TOTAL NO. OF SUPER TROOPRZ: {state.queryResults.erc20Balance}
-                                        </Text>}
+                                        </Text></Center>}
                                     {state.walletWeb3Modal.connected && tokensInWallet && tokensInWallet.length >= 0 &&
-                                        <><Text fontWeight='bold'>
+                                        <><Center><Text fontWeight='bold'>
                                             TOTAL NO. OF ELIGIBLE SUPER TROOPRZ: {tokensInWallet.length}
-                                        </Text>
-                                            <Text fontWeight='bold'>TOTAL NO. OF MICROBES LEFT TO
-                                                CLAIM: {tokensInWallet.length * 2}</Text><br/></>
+                                        </Text></Center>
+                                            <Center><Text fontWeight='bold'>TOTAL NO. OF MICROBES LEFT TO
+                                                CLAIM: {tokensInWallet.length * 2}</Text></Center><br/></>
                                     }
                                     {renderActionButtons()}
                                 </Box>}
