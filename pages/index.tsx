@@ -235,11 +235,11 @@ const Home: React.FC<IProps> = () => {
                                                     The system will tell you how many miCRObes you have left to claim
                                                 </ListItem>
                                                 <ListItem>
-                                                    You can claim max. 10 per transaction (performance optimisation)
+                                                    You can claim 20 miCRObes per transaction (performance optimisation)
                                                 </ListItem>
                                                 <ListItem>
-                                                    Example: If you have 34 miCRObes to claim, you will need to do 4
-                                                    separate claim transactions: 10, 10, 10 and 4
+                                                    Example: If you have 34 miCRObes to claim, you will need to do 2
+                                                    separate claim transactions: 20 and 14
                                                 </ListItem>
                                                 <ListItem>
                                                     The system will handle the number each time you claim and increment
