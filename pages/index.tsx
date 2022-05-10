@@ -215,7 +215,7 @@ const Home: React.FC<IProps> = () => {
                 <main className={styles.main}>
                     <Center>
                         <VStack spacing='24px' width='100%'>
-                            <Box w="75%">
+                            <Box w="60%">
                                 <Image src="/images/Microbes_Logo_Green.png"/>
                             </Box>
                             <Header/>
@@ -261,6 +261,9 @@ const Home: React.FC<IProps> = () => {
                                 </Box>}
                             {state.walletWeb3Modal.connected &&
                                 <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
+                                    {state.walletWeb3Modal.connected && tokensInWallet.length == 0 &&
+                                        <Center><Text fontWeight='bold' color='red'>Please be patient while we load your
+                                            miCRObes - this may take a few minutes for large numbers</Text></Center>}
                                     {state.walletWeb3Modal.connected &&
                                         <Center><Text fontWeight='bold'>
                                             TOTAL NO. OF SUPER TROOPRZ: {state.queryResults.erc20Balance}
