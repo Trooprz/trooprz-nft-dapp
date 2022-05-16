@@ -16,6 +16,7 @@ import {checkIfTokenIsEligible} from "../helpers/utils";
 import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
+import Link from "next/link";
 
 interface IProps {
 }
@@ -262,6 +263,10 @@ const Home: React.FC<IProps> = () => {
                                                 {/*</ListItem><br/>*/}
                                                 <ListItem>Claim has ended!</ListItem>
                                                 <ListItem>Mint will become active 17/05/2022 at 13pm BST</ListItem>
+                                                <ListItem>Don&lsquo;t forget you will need 1 OG Trooprz + 4 miCRObes to
+                                                    SPAWN Mutantz</ListItem>
+                                                <ListItem><Link
+                                                    href="https://app.ebisusbay.com/collection/trooprz">https://app.ebisusbay.com/collection/trooprz</Link></ListItem>
                                             </UnorderedList></Center>
                                     </>
 
