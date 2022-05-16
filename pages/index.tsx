@@ -29,6 +29,8 @@ const Home: React.FC<IProps> = () => {
     const [ineligibleTokensInWallet, setIneligibleTokensInWallet] = useState([]);
     const [isEligible, setIsEligible] = useState(Boolean);
     const [show, setShow] = useState(false);
+    const [minted, setMinted] = useState(false);
+    const [actualPrice, setActualPrice] = useState(0);
 
     let claimWallet: any[];
 
@@ -153,6 +155,10 @@ const Home: React.FC<IProps> = () => {
         }
     };
 
+    const canMint = () => {
+        return true;
+    }
+
     const isTokenEligible = async () => {
         if (await checkIfTokenIsEligible(state.walletWeb3Modal.provider, id)) {
             setIsEligible(true);
@@ -228,54 +234,95 @@ const Home: React.FC<IProps> = () => {
                                     </Text></Center>
                                         <Center>
                                             <UnorderedList>
-                                                <ListItem>
-                                                    Press &lsquo;Claim your miCRObes&lsquo; to claim
-                                                </ListItem>
-                                                <ListItem>
-                                                    The system will tell you how many miCRObes you have left to claim
-                                                </ListItem>
-                                                <ListItem>
-                                                    You can claim 20 miCRObes per transaction (performance optimisation)
-                                                </ListItem>
-                                                <ListItem>
-                                                    Example: If you have 34 miCRObes to claim, you will need to do 2
-                                                    separate claim transactions: 20 and 14
-                                                </ListItem>
-                                                <ListItem>
-                                                    The system will handle the number each time you claim and increment
-                                                    your &lsquo;Total No. of Eligible Super Trooprz&lsquo; and
-                                                    your &lsquo;Total No. of miCRObes left to claim&lsquo; each time
-                                                </ListItem>
-                                                <ListItem>
-                                                    You can use the &lsquo;Eligibility Check&lsquo; function to check if
-                                                    a
-                                                    Super Trooprz ID has claimed miCRObes already (before you buy!)
-                                                </ListItem>
-                                                <ListItem>
-                                                    Don&lsquo;t forget to disconnect your wallet - Safety First!
-                                                </ListItem><br/>
-
+                                                {/*<ListItem>*/}
+                                                {/*    Press &lsquo;Mint your miCRObes&lsquo; to mint*/}
+                                                {/*</ListItem>*/}
+                                                {/*<ListItem>*/}
+                                                {/*    The system will tell you how many miCRObes you have left to claim*/}
+                                                {/*</ListItem>*/}
+                                                {/*<ListItem>*/}
+                                                {/*    You can claim 20 miCRObes per transaction (performance optimisation)*/}
+                                                {/*</ListItem>*/}
+                                                {/*<ListItem>*/}
+                                                {/*    Example: If you have 34 miCRObes to claim, you will need to do 2*/}
+                                                {/*    separate claim transactions: 20 and 14*/}
+                                                {/*</ListItem>*/}
+                                                {/*<ListItem>*/}
+                                                {/*    The system will handle the number each time you claim and increment*/}
+                                                {/*    your &lsquo;Total No. of Eligible Super Trooprz&lsquo; and*/}
+                                                {/*    your &lsquo;Total No. of miCRObes left to claim&lsquo; each time*/}
+                                                {/*</ListItem>*/}
+                                                {/*<ListItem>*/}
+                                                {/*    You can use the &lsquo;Eligibility Check&lsquo; function to check if*/}
+                                                {/*    a*/}
+                                                {/*    Super Trooprz ID has claimed miCRObes already (before you buy!)*/}
+                                                {/*</ListItem>*/}
+                                                {/*<ListItem>*/}
+                                                {/*    Don&lsquo;t forget to disconnect your wallet - Safety First!*/}
+                                                {/*</ListItem><br/>*/}
+                                                <ListItem>Claim has ended!</ListItem>
+                                                <ListItem>Mint will become active 17/05/2022 at 13pm BST</ListItem>
                                             </UnorderedList></Center>
                                     </>
 
                                 </Box>}
+                            {/*{state.walletWeb3Modal.connected &&*/}
+                            {/*    <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>*/}
+                            {/*        {state.walletWeb3Modal.connected && tokensInWallet.length == 0 &&*/}
+                            {/*            <Center><Text fontWeight='bold' color='red'>Please be patient while we load your*/}
+                            {/*                miCRObes - this may take a few minutes for large numbers</Text></Center>}*/}
+                            {/*        {state.walletWeb3Modal.connected &&*/}
+                            {/*            <Center><Text fontWeight='bold'>*/}
+                            {/*                TOTAL NO. OF SUPER TROOPRZ: {state.queryResults.erc20Balance}*/}
+                            {/*            </Text></Center>}*/}
+                            {/*        {state.walletWeb3Modal.connected && tokensInWallet && tokensInWallet.length >= 0 &&*/}
+                            {/*            <><Center><Text fontWeight='bold'>*/}
+                            {/*                TOTAL NO. OF ELIGIBLE SUPER TROOPRZ: {tokensInWallet.length}*/}
+                            {/*            </Text></Center>*/}
+                            {/*                <Center><Text fontWeight='bold'>TOTAL NO. OF MICROBES LEFT TO*/}
+                            {/*                    CLAIM: {tokensInWallet.length * 2}</Text></Center><br/></>*/}
+                            {/*        }*/}
+                            {/*        {renderActionButtons()}*/}
+                            {/*    </Box>}*/}
                             {state.walletWeb3Modal.connected &&
-                                <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
-                                    {state.walletWeb3Modal.connected && tokensInWallet.length == 0 &&
-                                        <Center><Text fontWeight='bold' color='red'>Please be patient while we load your
-                                            miCRObes - this may take a few minutes for large numbers</Text></Center>}
+                                <Box>
+                                    <Center>
+                                        <NumberInput bg='white' width="200px">
+                                            <NumberInputField value={amount}
+                                                              onChange={(e) => {
+                                                                  setAmount(e.target.value);
+                                                                  setActualPrice(parseInt(e.target.value) * 99)
+                                                              }}/>
+                                        </NumberInput><br/><br/>
+                                    </Center>
                                     {state.walletWeb3Modal.connected &&
-                                        <Center><Text fontWeight='bold'>
-                                            TOTAL NO. OF SUPER TROOPRZ: {state.queryResults.erc20Balance}
-                                        </Text></Center>}
-                                    {state.walletWeb3Modal.connected && tokensInWallet && tokensInWallet.length >= 0 &&
-                                        <><Center><Text fontWeight='bold'>
-                                            TOTAL NO. OF ELIGIBLE SUPER TROOPRZ: {tokensInWallet.length}
-                                        </Text></Center>
-                                            <Center><Text fontWeight='bold'>TOTAL NO. OF MICROBES LEFT TO
-                                                CLAIM: {tokensInWallet.length * 2}</Text></Center><br/></>
-                                    }
-                                    {renderActionButtons()}
+                                        <Center>
+                                            <Button size='md'
+                                                    height='48px'
+                                                    width='220px'
+                                                    border='2px'
+                                                    bg='#C2DCA5'
+                                                    borderColor='#4E6840'
+                                                    disabled={canMint()}
+                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                mintMicrobe().then(r => setMinted(true))
+                                            }}>
+                                                Mint
+                                            </Button>
+                                        </Center>}
+                                </Box>
+                            }
+                            {state.walletWeb3Modal.connected && actualPrice > 0 &&
+                                <Box>
+                                    <p>Mint {amount} miCRObes for {actualPrice} CRO</p>
+                                </Box>}
+                            {state.walletWeb3Modal.connected &&
+                                <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'
+                                     paddingBottom='20px'>
+                                    {show && isEligible &&
+                                        <Center><p>This token is not eligible</p></Center>}
+                                    {show && !isEligible &&
+                                        <Center><p>This token is eligible</p></Center>}
                                 </Box>}
                             {state.walletWeb3Modal.connected &&
                                 <Box>
