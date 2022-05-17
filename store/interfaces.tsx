@@ -94,7 +94,8 @@ export interface IQueryResults {
   erc20Balance: number;
   lastTxHash: string;
   provider: null,
-  signer: null
+  signer: null,
+  supplyLeft: number;
 }
 
 export const defaultQueryResults: IQueryResults = {
@@ -103,5 +104,6 @@ export const defaultQueryResults: IQueryResults = {
   erc20Balance: 0,
   lastTxHash: "",
   provider: null,
-  signer: null
+  signer: null,
+  supplyLeft: 0
 };

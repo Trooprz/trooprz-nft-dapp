@@ -3,16 +3,22 @@ import styles from '../styles/Home.module.css'
 import React, {useEffect, useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction, updateWalletWeb3ModalAction} from "../store/actions";
-import {Box, Image, ListItem, Text, UnorderedList, VStack} from '@chakra-ui/react';
-import * as utils from "../helpers/utils";
-import {BigNumber} from "ethers";
 import {
-    Button, Center,
+    Box,
+    Button,
+    Center,
+    Image,
+    ListItem,
     NumberInput,
     NumberInputField,
-} from "@chakra-ui/react";
+    Text,
+    UnorderedList,
+    VStack
+} from '@chakra-ui/react';
+import * as utils from "../helpers/utils";
+import {checkIfTokenIsEligible} from "../helpers/utils";
+import {BigNumber} from "ethers";
 import Header from "./mint/Header";
-import {checkIfTokenIsEligible, getTotalSupplyLeft} from "../helpers/utils";
 import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
@@ -32,6 +38,7 @@ const Home: React.FC<IProps> = () => {
     const [show, setShow] = useState(false);
     const [minted, setMinted] = useState(false);
     const [actualPrice, setActualPrice] = useState(0);
+    const [supplyLeft, setSupplyLeft] = useState(0);
     let claimWallet: any[];
     let web3Modal;
 
@@ -55,7 +62,19 @@ const Home: React.FC<IProps> = () => {
         }
         fetchIneligibleTokensInWallet().catch(console.error);
 
-    }, [state.queryResults.erc20Balance])
+        async function calculateSupplyLeft() {
+            await utils.getTotalSupplyLeft(state.walletWeb3Modal.provider).then((result) => {
+                setSupplyLeft(result);
+                updateQueryResultsAction(dispatch, {
+                        ...state.queryResults,
+                        supplyLeft: result,
+                    }
+                )
+            })
+        }
+
+        calculateSupplyLeft().catch(console.error)
+    }, [state.queryResults.erc20Balance, state.walletWeb3Modal.connected])
 
     const claimMicrobe = async () => {
         updateRefreshingAction(dispatch, {
@@ -320,17 +339,9 @@ const Home: React.FC<IProps> = () => {
                                 <Box>
                                     <p>Mint {amount} miCRObes for {actualPrice} CRO</p>
                                 </Box>}
-                            {/*{state.walletWeb3Modal.connected &&*/}
-                            {/*    <Box>*/}
-                            {/*        <p>{supplyLeft} miCRObes left to mint</p>*/}
-                            {/*    </Box>}*/}
                             {state.walletWeb3Modal.connected &&
-                                <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'
-                                     paddingBottom='20px'>
-                                    {show && isEligible &&
-                                        <Center><p>This token is not eligible</p></Center>}
-                                    {show && !isEligible &&
-                                        <Center><p>This token is eligible</p></Center>}
+                                <Box>
+                                    <p>{supplyLeft} miCRObes left to mint</p>
                                 </Box>}
                             {state.walletWeb3Modal.connected &&
                                 <Box>
