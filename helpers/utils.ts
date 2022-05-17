@@ -77,7 +77,6 @@ export const getTotalSupplyLeft = async (
         serverWeb3Provider
     );
     const currentSupply = BigNumber.from(await readContractInstance["totalSupply"]()).toNumber();
-    console.log(currentSupply)
     return (
         7800 - currentSupply
     );
