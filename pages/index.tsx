@@ -24,7 +24,7 @@ interface IProps {
 const Home: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
     const [amount, setAmount] = useState('');
-    const cost = BigNumber.from("5000000000000000000");
+    const cost = BigNumber.from("99000000000000000000");
     const [tokensInWallet, setTokensInWallet] = useState([]);
     const [id, setId] = useState('');
     const [ineligibleTokensInWallet, setIneligibleTokensInWallet] = useState([]);
