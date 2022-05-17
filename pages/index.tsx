@@ -308,7 +308,6 @@ const Home: React.FC<IProps> = () => {
                                                     border='2px'
                                                     bg='#C2DCA5'
                                                     borderColor='#4E6840'
-                                                    disabled={canMint()}
                                                     _hover={{bg: '#D6E9CF'}} onClick={() => {
                                                 mintMicrobe().then(r => setMinted(true))
                                             }}>
