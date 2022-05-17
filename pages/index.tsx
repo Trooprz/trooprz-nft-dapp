@@ -281,7 +281,7 @@ const Home: React.FC<IProps> = () => {
                                                 {/*    Don&lsquo;t forget to disconnect your wallet - Safety First!*/}
                                                 {/*</ListItem><br/>*/}
                                                 <ListItem>Claim has ended!</ListItem>
-                                                <ListItem>Mint will become active 17/05/2022 at 13pm BST</ListItem>
+                                                <ListItem>Mint is LIVE</ListItem>
                                                 <ListItem>Don&lsquo;t forget you will need 1 OG Trooprz + 4 miCRObes to
                                                     SPAWN Mutantz</ListItem>
                                                 <ListItem><Link
@@ -342,38 +342,6 @@ const Home: React.FC<IProps> = () => {
                             {state.walletWeb3Modal.connected &&
                                 <Box>
                                     <p>{supplyLeft} miCRObes left to mint</p>
-                                </Box>}
-                            {state.walletWeb3Modal.connected &&
-                                <Box>
-                                    <Center>
-                                        <NumberInput bg='white' width="200px">
-                                            <NumberInputField value={id}
-                                                              onChange={(e) => setId(e.target.value)}/>
-                                        </NumberInput><br/><br/>
-                                    </Center>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            isTokenEligible().then(() => {
-                                                setShow(true)
-                                            })
-                                        }}>
-                                            Check if Token is eligible
-                                        </Button></Center>
-                                </Box>
-                            }
-                            {state.walletWeb3Modal.connected &&
-                                <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'
-                                     paddingBottom='20px'>
-                                    {show && isEligible &&
-                                        <Center><p>This token is not eligible</p></Center>}
-                                    {show && !isEligible &&
-                                        <Center><p>This token is eligible</p></Center>}
                                 </Box>}
                             <Box>
                                 {state.walletWeb3Modal.connected &&
