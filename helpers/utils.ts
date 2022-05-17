@@ -77,9 +77,7 @@ export const getTotalSupplyLeft = async (
         serverWeb3Provider
     );
     const currentSupply = BigNumber.from(await readContractInstance["totalSupply"]()).toNumber();
-    return (
-        7800 - currentSupply
-    );
+    return currentSupply;
 };
 
 export const getEligibleTokens = async (

@@ -341,7 +341,7 @@ const Home: React.FC<IProps> = () => {
                                 </Box>}
                             {state.walletWeb3Modal.connected &&
                                 <Box>
-                                    <p>{supplyLeft} miCRObes left to mint</p>
+                                    <p>{supplyLeft} / 7800 minted</p>
                                 </Box>}
                             <Box>
                                 {state.walletWeb3Modal.connected &&
