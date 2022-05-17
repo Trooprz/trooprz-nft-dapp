@@ -12,7 +12,7 @@ import {
     NumberInputField,
 } from "@chakra-ui/react";
 import Header from "./mint/Header";
-import {checkIfTokenIsEligible} from "../helpers/utils";
+import {checkIfTokenIsEligible, getTotalSupplyLeft} from "../helpers/utils";
 import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
@@ -32,10 +32,9 @@ const Home: React.FC<IProps> = () => {
     const [show, setShow] = useState(false);
     const [minted, setMinted] = useState(false);
     const [actualPrice, setActualPrice] = useState(0);
-
     let claimWallet: any[];
-
     let web3Modal;
+
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
             providerOptions
@@ -55,6 +54,7 @@ const Home: React.FC<IProps> = () => {
             setIneligibleTokensInWallet(data);
         }
         fetchIneligibleTokensInWallet().catch(console.error);
+
     }, [state.queryResults.erc20Balance])
 
     const claimMicrobe = async () => {
@@ -321,6 +321,10 @@ const Home: React.FC<IProps> = () => {
                                 <Box>
                                     <p>Mint {amount} miCRObes for {actualPrice} CRO</p>
                                 </Box>}
+                            {/*{state.walletWeb3Modal.connected &&*/}
+                            {/*    <Box>*/}
+                            {/*        <p>{supplyLeft} miCRObes left to mint</p>*/}
+                            {/*    </Box>}*/}
                             {state.walletWeb3Modal.connected &&
                                 <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'
                                      paddingBottom='20px'>

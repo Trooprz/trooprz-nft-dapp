@@ -67,6 +67,22 @@ export const getBalance = async (
     );
 };
 
+export const getTotalSupplyLeft = async (
+    serverWeb3Provider,
+): Promise<number> => {
+    const contractAbi = Microbes.abi;
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.address,
+        contractAbi,
+        serverWeb3Provider
+    );
+    const currentSupply = BigNumber.from(await readContractInstance["totalSupply"]()).toNumber();
+    console.log(currentSupply)
+    return (
+        7800 - currentSupply
+    );
+};
+
 export const getEligibleTokens = async (
     serverWeb3Provider,
     address: string,
