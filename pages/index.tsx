@@ -10,7 +10,7 @@ import {
     Image,
     ListItem,
     NumberInput,
-    NumberInputField, Stack,
+    NumberInputField, SimpleGrid, Spinner, Stack,
     Text,
     UnorderedList,
     VStack
@@ -23,6 +23,7 @@ import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import Link from "next/link";
+import _, {set} from "lodash";
 
 interface IProps {
 }
@@ -43,10 +44,11 @@ const Home: React.FC<IProps> = () => {
     const [isRegularFlow, setIsRegularFlow] = useState(false);
     const [goldenMicrobesInWallet, setGoldenMicrobesInWallet] = useState([]);
     const [selectOGTrooprz, setSelectOGTrooprz] = useState(false);
-    const [microbesList, setMicrobesList] = useState([]);
+    const [token, setToken] = useState(0);
     let claimWallet: any[];
+    let duplicateFound = false;
     let web3Modal;
-
+    let microbesList = new Set();
 
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
@@ -56,16 +58,11 @@ const Home: React.FC<IProps> = () => {
 
 
     useEffect(() => {
-        const fetchAmountOfGoldenMicrobesInWallet = async () => {
-            const data = await utils.getGoldenMicrobesInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
-            setGoldenMicrobesInWallet(data);
-        }
-        const fetchAmountOfTokensInWallet = async () => {
-            const data = await utils.getTokensInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
-            setTokensInWallet(data);
-        }
-        fetchAmountOfTokensInWallet().catch(console.error);
-
+        //     const fetchAmountOfGoldenMicrobesInWallet = async () => {
+        //         const data = await utils.getGoldenMicrobesInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
+        //         setGoldenMicrobesInWallet(data);
+        //     }
+        // fetchAmountOfTokensInWallet().catch(console.error);
         // const fetchIneligibleTokensInWallet = async () => {
         //     const data = await utils.getIneligibleTokens(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
         //     setIneligibleTokensInWallet(data);
@@ -84,8 +81,8 @@ const Home: React.FC<IProps> = () => {
         }
 
         calculateSupplyLeft().catch(console.error)
-    }, [state.queryResults.erc20Balance, state.walletWeb3Modal.connected])
 
+    }, [state.walletWeb3Modal.connected])
     // const selectMicrobes: (id) => void = (id) => {
     //     let microbesList = []
     //     if (microbesList) {
@@ -101,140 +98,34 @@ const Home: React.FC<IProps> = () => {
     //     }
     // }
 
-    const claimMicrobe = async () => {
+    const fetchAmountOfTokensInWallet = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
         });
-        const microbesWriteContractInstance = await utils.getWriteContractInstance(
-            state.walletWeb3Modal.provider
-        );
-        const tx = await microbesWriteContractInstance["claim"](
-            id
-        );
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-        updateQueryResultsAction(dispatch, {
-            ...state.queryResults,
-            lastTxHash: tx.hash,
-        });
-    };
 
-    const claimMaxTenMicrobesPerTurn = async () => {
-        updateRefreshingAction(dispatch, {
-            status: true,
-            message: "Sending transaction...",
-        });
-        const microbesWriteContractInstance = await utils.getWriteContractInstance(
-            state.walletWeb3Modal.provider,
-        );
-        const firstTenTokensInWallet = tokensInWallet.slice(0, 10);
-        tokensInWallet.splice(0, 10)
-        const tx = await microbesWriteContractInstance["claimAll"](
-            firstTenTokensInWallet
-        );
+        const data = await utils.getTokensInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
+
         updateRefreshingAction(dispatch, {
             status: false,
             message: "Complete",
         });
-        updateQueryResultsAction(dispatch, {
-            ...state.queryResults,
-            lastTxHash: tx.hash,
-        });
+
+        return data;
     }
 
-    const claimAllMicrobes = async () => {
-        updateRefreshingAction(dispatch, {
-            status: true,
-            message: "Sending transaction...",
-        });
-        const microbesWriteContractInstance = await utils.getWriteContractInstance(
-            state.walletWeb3Modal.provider,
-        );
-        if (tokensInWallet.length > 20) {
-            for (let i = 0; i < 20; i++) {
-                claimWallet[i] = tokensInWallet[i];
-                tokensInWallet.splice(i, 1);
-            }
-            const slicedTokensInWallet = tokensInWallet.slice(0, 19);
+    const addToMicrobesList = (token) => {
+        if (microbesList.size === 0) {
+            console.log("List is empty, adding " + token);
+            microbesList.add(token);
+        } else if (microbesList.has(token)) {
+            console.log("removing " + token);
+            microbesList.delete(token);
         } else {
-            claimWallet = tokensInWallet;
-        }
-        const tx = await microbesWriteContractInstance["claimAll"](
-            claimWallet
-        );
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-        updateQueryResultsAction(dispatch, {
-            ...state.queryResults,
-            lastTxHash: tx.hash,
-        });
-    };
-
-    const mintMicrobe = async () => {
-        updateRefreshingAction(dispatch, {
-            status: true,
-            message: "Sending transaction...",
-        });
-        const microbesWriteContractInstance = await utils.getWriteContractInstance(
-            state.walletWeb3Modal.provider,
-        );
-        const tx = await microbesWriteContractInstance["mint"](amount, {value: cost.mul(amount)});
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-        updateQueryResultsAction(dispatch, {
-            ...state.queryResults,
-            lastTxHash: tx.hash,
-        });
-    };
-
-    const canClaim = () => {
-        if (tokensInWallet.length == 0) {
-            return true;
-        }
-    };
-
-    const canMint = () => {
-        return true;
-    }
-
-    const isTokenEligible = async () => {
-        if (await checkIfTokenIsEligible(state.walletWeb3Modal.provider, id)) {
-            setIsEligible(true);
-        } else {
-            setIsEligible(false);
+            microbesList.add(token);
         }
     }
 
-
-    const renderActionButtons = () => {
-        if (state.walletWeb3Modal.connected) {
-            return (
-                <div>
-                    <Center>
-                        <Button size='md'
-                                height='48px'
-                                width='220px'
-                                border='2px'
-                                bg='#C2DCA5'
-                                borderColor='#4E6840'
-                                _hover={{bg: '#D6E9CF'}} onClick={claimMaxTenMicrobesPerTurn} disabled={canClaim()}>
-                            Claim your miCRObes
-                        </Button></Center><br/>
-
-                </div>
-            )
-                ;
-        } else {
-            return null;
-        }
-    };
 
     const disconnectWallet = async () => {
         setTokensInWallet([]);
@@ -326,7 +217,10 @@ const Home: React.FC<IProps> = () => {
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsGoldenFlow(true)}>
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setIsGoldenFlow(true);
+                                            fetchAmountOfTokensInWallet().then(r => setTokensInWallet(r))
+                                        }}>
                                             Golden miCRObes
                                         </Button>
                                         <Button size='md'
@@ -335,26 +229,36 @@ const Home: React.FC<IProps> = () => {
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsRegularFlow(true)}>
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setIsRegularFlow(true);
+                                            fetchAmountOfTokensInWallet().then(r => setTokensInWallet(r))
+                                        }}>
                                             Regular miCRObes
                                         </Button></Center><br/>
                                 </Box>
                             }
-                            {state.walletWeb3Modal.connected && isGoldenFlow &&
+                            {state.walletWeb3Modal.connected && state.refreshing.status &&
+                                <Spinner></Spinner>}
+                            {state.walletWeb3Modal.connected && isGoldenFlow && !isRegularFlow &&
                                 <Box>
                                     <Center>
                                         <Text>Choose your Golden miCRObes</Text>
                                     </Center>
-                                    <Stack direction={"row"}>
+                                    <SimpleGrid columns={5} spacing={10}>
                                         {tokensInWallet.map((token) => (
-                                            <div key={token} onClick={() => {setMicrobesList([...microbesList, token]); console.log(microbesList)}}>
                                             <Image
+                                                key={token}
+                                                // onSelect={}
+                                                onClick={() => {
+                                                    addToMicrobesList(token);
+                                                    console.log("Clicked token " + token)
+                                                }}
                                                 boxSize='150px'
                                                 objectFit='cover'
                                                 src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
-                                                alt={`miCRObes id ${token}`} />
-                                            </div>))}
-                                    </Stack><br/>
+                                                alt={`miCRObes id ${token}`}/>
+                                        ))}
+                                    </SimpleGrid><br/>
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
@@ -362,7 +266,10 @@ const Home: React.FC<IProps> = () => {
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => setSelectOGTrooprz(true)}>
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setSelectOGTrooprz(true);
+                                            console.log(microbesList)
+                                        }}>
                                             Continue
                                         </Button>
                                         <Button size='md'
@@ -382,16 +289,32 @@ const Home: React.FC<IProps> = () => {
                                     <Center>
                                         <Text>Choose your miCRObes</Text>
                                     </Center>
-                                    <Stack direction={"row"}>
+                                    <SimpleGrid columns={5} spacing={10}>
                                         {tokensInWallet.map((token) => (
                                             <Image
                                                 key={'token'}
                                                 boxSize='150px'
+                                                onClick={() => {
+                                                    addToMicrobesList(token);
+                                                    console.log("Clicked token " + token)
+                                                }}
                                                 objectFit='cover'
                                                 src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
                                                 alt={`miCRObes id ${token}`}/>))}
-                                    </Stack><br/>
+                                    </SimpleGrid><br/>
                                     <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setSelectOGTrooprz(true);
+                                            console.log(microbesList)
+                                        }}>
+                                            Continue
+                                        </Button>
                                         <Button size='md'
                                                 height='48px'
                                                 width='220px'
