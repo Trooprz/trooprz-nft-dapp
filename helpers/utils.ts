@@ -3,9 +3,10 @@ import * as config from "../config/config";
 import Microbes from "../artifacts/Microbes.json";
 import SuperTrooprz from "../artifacts/SuperTrooprz.json";
 
-const microbesAddress = '0xbabdFDD5f88035C9FbA58Be1b5c76DcFC6A847f3'
+const microbesAddress = '0x96628048830a499b156aBdC04cC169C18c3A17f2'
 const microbesABI = Microbes.abi
 let tokensInWallet = [];
+let goldenMicrobesInWallet = [];
 let ineligibleTokensInWallet = [];
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -80,7 +81,7 @@ export const getTotalSupplyLeft = async (
     return currentSupply;
 };
 
-export const getEligibleTokens = async (
+export const getTokensInWallet = async (
     serverWeb3Provider,
     address: string,
     amount
@@ -100,12 +101,41 @@ export const getEligibleTokens = async (
     for (let i = 0; i < amount; i++) {
         tokensInWallet[i] = BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toString();
     }
-    for (let i = 0; i < tokensInWallet.length; i++) {
-        if (await readMicrobesContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
-            tokensInWallet[i] = null;
+    // for (let i = 0; i < tokensInWallet.length; i++) {
+    //     if (await readMicrobesContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
+    //         tokensInWallet[i] = null;
+    //     }
+    // }
+    return tokensInWallet;
+};
+
+export const getGoldenMicrobesInWallet = async (
+    serverWeb3Provider,
+    address: string,
+    amount
+): Promise<String[]> => {
+    const contractAbi = Microbes.abi;
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.superTrooprzAddress,
+        serverWeb3Provider
+    );
+    const readMicrobesContractInstance = new ethers.Contract(
+        config.configVars.erc20.address,
+        contractAbi,
+        serverWeb3Provider
+    );
+    for (let i = 0; i < amount; i++) {
+        let currentToken = BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
+        if (currentToken < 223) {
+            goldenMicrobesInWallet[i] = currentToken;
         }
     }
-    return tokensInWallet.filter(x => x != null);
+    return goldenMicrobesInWallet
+    // for (let i = 0; i < tokensInWallet.length; i++) {
+    //     if (await readMicrobesContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
+    //         tokensInWallet[i] = null;
+    //     }
+    // }
 };
 
 export const checkIfTokenIsEligible = async (

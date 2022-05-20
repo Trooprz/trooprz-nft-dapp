@@ -5,10 +5,10 @@ const providerOptions = {
         package: WalletConnect,
         options: {
             rpc: {
-                25: "https://evm.cronos.org/",
+                338: "https://cronos-testnet-3.crypto.org:8545/",
             },
-            chainId: 25,
-            network: "cronos",
+            chainId: 338,
+            network: "cronos-testnet",
             qrcode: true
         }
     },

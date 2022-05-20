@@ -10,7 +10,7 @@ import {
     Image,
     ListItem,
     NumberInput,
-    NumberInputField,
+    NumberInputField, Stack,
     Text,
     UnorderedList,
     VStack
@@ -39,8 +39,14 @@ const Home: React.FC<IProps> = () => {
     const [minted, setMinted] = useState(false);
     const [actualPrice, setActualPrice] = useState(0);
     const [supplyLeft, setSupplyLeft] = useState(0);
+    const [isGoldenFlow, setIsGoldenFlow] = useState(false);
+    const [isRegularFlow, setIsRegularFlow] = useState(false);
+    const [goldenMicrobesInWallet, setGoldenMicrobesInWallet] = useState([]);
+    const [selectOGTrooprz, setSelectOGTrooprz] = useState(false);
+    const [microbesList, setMicrobesList] = useState([]);
     let claimWallet: any[];
     let web3Modal;
+
 
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
@@ -50,17 +56,21 @@ const Home: React.FC<IProps> = () => {
 
 
     useEffect(() => {
+        const fetchAmountOfGoldenMicrobesInWallet = async () => {
+            const data = await utils.getGoldenMicrobesInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
+            setGoldenMicrobesInWallet(data);
+        }
         const fetchAmountOfTokensInWallet = async () => {
-            const data = await utils.getEligibleTokens(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
+            const data = await utils.getTokensInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
             setTokensInWallet(data);
         }
         fetchAmountOfTokensInWallet().catch(console.error);
 
-        const fetchIneligibleTokensInWallet = async () => {
-            const data = await utils.getIneligibleTokens(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
-            setIneligibleTokensInWallet(data);
-        }
-        fetchIneligibleTokensInWallet().catch(console.error);
+        // const fetchIneligibleTokensInWallet = async () => {
+        //     const data = await utils.getIneligibleTokens(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
+        //     setIneligibleTokensInWallet(data);
+        // }
+        // fetchIneligibleTokensInWallet().catch(console.error);
 
         async function calculateSupplyLeft() {
             await utils.getTotalSupplyLeft(state.walletWeb3Modal.provider).then((result) => {
@@ -75,6 +85,21 @@ const Home: React.FC<IProps> = () => {
 
         calculateSupplyLeft().catch(console.error)
     }, [state.queryResults.erc20Balance, state.walletWeb3Modal.connected])
+
+    // const selectMicrobes: (id) => void = (id) => {
+    //     let microbesList = []
+    //     if (microbesList) {
+    //         if (microbesList.length != 0) {
+    //             for (let i = 0; i < microbesList.length; i++) {
+    //                 if (microbesList[i] === id) {
+    //                     microbesList.splice(i, 1);
+    //                 }
+    //             }
+    //         }
+    //         microbesList.push(id);
+    //         console.log(microbesList);
+    //     }
+    // }
 
     const claimMicrobe = async () => {
         updateRefreshingAction(dispatch, {
@@ -288,63 +313,12 @@ const Home: React.FC<IProps> = () => {
                                                     href="https://app.ebisusbay.com/collection/trooprz">https://app.ebisusbay.com/collection/trooprz</Link></ListItem>
                                             </UnorderedList></Center>
                                     </>
-
                                 </Box>}
-                            {/*{state.walletWeb3Modal.connected &&*/}
-                            {/*    <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>*/}
-                            {/*        {state.walletWeb3Modal.connected && tokensInWallet.length == 0 &&*/}
-                            {/*            <Center><Text fontWeight='bold' color='red'>Please be patient while we load your*/}
-                            {/*                miCRObes - this may take a few minutes for large numbers</Text></Center>}*/}
-                            {/*        {state.walletWeb3Modal.connected &&*/}
-                            {/*            <Center><Text fontWeight='bold'>*/}
-                            {/*                TOTAL NO. OF SUPER TROOPRZ: {state.queryResults.erc20Balance}*/}
-                            {/*            </Text></Center>}*/}
-                            {/*        {state.walletWeb3Modal.connected && tokensInWallet && tokensInWallet.length >= 0 &&*/}
-                            {/*            <><Center><Text fontWeight='bold'>*/}
-                            {/*                TOTAL NO. OF ELIGIBLE SUPER TROOPRZ: {tokensInWallet.length}*/}
-                            {/*            </Text></Center>*/}
-                            {/*                <Center><Text fontWeight='bold'>TOTAL NO. OF MICROBES LEFT TO*/}
-                            {/*                    CLAIM: {tokensInWallet.length * 2}</Text></Center><br/></>*/}
-                            {/*        }*/}
-                            {/*        {renderActionButtons()}*/}
-                            {/*    </Box>}*/}
-                            {state.walletWeb3Modal.connected &&
+                            {state.walletWeb3Modal.connected && !isGoldenFlow && !isRegularFlow &&
                                 <Box>
                                     <Center>
-                                        <NumberInput bg='white' width="200px">
-                                            <NumberInputField value={amount}
-                                                              onChange={(e) => {
-                                                                  setAmount(e.target.value);
-                                                                  setActualPrice(parseInt(e.target.value) * 99)
-                                                              }}/>
-                                        </NumberInput><br/><br/>
+                                        <Text>What kind of miCRObes will you use to spawn your Mutantz?</Text>
                                     </Center>
-                                    {state.walletWeb3Modal.connected &&
-                                        <Center>
-                                            <Button size='md'
-                                                    height='48px'
-                                                    width='220px'
-                                                    border='2px'
-                                                    bg='#C2DCA5'
-                                                    borderColor='#4E6840'
-                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                                mintMicrobe().then(r => setMinted(true))
-                                            }}>
-                                                Mint
-                                            </Button>
-                                        </Center>}
-                                </Box>
-                            }
-                            {state.walletWeb3Modal.connected && actualPrice > 0 &&
-                                <Box>
-                                    <p>Mint {amount} miCRObes for {actualPrice} CRO</p>
-                                </Box>}
-                            {state.walletWeb3Modal.connected &&
-                                <Box>
-                                    <p>{supplyLeft} / 7800 minted</p>
-                                </Box>}
-                            <Box>
-                                {state.walletWeb3Modal.connected &&
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
@@ -352,11 +326,85 @@ const Home: React.FC<IProps> = () => {
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={disconnectWallet}>
-                                            Disconnect
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsGoldenFlow(true)}>
+                                            Golden miCRObes
                                         </Button>
-                                    </Center>}
-                            </Box>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsRegularFlow(true)}>
+                                            Regular miCRObes
+                                        </Button></Center><br/>
+                                </Box>
+                            }
+                            {state.walletWeb3Modal.connected && isGoldenFlow &&
+                                <Box>
+                                    <Center>
+                                        <Text>Choose your Golden miCRObes</Text>
+                                    </Center>
+                                    <Stack direction={"row"}>
+                                        {tokensInWallet.map((token) => (
+                                            <div key={token} onClick={() => {setMicrobesList([...microbesList, token]); console.log(microbesList)}}>
+                                            <Image
+                                                boxSize='150px'
+                                                objectFit='cover'
+                                                src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
+                                                alt={`miCRObes id ${token}`} />
+                                            </div>))}
+                                    </Stack><br/>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => setSelectOGTrooprz(true)}>
+                                            Continue
+                                        </Button>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsGoldenFlow(false)}>
+                                            Back
+                                        </Button>
+                                    </Center>
+                                </Box>
+                            }
+                            {state.walletWeb3Modal.connected && !isGoldenFlow && isRegularFlow &&
+                                <Box>
+                                    <Center>
+                                        <Text>Choose your miCRObes</Text>
+                                    </Center>
+                                    <Stack direction={"row"}>
+                                        {tokensInWallet.map((token) => (
+                                            <Image
+                                                key={'token'}
+                                                boxSize='150px'
+                                                objectFit='cover'
+                                                src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
+                                                alt={`miCRObes id ${token}`}/>))}
+                                    </Stack><br/>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsRegularFlow(false)}>
+                                            Back
+                                        </Button>
+                                    </Center>
+                                </Box>
+                            }
+
                         </VStack>
                     </Center>
                 </main>
