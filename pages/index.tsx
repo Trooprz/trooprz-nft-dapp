@@ -23,6 +23,7 @@ import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import Link from "next/link";
 import {isDisabled} from "@chakra-ui/utils";
+import {indexOf} from "lodash";
 
 interface IProps {
 }
@@ -120,8 +121,10 @@ const Home: React.FC<IProps> = () => {
     }
 
     const getMicrobesFromStorage = () => {
+        let microbesArray = [];
         const microbes = JSON.parse(sessionStorage.getItem('microbesList'));
-        return Array.from(microbes);
+        microbesArray = Array.from(microbes);
+        return microbesArray;
     }
 
     const getTrooprzSize = () => {
@@ -173,8 +176,10 @@ const Home: React.FC<IProps> = () => {
     }
 
     const getTrooprzFromStorage = () => {
+        let trooprzArray = [];
         const trooprz = JSON.parse(sessionStorage.getItem('trooprzList'));
-        return Array.from(trooprz);
+        trooprzArray = Array.from(trooprz);
+        return trooprzArray;
     }
 
     const checkAmountOfTrooprzSelected = () => {
@@ -272,10 +277,12 @@ const Home: React.FC<IProps> = () => {
                                     </Text></Center>
                                         <Center>
                                             <UnorderedList color={"white"}>
-                                                <ListItem>Claim has ended!</ListItem>
-                                                <ListItem>Mint is LIVE</ListItem>
-                                                <ListItem>Don&lsquo;t forget you will need 1 OG Trooprz + 4 miCRObes to
+                                                <ListItem>miCRObes have SOLD OUT!</ListItem>
+                                                <ListItem>MUTANTZ SPAWN is LIVE!</ListItem>
+                                                <ListItem>You will need 1 OG Trooprz + 4 miCRObes or 1 golden miCRObe to
                                                     SPAWN Mutantz</ListItem>
+                                                <ListItem>Due to chain performance reasons, you can spawn a max of 5
+                                                    Mutantz per turn</ListItem>
                                                 <ListItem><Link
                                                     href="https://app.ebisusbay.com/collection/trooprz">https://app.ebisusbay.com/collection/trooprz</Link></ListItem>
                                             </UnorderedList></Center>
@@ -315,7 +322,7 @@ const Home: React.FC<IProps> = () => {
                             {state.walletWeb3Modal.connected && isTrooprzFlow &&
                                 <Box w={'100%'}>
                                     <Center>
-                                        <Text color={"white"}>Select your OG Trooprz</Text>
+                                        <Text color={"white"}>Select max 5 OG Trooprz per turn</Text>
                                     </Center>
                                     <Center>
                                         <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
@@ -383,7 +390,7 @@ const Home: React.FC<IProps> = () => {
                                         <Text color={"white"}>Select your miCRObes</Text>
                                     </Center>
                                     <Center>
-                                        <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
+                                        <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                             {tokensInWallet.map((token) => (
                                                 <Image
                                                     className="clickable"
@@ -482,7 +489,6 @@ const Home: React.FC<IProps> = () => {
                                             {getTrooprzFromStorage().map((token) => (
                                                 <Image
                                                     key={token}
-                                                    // onSelect={}
                                                     boxSize='150px'
                                                     objectFit='cover'
                                                     src={`https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
