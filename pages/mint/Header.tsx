@@ -11,14 +11,13 @@ import {
     updateRefreshingAction,
     updateWalletWeb3ModalAction,
 } from "../../store/actions";
-import {defaultQueryResults, defaultWalletWeb3Modal} from "../../store/interfaces";
+import {defaultQueryResults} from "../../store/interfaces";
 import {
     Button,
     Center,
 } from '@chakra-ui/react'
 
 import Web3Modal from "web3modal";
-import {getTrooprzBalance} from "../../helpers/utils";
 
 declare global {
     interface Window {

@@ -98,6 +98,8 @@ export interface IQueryResults {
   supplyLeft: number;
   trooprzBalance: number;
   microbesBalance: number;
+  trooprzSelected: number;
+  microbesNeeded: number;
 }
 
 export const defaultQueryResults: IQueryResults = {
@@ -109,5 +111,7 @@ export const defaultQueryResults: IQueryResults = {
   signer: null,
   supplyLeft: 0,
   trooprzBalance: 0,
-  microbesBalance: 0
+  microbesBalance: 0,
+  trooprzSelected: 0,
+  microbesNeeded: 0
 };

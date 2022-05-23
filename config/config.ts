@@ -28,7 +28,7 @@ export const configVars = {
     blockExplorerUrl: "https://cronoscan.com/",
   },
   erc20: {
-    address: "0x64FD05b6b0726d68cDc9bF6061c29b10544d7b92", // Mutantz on Cronos Testnet
+    address: "0xD1E5C82A036Bf9c7454162f898774D777F00fb0c", // Mutantz on Cronos Testnet
     microbesAddress: "0x96628048830a499b156aBdC04cC169C18c3A17f2", // miCRObes on testnet
     trooprzAddres: "0x140559b57C6e8C178ddeA899146E7a199624B340", // trooprz on testnet
     address_mainnet: "0x3987bB060a433F01a19a5d2e790cE67C8AEB9f9c", // on Cronos Mainnet

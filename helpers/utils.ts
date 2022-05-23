@@ -143,8 +143,8 @@ export const getOGTrooprzInWallet = async (
             trooprzInWallet[i] = currentToken;
         }
     }
-    for (let i = 0; i < tokensInWallet.length; i++) {
-        if (await readMutantzContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i]) == true) {
+    for (let i = 0; i < trooprzInWallet.length; i++) {
+        if (await readMutantzContractInstance["checkIfOGTrooprUsedBefore"]([trooprzInWallet[i]]) == true) {
             trooprzInWallet[i] = null;
         }
     }

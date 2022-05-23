@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction, updateWalletWeb3ModalAction} from "../store/actions";
 import {
@@ -22,6 +22,7 @@ import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import Link from "next/link";
+import {isDisabled} from "@chakra-ui/utils";
 
 interface IProps {
 }
@@ -33,6 +34,8 @@ const Home: React.FC<IProps> = () => {
     const [isTrooprzFlow, setIsTrooprzFlow] = useState(false);
     const [isSummary, setIsSummary] = useState(false);
     const [isSpawning, setIsSpawning] = useState(false);
+    const [trooprzCounter, setTrooprzCounter] = useState(0);
+
     const toast = useToast();
     let web3Modal;
     let microbesList = new Set();
@@ -105,6 +108,15 @@ const Home: React.FC<IProps> = () => {
         } else {
             trooprzList.add(token);
         }
+        // if (trooprzList.size === 0) {
+        //     setTrooprzList(previousState => new Set(previousState.add(token)));
+        // }
+        // else if (trooprzList.has(token)) {
+        //     setTrooprzList(prevState => new Set([...prevState].filter(x => x !== token)));
+        //     }
+        // else {
+        //     setTrooprzList(prevState => new Set(prevState.add(token));
+        // }
     }
 
     const getMicrobesFromStorage = () => {
@@ -112,9 +124,74 @@ const Home: React.FC<IProps> = () => {
         return Array.from(microbes);
     }
 
+    const getTrooprzSize = () => {
+        const trooprz = JSON.parse(sessionStorage.getItem('trooprzList'));
+        let trooprzList = Array.from(trooprz);
+        return trooprzList.length;
+    }
+
+    const validateAmount = () => {
+        let trooprzSize = getTrooprzSize();
+        const microbes = JSON.parse(sessionStorage.getItem('microbesList'));
+        let microbesList = Array.from(microbes);
+        for (let i = 0; i < microbesList.length; i++) {
+            if (microbesList[i] <= 222) {
+                trooprzSize = trooprzSize - 1;
+            } else {
+                trooprzSize = trooprzSize - 0.25;
+            }
+        }
+        if (trooprzSize === 0) {
+            toast({
+                title: 'Succes',
+                description: 'Amounts are correct. You can spawn your Mutantz!',
+                status: 'success',
+                duration: 9000,
+                isClosable: true
+            })
+            return true;
+        } else if (trooprzSize < 0) {
+            toast({
+                title: 'Fail',
+                description: "Amounts are incorrect. You selected too many miCRObes",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+            return false;
+        } else {
+            toast({
+                title: 'Fail',
+                description: "Amounts are incorrect. You need " + trooprzSize * 4 + " more regular miCRObes or " + trooprzSize + " more golden miCRObes.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+            return false;
+            // return "Amounts are incorrect. You need " + trooprzSize * 4 + " more miCRObes.";
+        }
+    }
+
     const getTrooprzFromStorage = () => {
         const trooprz = JSON.parse(sessionStorage.getItem('trooprzList'));
         return Array.from(trooprz);
+    }
+
+    const checkAmountOfTrooprzSelected = () => {
+        if (trooprzList.size > 5) {
+            toast({
+                title: 'Fail',
+                description: "Due to performance issues, you can not mint more than 5 Mutantz per turn. You can't select more than 5 OG Trooprz.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+        } else {
+            setTokensInWallet([]);
+            setIsTrooprzFlow(false);
+            setIsMicrobesFlow(true);
+            fetchAmountOfMicrobesInWallet().then(r => setTokensInWallet(r))
+        }
     }
 
     const spawnMutantz = async () => {
@@ -226,14 +303,22 @@ const Home: React.FC<IProps> = () => {
                             }
 
                             {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && isTrooprzFlow &&
-                                <Spinner color={"white"}></Spinner>}
+                                <Box>
+                                    <Center>
+                                        <Text color={"white"}>Please be patient while we load your eligible OG
+                                            Trooprz</Text>
+                                    </Center><br/>
+                                    <Center>
+                                        <Spinner color={"white"}>
+                                        </Spinner></Center>
+                                </Box>}
                             {state.walletWeb3Modal.connected && isTrooprzFlow &&
                                 <Box w={'100%'}>
                                     <Center>
-                                        <Text color={"white"}>Choose your OG Trooprz</Text>
+                                        <Text color={"white"}>Select your OG Trooprz</Text>
                                     </Center>
                                     <Center>
-                                        <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
+                                        <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                             {tokensInWallet.map((token) => (
                                                 <Image
                                                     className="clickable"
@@ -250,6 +335,7 @@ const Home: React.FC<IProps> = () => {
                                                 />
                                             ))}
                                         </SimpleGrid></Center><br/>
+
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
@@ -259,10 +345,7 @@ const Home: React.FC<IProps> = () => {
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             sessionStorage.setItem("trooprzList", JSON.stringify(Array.from(trooprzList)));
-                                            setTokensInWallet([]);
-                                            setIsTrooprzFlow(false);
-                                            setIsMicrobesFlow(true);
-                                            fetchAmountOfMicrobesInWallet().then(r => setTokensInWallet(r))
+                                            checkAmountOfTrooprzSelected();
                                             console.log(sessionStorage.getItem('trooprzList'))
                                         }}>
                                             Continue
@@ -284,13 +367,20 @@ const Home: React.FC<IProps> = () => {
                             }
 
                             {state.walletWeb3Modal.connected && state.refreshing.status && !isTrooprzFlow && isMicrobesFlow &&
-                                <Spinner color={"white"}></Spinner>}
+                                <Box>
+                                    <Center>
+                                        <Text color={"white"}>Please be patient while we load your miCRObes</Text>
+                                    </Center><br/>
+                                    <Center>
+                                        <Spinner color={"white"}>
+                                        </Spinner></Center>
+                                </Box>}
 
 
                             {state.walletWeb3Modal.connected && isMicrobesFlow && !isTrooprzFlow && !isSummary &&
                                 <Box>
                                     <Center>
-                                        <Text color={"white"}>Choose your miCRObes</Text>
+                                        <Text color={"white"}>Select your miCRObes</Text>
                                     </Center>
                                     <Center>
                                         <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
@@ -310,6 +400,24 @@ const Home: React.FC<IProps> = () => {
                                                 />
                                             ))}
                                         </SimpleGrid></Center><br/>
+                                    <Center>
+                                        <Text color={'white'}>You have selected {getTrooprzSize()} Trooprz. You
+                                            need {getTrooprzSize() * 4} miCRObes.</Text>
+                                    </Center>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            sessionStorage.setItem("microbesList", JSON.stringify(Array.from(microbesList)));
+                                            validateAmount();
+                                        }}>
+                                            Validate
+                                        </Button>
+                                    </Center><br/>
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
@@ -420,9 +528,15 @@ const Home: React.FC<IProps> = () => {
                                 </Box>
                             }
                             {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning &&
-                                <Spinner color={"white"}>Please be patient while spawning</Spinner>
+                                <Box>
+                                    <Center>
+                                        <Text color={"white"}>Your Mutantz are spawning!</Text>
+                                    </Center><br/>
+                                    <Center>
+                                        <Spinner color={"white"}></Spinner>
+                                    </Center>
+                                </Box>
                             }
-
                         </VStack>
                     </Center>
                 </main>
