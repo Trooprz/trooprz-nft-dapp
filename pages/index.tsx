@@ -223,8 +223,11 @@ const Home: React.FC<IProps> = () => {
         } catch (error) {
             console.log(error);
             toast({
-                title: 'MAYDAY!',
-                description: 'There was an error'
+                title: 'Error!',
+                status: 'error',
+                description: 'Error: ' + error.data.message,
+                duration: 9000,
+                isClosable: true
             })
         }
         updateRefreshingAction(dispatch, {
