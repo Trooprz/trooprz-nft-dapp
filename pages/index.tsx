@@ -36,6 +36,7 @@ const Home: React.FC<IProps> = () => {
     const [isSummary, setIsSummary] = useState(false);
     const [isSpawning, setIsSpawning] = useState(false);
     const [trooprzCounter, setTrooprzCounter] = useState(0);
+    const [validated, setValidated] = useState(false);
 
     const toast = useToast();
     let web3Modal;
@@ -152,7 +153,7 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
-            return true;
+            setValidated(true);
         } else if (trooprzSize < 0) {
             toast({
                 title: 'Fail',
@@ -161,7 +162,6 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
-            return false;
         } else {
             toast({
                 title: 'Fail',
@@ -170,10 +170,9 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
-            return false;
-            // return "Amounts are incorrect. You need " + trooprzSize * 4 + " more miCRObes.";
         }
     }
+
 
     const getTrooprzFromStorage = () => {
         let trooprzArray = [];
@@ -183,7 +182,15 @@ const Home: React.FC<IProps> = () => {
     }
 
     const checkAmountOfTrooprzSelected = () => {
-        if (trooprzList.size > 5) {
+        if (trooprzList.size === 0) {
+            toast({
+                title: 'Fail',
+                description: "You have to select at least one Troopr.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+        } else if (trooprzList.size > 5) {
             toast({
                 title: 'Fail',
                 description: "Due to performance issues, you can not mint more than 5 Mutantz per turn. You can't select more than 5 OG Trooprz.",
@@ -222,13 +229,23 @@ const Home: React.FC<IProps> = () => {
 
         } catch (error) {
             console.log(error);
-            toast({
-                title: 'Error!',
-                status: 'error',
-                description: 'Error: ' + error.data.message,
-                duration: 9000,
-                isClosable: true
-            })
+            if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
+                toast({
+                    title: 'Error!',
+                    status: 'error',
+                    description: 'Error: ' + error.data.message,
+                    duration: 9000,
+                    isClosable: true
+                })
+            } else {
+                toast({
+                    title: 'Error!',
+                    status: 'error',
+                    description: 'Error: ' + error.message,
+                    duration: 9000,
+                    isClosable: true
+                })
+            }
         }
         updateRefreshingAction(dispatch, {
             status: false,
@@ -353,6 +370,7 @@ const Home: React.FC<IProps> = () => {
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
+                                                disabled={validated}
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             sessionStorage.setItem("trooprzList", JSON.stringify(Array.from(trooprzList)));
                                             checkAmountOfTrooprzSelected();
@@ -393,6 +411,12 @@ const Home: React.FC<IProps> = () => {
                                         <Text color={"white"}>Select your miCRObes</Text>
                                     </Center>
                                     <Center>
+                                        <Center>
+                                            <Text color={'white'}>You have selected {getTrooprzSize()} Trooprz. You
+                                                need {getTrooprzSize() * 4} miCRObes.</Text>
+                                        </Center>
+                                    </Center>
+                                    <Center>
                                         <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                             {tokensInWallet.map((token) => (
                                                 <Image
@@ -410,10 +434,6 @@ const Home: React.FC<IProps> = () => {
                                                 />
                                             ))}
                                         </SimpleGrid></Center><br/>
-                                    <Center>
-                                        <Text color={'white'}>You have selected {getTrooprzSize()} Trooprz. You
-                                            need {getTrooprzSize() * 4} miCRObes.</Text>
-                                    </Center>
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
@@ -435,6 +455,7 @@ const Home: React.FC<IProps> = () => {
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
+                                                disabled={!validated}
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             sessionStorage.setItem("microbesList", JSON.stringify(Array.from(microbesList)));
                                             setTokensInWallet([]);
@@ -546,6 +567,20 @@ const Home: React.FC<IProps> = () => {
                                     </Center>
                                 </Box>
                             }
+                            <Box>
+                                {state.walletWeb3Modal.connected &&
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={disconnectWallet}>
+                                            Disconnect
+                                        </Button>
+                                    </Center>}
+                            </Box>
                         </VStack>
                     </Center>
                 </main>
