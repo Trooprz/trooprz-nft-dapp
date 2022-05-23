@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import Web3Modal from "web3modal";
+import {getTrooprzBalance} from "../../helpers/utils";
 
 declare global {
     interface Window {
@@ -44,28 +45,27 @@ const Header: React.FC<IProps> = () => {
         localStorage.clear();
         newWallet = await walletWeb3Modal.connect();
         if (newWallet.connected) {
-            const croBalance = await utils.getCroBalance(
-                newWallet.provider,
-                newWallet.signer,
-                newWallet.address
-            );
-            const erc20Balance = await utils.getBalance(
+            const trooprzBalance = await utils.getTrooprzBalance(
                 newWallet.provider,
                 newWallet.address
             );
-                updateWalletWeb3ModalAction(dispatch, newWallet);
-                updateQueryResultsAction(dispatch, {
-                    ...defaultQueryResults,
-                    croBalance: croBalance,
-                    erc20Balance: erc20Balance,
-                    provider: newWallet.provider,
-                    signer: newWallet.signer
-                });
-            }
-            updateRefreshingAction(dispatch, {
-                status: false,
-                message: "Complete",
+            const microbesBalance = await utils.getMicrobesBalance(
+                newWallet.provider,
+                newWallet.address
+            );
+            updateWalletWeb3ModalAction(dispatch, newWallet);
+            updateQueryResultsAction(dispatch, {
+                ...defaultQueryResults,
+                trooprzBalance: trooprzBalance,
+                microbesBalance: microbesBalance,
+                provider: newWallet.provider,
+                signer: newWallet.signer
             });
+        }
+        updateRefreshingAction(dispatch, {
+            status: false,
+            message: "Complete",
+        });
     }
 
     const renderLoginbutton = () => {

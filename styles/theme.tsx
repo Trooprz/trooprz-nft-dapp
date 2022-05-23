@@ -5,6 +5,7 @@ const theme = extendTheme({
         heading: 'Montserrat, sans-serif',
         body: 'Montserrat, sans-serif',
     },
+
 })
 
 export default theme

@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction, updateWalletWeb3ModalAction} from "../store/actions";
 import {
@@ -9,46 +9,39 @@ import {
     Center,
     Image,
     ListItem,
-    NumberInput,
-    NumberInputField, SimpleGrid, Spinner, Stack,
+    SimpleGrid,
+    Spinner,
     Text,
     UnorderedList,
+    useToast,
     VStack
 } from '@chakra-ui/react';
 import * as utils from "../helpers/utils";
-import {checkIfTokenIsEligible} from "../helpers/utils";
-import {BigNumber} from "ethers";
 import Header from "./mint/Header";
 import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import Link from "next/link";
-import _, {set} from "lodash";
 
 interface IProps {
 }
 
 const Home: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
-    const [amount, setAmount] = useState('');
-    const cost = BigNumber.from("99000000000000000000");
     const [tokensInWallet, setTokensInWallet] = useState([]);
-    const [id, setId] = useState('');
-    const [ineligibleTokensInWallet, setIneligibleTokensInWallet] = useState([]);
-    const [isEligible, setIsEligible] = useState(Boolean);
-    const [show, setShow] = useState(false);
-    const [minted, setMinted] = useState(false);
-    const [actualPrice, setActualPrice] = useState(0);
-    const [supplyLeft, setSupplyLeft] = useState(0);
-    const [isGoldenFlow, setIsGoldenFlow] = useState(false);
-    const [isRegularFlow, setIsRegularFlow] = useState(false);
-    const [goldenMicrobesInWallet, setGoldenMicrobesInWallet] = useState([]);
-    const [selectOGTrooprz, setSelectOGTrooprz] = useState(false);
-    const [token, setToken] = useState(0);
-    let claimWallet: any[];
-    let duplicateFound = false;
+    const [isMicrobesFlow, setIsMicrobesFlow] = useState(false);
+    const [isTrooprzFlow, setIsTrooprzFlow] = useState(false);
+    const [isSummary, setIsSummary] = useState(false);
+    const [isSpawning, setIsSpawning] = useState(false);
+    const toast = useToast();
     let web3Modal;
     let microbesList = new Set();
+    let trooprzList = new Set();
+
+    function selected(e) {
+        let target = e.currentTarget;
+        target.classList.toggle('selected')
+    }
 
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
@@ -56,55 +49,13 @@ const Home: React.FC<IProps> = () => {
         })
     }
 
-
-    useEffect(() => {
-        //     const fetchAmountOfGoldenMicrobesInWallet = async () => {
-        //         const data = await utils.getGoldenMicrobesInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
-        //         setGoldenMicrobesInWallet(data);
-        //     }
-        // fetchAmountOfTokensInWallet().catch(console.error);
-        // const fetchIneligibleTokensInWallet = async () => {
-        //     const data = await utils.getIneligibleTokens(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
-        //     setIneligibleTokensInWallet(data);
-        // }
-        // fetchIneligibleTokensInWallet().catch(console.error);
-
-        async function calculateSupplyLeft() {
-            await utils.getTotalSupplyLeft(state.walletWeb3Modal.provider).then((result) => {
-                setSupplyLeft(result);
-                updateQueryResultsAction(dispatch, {
-                        ...state.queryResults,
-                        supplyLeft: result,
-                    }
-                )
-            })
-        }
-
-        calculateSupplyLeft().catch(console.error)
-
-    }, [state.walletWeb3Modal.connected])
-    // const selectMicrobes: (id) => void = (id) => {
-    //     let microbesList = []
-    //     if (microbesList) {
-    //         if (microbesList.length != 0) {
-    //             for (let i = 0; i < microbesList.length; i++) {
-    //                 if (microbesList[i] === id) {
-    //                     microbesList.splice(i, 1);
-    //                 }
-    //             }
-    //         }
-    //         microbesList.push(id);
-    //         console.log(microbesList);
-    //     }
-    // }
-
-    const fetchAmountOfTokensInWallet = async () => {
+    const fetchAmountOfMicrobesInWallet = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
         });
 
-        const data = await utils.getTokensInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.erc20Balance);
+        const data = await utils.getMicrobesInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.microbesBalance);
 
         updateRefreshingAction(dispatch, {
             status: false,
@@ -113,6 +64,24 @@ const Home: React.FC<IProps> = () => {
 
         return data;
     }
+
+    const fetchAmountOfOGTrooprzInWallet = async () => {
+        updateRefreshingAction(dispatch, {
+            status: true,
+            message: "Sending transaction...",
+        });
+        console.log(state.queryResults.trooprzBalance);
+
+        const data = await utils.getOGTrooprzInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.trooprzBalance);
+
+        updateRefreshingAction(dispatch, {
+            status: false,
+            message: "Complete",
+        });
+
+        return data;
+    }
+
 
     const addToMicrobesList = (token) => {
         if (microbesList.size === 0) {
@@ -125,6 +94,62 @@ const Home: React.FC<IProps> = () => {
             microbesList.add(token);
         }
     }
+
+    const addToTrooprzList = (token) => {
+        if (trooprzList.size === 0) {
+            console.log("List is empty, adding " + token);
+            trooprzList.add(token);
+        } else if (trooprzList.has(token)) {
+            console.log("removing " + token);
+            trooprzList.delete(token);
+        } else {
+            trooprzList.add(token);
+        }
+    }
+
+    const getMicrobesFromStorage = () => {
+        const microbes = JSON.parse(sessionStorage.getItem('microbesList'));
+        return Array.from(microbes);
+    }
+
+    const getTrooprzFromStorage = () => {
+        const trooprz = JSON.parse(sessionStorage.getItem('trooprzList'));
+        return Array.from(trooprz);
+    }
+
+    const spawnMutantz = async () => {
+        updateRefreshingAction(dispatch, {
+            status: true,
+            message: "Sending transaction...",
+        });
+        const mutantzWriteContractInstance = await utils.getWriteContractInstance(
+            state.walletWeb3Modal.provider,
+        );
+
+        try {
+            const tx = await mutantzWriteContractInstance["spawn"](getMicrobesFromStorage(), getTrooprzFromStorage());
+
+            await tx.wait();
+            toast({
+                title: 'Mutantz spawned!',
+                description: 'Your Mutantz have been spawned!',
+                status: 'success',
+                duration: 9000,
+                isClosable: true
+            })
+
+        } catch (error) {
+            console.log(error);
+            toast({
+                title: 'MAYDAY!',
+                description: 'There was an error'
+            })
+        }
+        updateRefreshingAction(dispatch, {
+            status: false,
+            message: "Complete",
+        });
+    };
 
 
     const disconnectWallet = async () => {
@@ -156,46 +181,20 @@ const Home: React.FC<IProps> = () => {
                 </Head>
                 <main className={styles.main}>
                     <Center>
-                        <VStack spacing='24px' width='100%'>
+                        <VStack>
                             <Box w="60%">
-                                <Image src="/images/Microbes_Logo_Green.png"/>
+                                <Image src="/images/Mutantz-Logo.png"/>
                             </Box>
                             <Header/>
                             {state.walletWeb3Modal.connected &&
-                                <Box w="75%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
+                                <Box w="100%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
 
 
-                                    <><Center><Text fontSize="5xl">
+                                    <><Center><Text fontSize="5xl" color={"white"}>
                                         Pew! Pew! Pew!
                                     </Text></Center>
                                         <Center>
-                                            <UnorderedList>
-                                                {/*<ListItem>*/}
-                                                {/*    Press &lsquo;Mint your miCRObes&lsquo; to mint*/}
-                                                {/*</ListItem>*/}
-                                                {/*<ListItem>*/}
-                                                {/*    The system will tell you how many miCRObes you have left to claim*/}
-                                                {/*</ListItem>*/}
-                                                {/*<ListItem>*/}
-                                                {/*    You can claim 20 miCRObes per transaction (performance optimisation)*/}
-                                                {/*</ListItem>*/}
-                                                {/*<ListItem>*/}
-                                                {/*    Example: If you have 34 miCRObes to claim, you will need to do 2*/}
-                                                {/*    separate claim transactions: 20 and 14*/}
-                                                {/*</ListItem>*/}
-                                                {/*<ListItem>*/}
-                                                {/*    The system will handle the number each time you claim and increment*/}
-                                                {/*    your &lsquo;Total No. of Eligible Super Trooprz&lsquo; and*/}
-                                                {/*    your &lsquo;Total No. of miCRObes left to claim&lsquo; each time*/}
-                                                {/*</ListItem>*/}
-                                                {/*<ListItem>*/}
-                                                {/*    You can use the &lsquo;Eligibility Check&lsquo; function to check if*/}
-                                                {/*    a*/}
-                                                {/*    Super Trooprz ID has claimed miCRObes already (before you buy!)*/}
-                                                {/*</ListItem>*/}
-                                                {/*<ListItem>*/}
-                                                {/*    Don&lsquo;t forget to disconnect your wallet - Safety First!*/}
-                                                {/*</ListItem><br/>*/}
+                                            <UnorderedList color={"white"}>
                                                 <ListItem>Claim has ended!</ListItem>
                                                 <ListItem>Mint is LIVE</ListItem>
                                                 <ListItem>Don&lsquo;t forget you will need 1 OG Trooprz + 4 miCRObes to
@@ -205,10 +204,10 @@ const Home: React.FC<IProps> = () => {
                                             </UnorderedList></Center>
                                     </>
                                 </Box>}
-                            {state.walletWeb3Modal.connected && !isGoldenFlow && !isRegularFlow &&
+                            {state.walletWeb3Modal.connected && !isMicrobesFlow && !isTrooprzFlow && !isSummary &&
                                 <Box>
                                     <Center>
-                                        <Text>What kind of miCRObes will you use to spawn your Mutantz?</Text>
+                                        <Text color={"white"}>Start spawning Mutantz</Text>
                                     </Center>
                                     <Center>
                                         <Button size='md'
@@ -218,47 +217,39 @@ const Home: React.FC<IProps> = () => {
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsGoldenFlow(true);
-                                            fetchAmountOfTokensInWallet().then(r => setTokensInWallet(r))
+                                            setIsTrooprzFlow(true);
+                                            fetchAmountOfOGTrooprzInWallet().then(r => setTokensInWallet(r))
                                         }}>
-                                            Golden miCRObes
-                                        </Button>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsRegularFlow(true);
-                                            fetchAmountOfTokensInWallet().then(r => setTokensInWallet(r))
-                                        }}>
-                                            Regular miCRObes
+                                            Select OG Trooprz
                                         </Button></Center><br/>
                                 </Box>
                             }
-                            {state.walletWeb3Modal.connected && state.refreshing.status &&
-                                <Spinner></Spinner>}
-                            {state.walletWeb3Modal.connected && isGoldenFlow && !isRegularFlow &&
-                                <Box>
+
+                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && isTrooprzFlow &&
+                                <Spinner color={"white"}></Spinner>}
+                            {state.walletWeb3Modal.connected && isTrooprzFlow &&
+                                <Box w={'100%'}>
                                     <Center>
-                                        <Text>Choose your Golden miCRObes</Text>
+                                        <Text color={"white"}>Choose your OG Trooprz</Text>
                                     </Center>
-                                    <SimpleGrid columns={5} spacing={10}>
-                                        {tokensInWallet.map((token) => (
-                                            <Image
-                                                key={token}
-                                                // onSelect={}
-                                                onClick={() => {
-                                                    addToMicrobesList(token);
-                                                    console.log("Clicked token " + token)
-                                                }}
-                                                boxSize='150px'
-                                                objectFit='cover'
-                                                src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
-                                                alt={`miCRObes id ${token}`}/>
-                                        ))}
-                                    </SimpleGrid><br/>
+                                    <Center>
+                                        <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
+                                            {tokensInWallet.map((token) => (
+                                                <Image
+                                                    className="clickable"
+                                                    key={token}
+                                                    onClick={(e) => {
+                                                        addToTrooprzList(token);
+                                                        console.log("Clicked token " + token);
+                                                        selected(e);
+                                                    }}
+                                                    boxSize='150px'
+                                                    objectFit='cover'
+                                                    src={`https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
+                                                    alt={`trooprz id ${token}`}
+                                                />
+                                            ))}
+                                        </SimpleGrid></Center><br/>
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
@@ -267,41 +258,58 @@ const Home: React.FC<IProps> = () => {
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setSelectOGTrooprz(true);
-                                            console.log(microbesList)
+                                            sessionStorage.setItem("trooprzList", JSON.stringify(Array.from(trooprzList)));
+                                            setTokensInWallet([]);
+                                            setIsTrooprzFlow(false);
+                                            setIsMicrobesFlow(true);
+                                            fetchAmountOfMicrobesInWallet().then(r => setTokensInWallet(r))
+                                            console.log(sessionStorage.getItem('trooprzList'))
                                         }}>
                                             Continue
                                         </Button>
+                                    </Center>
+                                    <br/>
+                                    <Center>
                                         <Button size='md'
                                                 height='48px'
                                                 width='220px'
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsGoldenFlow(false)}>
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsTrooprzFlow(false)}>
                                             Back
                                         </Button>
                                     </Center>
                                 </Box>
                             }
-                            {state.walletWeb3Modal.connected && !isGoldenFlow && isRegularFlow &&
+
+                            {state.walletWeb3Modal.connected && state.refreshing.status && !isTrooprzFlow && isMicrobesFlow &&
+                                <Spinner color={"white"}></Spinner>}
+
+
+                            {state.walletWeb3Modal.connected && isMicrobesFlow && !isTrooprzFlow && !isSummary &&
                                 <Box>
                                     <Center>
-                                        <Text>Choose your miCRObes</Text>
+                                        <Text color={"white"}>Choose your miCRObes</Text>
                                     </Center>
-                                    <SimpleGrid columns={5} spacing={10}>
-                                        {tokensInWallet.map((token) => (
-                                            <Image
-                                                key={'token'}
-                                                boxSize='150px'
-                                                onClick={() => {
-                                                    addToMicrobesList(token);
-                                                    console.log("Clicked token " + token)
-                                                }}
-                                                objectFit='cover'
-                                                src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
-                                                alt={`miCRObes id ${token}`}/>))}
-                                    </SimpleGrid><br/>
+                                    <Center>
+                                        <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
+                                            {tokensInWallet.map((token) => (
+                                                <Image
+                                                    className="clickable"
+                                                    key={token}
+                                                    onClick={(e) => {
+                                                        addToMicrobesList(token);
+                                                        selected(e);
+                                                        console.log("Clicked token " + token)
+                                                    }}
+                                                    boxSize='150px'
+                                                    objectFit='cover'
+                                                    src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
+                                                    alt={`miCRObes id ${token}`}
+                                                />
+                                            ))}
+                                        </SimpleGrid></Center><br/>
                                     <Center>
                                         <Button size='md'
                                                 height='48px'
@@ -310,22 +318,109 @@ const Home: React.FC<IProps> = () => {
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setSelectOGTrooprz(true);
+                                            sessionStorage.setItem("microbesList", JSON.stringify(Array.from(microbesList)));
+                                            setTokensInWallet([]);
+                                            setIsTrooprzFlow(false);
+                                            setIsMicrobesFlow(false);
+                                            setIsSummary(true);
                                             console.log(microbesList)
                                         }}>
                                             Continue
                                         </Button>
+                                    </Center><br/>
+                                    <Center>
                                         <Button size='md'
                                                 height='48px'
                                                 width='220px'
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => setIsRegularFlow(false)}>
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setIsMicrobesFlow(false);
+                                            setIsTrooprzFlow(true);
+                                            setIsSummary(false);
+                                            setTokensInWallet([]);
+                                            fetchAmountOfOGTrooprzInWallet().then(r => setTokensInWallet(r))
+                                        }}>
                                             Back
                                         </Button>
                                     </Center>
                                 </Box>
+                            }
+
+                            {state.walletWeb3Modal.connected && isSummary && !isTrooprzFlow &&
+                                <Box>
+                                    <Center>
+                                        <Text color={"white"}>You are about to spawn Mutantz!</Text><br/>
+                                    </Center>
+                                    <Center>
+                                        <Text color={"white"}>miCRObes and OG Trooprz used for this:</Text>
+                                    </Center>
+                                    <Center>
+                                        <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
+                                            {getMicrobesFromStorage().map((token) => (
+                                                <Image
+                                                    key={token}
+                                                    // onSelect={}
+                                                    boxSize='150px'
+                                                    objectFit='cover'
+                                                    src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
+                                                    alt={`trooprz id ${token}`}
+                                                />))}
+                                        </SimpleGrid>
+                                    </Center><br/>
+                                    <Center>
+                                        <SimpleGrid columns={5} spacing={10}>
+                                            {getTrooprzFromStorage().map((token) => (
+                                                <Image
+                                                    key={token}
+                                                    // onSelect={}
+                                                    boxSize='150px'
+                                                    objectFit='cover'
+                                                    src={`https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
+                                                    alt={`trooprz id ${token}`}
+                                                />))}
+                                            )
+                                        </SimpleGrid>
+                                    </Center><br/>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setIsSpawning(true);
+                                            setIsTrooprzFlow(false);
+                                            spawnMutantz();
+                                            console.log(getMicrobesFromStorage());
+                                            console.log(getTrooprzFromStorage())
+                                        }}>
+                                            Spawn Mutantz
+                                        </Button>
+                                    </Center><br/>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setIsTrooprzFlow(false);
+                                            setIsMicrobesFlow(true);
+                                            setTokensInWallet([]);
+                                            fetchAmountOfMicrobesInWallet().then(r => setTokensInWallet(r))
+                                            setIsSummary(false)
+                                        }}>
+                                            Back
+                                        </Button>
+                                    </Center>
+                                </Box>
+                            }
+                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning &&
+                                <Spinner color={"white"}>Please be patient while spawning</Spinner>
                             }
 
                         </VStack>

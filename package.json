@@ -25,6 +25,7 @@
     "next": "12.1.5",
     "react": "18.0.0",
     "react-dom": "18.0.0",
+    "react-toastify": "^9.0.1",
     "web-vitals": "^2.1.4",
     "web3": "^1.7.3",
     "web3modal": "^1.9.7"

@@ -96,6 +96,8 @@ export interface IQueryResults {
   provider: null,
   signer: null,
   supplyLeft: number;
+  trooprzBalance: number;
+  microbesBalance: number;
 }
 
 export const defaultQueryResults: IQueryResults = {
@@ -105,5 +107,7 @@ export const defaultQueryResults: IQueryResults = {
   lastTxHash: "",
   provider: null,
   signer: null,
-  supplyLeft: 0
+  supplyLeft: 0,
+  trooprzBalance: 0,
+  microbesBalance: 0
 };

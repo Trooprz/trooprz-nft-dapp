@@ -19,12 +19,25 @@ a {
   filter: grayscale(1);
 }
 
+.selected {
+  border: 5px solid #93C01F;
+}
+
 .image-container {
   position: relative;
-  background-size: cover;
-  background-image: url("../public/images/miCRObe-tile_background.png");
-  background-repeat: space;
+  background-image: url("../public/images/Mutantz-tile.png");
+  background-repeat: repeat;
   width: 100%;
+}
+
+.clickable {
+  cursor: pointer;
+
+}
+
+.clickable.active {
+  border-width: thick;
+  border-color: red;
 }
 
 > div {
