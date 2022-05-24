@@ -548,7 +548,6 @@ const Home: React.FC<IProps> = () => {
                                             {getMicrobesFromStorage().map((token) => (
                                                 <Image
                                                     key={token}
-                                                    // onSelect={}
                                                     boxSize='150px'
                                                     objectFit='cover'
                                                     src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
@@ -557,7 +556,7 @@ const Home: React.FC<IProps> = () => {
                                         </SimpleGrid>
                                     </Center><br/>
                                     <Center>
-                                        <SimpleGrid columns={5} spacing={10}>
+                                        <SimpleGrid columns={[2, 5]} spacing={10}>
                                             {getTrooprzFromStorage().map((token) => (
                                                 <Image
                                                     key={token}
@@ -574,7 +573,7 @@ const Home: React.FC<IProps> = () => {
                                             <Center>
                                                 <Text color={"white"}>
                                                     Step 1: Click &lsquo;Validate Burn&lsquo; (Only required once)
-                                                </Text>
+                                                </Text><br/>
                                                 <Text color={"white"}>
                                                     Step 2: Click &lsquo;Spawn Mutantz&lsquo; to spawn
                                                 </Text>
