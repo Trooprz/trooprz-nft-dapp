@@ -475,10 +475,6 @@ const Home: React.FC<IProps> = () => {
                                             need <b>{getTrooprzSize() * 4} miCRObes</b> or <b>{getTrooprzSize()} golden
                                                 miCRObes</b>.</Text>
                                     </Center><br/>
-                                    <Center>
-                                        <Text color={'white'}>Done with selecting? Scroll down,
-                                            press <b>Validate</b> and get ready to spawn Mutantz!! </Text>
-                                    </Center><br/>
 
                                     <Center>
                                         <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
@@ -500,8 +496,8 @@ const Home: React.FC<IProps> = () => {
                                         </SimpleGrid></Center><br/>
                                     <Center>
                                         <Text color={"white"}>
-                                            Press <b>Validate</b> to check if your amount of provided miCRObes is
-                                            correct. Once it is, Continue will become available.
+                                            Press <b>Continue</b> to check if your amount of provided miCRObes is
+                                            correct. If it is not, a message will pop up telling you how to fix it.
                                         </Text>
                                     </Center><br/>
                                     <Center>
@@ -601,7 +597,7 @@ const Home: React.FC<IProps> = () => {
                                                     Burn miCRObes
                                                 </Button>
                                             </Center><br/></>}
-                                    {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning && state.queryResults.approved &&
+                                    {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && !isSpawning && state.queryResults.approved &&
                                         <Box>
                                             <Center>
                                                 <Text color={"white"}>Approving miCRObes burn</Text>
@@ -627,27 +623,9 @@ const Home: React.FC<IProps> = () => {
                                             Spawn Mutantz
                                         </Button>
                                     </Center><br/>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            window.location.reload();
-                                            // setIsTrooprzFlow(false);
-                                            // setIsMicrobesFlow(false);
-                                            // setIsSummary(false);
-                                            // setTokensInWallet([]);
-                                            // getMicrobesBalance();
-                                        }}>
-                                            Back
-                                        </Button>
-                                    </Center><br/>
                                 </Box>
                             }
-                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning && !state.queryResults.approved &&
+                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning && state.queryResults.approved &&
                                 <Box>
                                     <Center>
                                         <Text color={"white"}>Hang tight, your Mutantz are spawning!!</Text>
@@ -666,7 +644,9 @@ const Home: React.FC<IProps> = () => {
                                                 border='2px'
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={disconnectWallet}>
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            window.location.reload()
+                                        }}>
                                             Disconnect
                                         </Button>
                                     </Center>}
