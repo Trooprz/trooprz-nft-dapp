@@ -415,7 +415,7 @@ const Home: React.FC<IProps> = () => {
                                                     }}
                                                     boxSize='150px'
                                                     objectFit='cover'
-                                                    src={`https://metadata.trooprz.army/series-1/${token}.png`}
+                                                    src={`https://app.ebisusbay.com/files/0x51112bf32b9a1c64716df2e6b82e63a04bd384fd/images/${token}.webp`}
                                                     alt={`trooprz id ${token}`}
                                                 />
                                             ))}
