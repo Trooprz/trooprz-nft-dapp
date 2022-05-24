@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import Web3Modal from "web3modal";
+import * as config from "../../config/config";
 
 declare global {
     interface Window {
@@ -52,13 +53,20 @@ const Header: React.FC<IProps> = () => {
                 newWallet.provider,
                 newWallet.address
             );
+            const approved = await utils.checkIfApprovedForAll(
+                newWallet.provider,
+                newWallet.address,
+                config.configVars.erc20.address);
+
+
             updateWalletWeb3ModalAction(dispatch, newWallet);
             updateQueryResultsAction(dispatch, {
                 ...defaultQueryResults,
                 trooprzBalance: trooprzBalance,
                 microbesBalance: microbesBalance,
                 provider: newWallet.provider,
-                signer: newWallet.signer
+                signer: newWallet.signer,
+                approved: approved
             });
         }
         updateRefreshingAction(dispatch, {

@@ -122,6 +122,19 @@ export const getMicrobesInWallet = async (
     return tokensInWallet;
 };
 
+export const checkIfApprovedForAll = async (
+    serverWeb3Provider,
+    senderAddress: string,
+    contractAddress: string
+): Promise<Boolean> => {
+    const readMicrobesContractInstance = new ethers.Contract(
+        config.configVars.erc20.microbesAddress,
+        microbesAbi,
+        serverWeb3Provider
+    );
+    return (await readMicrobesContractInstance["isApprovedForAll"](senderAddress, contractAddress));
+};
+
 export const getOGTrooprzInWallet = async (
     serverWeb3Provider,
     address: string,
@@ -192,12 +205,25 @@ export const getIneligibleTokens = async (
     return ineligibleTokensInWallet.filter(x => x != null);
 };
 
-export const getWriteContractInstance = async (
+export const getMutantzWriteContractInstance = async (
     browserWeb3Provider: any,
 ): Promise<ethers.Contract> => {
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.address,
         mutantzAbi,
+        browserWeb3Provider
+    );
+    const signer = browserWeb3Provider.getSigner();
+
+    return readContractInstance.connect(signer);
+};
+
+export const getMicrobesWriteContractInstance = async (
+    browserWeb3Provider: any,
+): Promise<ethers.Contract> => {
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.microbesAddress,
+        microbesAbi,
         browserWeb3Provider
     );
     const signer = browserWeb3Provider.getSigner();

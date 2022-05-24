@@ -100,6 +100,7 @@ export interface IQueryResults {
   microbesBalance: number;
   trooprzSelected: number;
   microbesNeeded: number;
+  approved: Boolean;
 }
 
 export const defaultQueryResults: IQueryResults = {
@@ -113,5 +114,6 @@ export const defaultQueryResults: IQueryResults = {
   trooprzBalance: 0,
   microbesBalance: 0,
   trooprzSelected: 0,
-  microbesNeeded: 0
+  microbesNeeded: 0,
+  approved: false
 };
