@@ -573,10 +573,10 @@ const Home: React.FC<IProps> = () => {
                                         <>
                                             <Center>
                                                 <Text color={"white"}>
-                                                    Step 1: Click 'Validate Burn' (Only required once)
+                                                    Step 1: Click &lsquo;Validate Burn&lsquo; (Only required once)
                                                 </Text>
                                                 <Text color={"white"}>
-                                                    Step 2: Click 'Spawn Mutantz' to spawn
+                                                    Step 2: Click &lsquo;Spawn Mutantz&lsquo; to spawn
                                                 </Text>
                                             </Center>
                                             <Center>
