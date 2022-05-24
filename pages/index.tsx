@@ -488,7 +488,7 @@ const Home: React.FC<IProps> = () => {
                                                     }}
                                                     boxSize='150px'
                                                     objectFit='cover'
-                                                    src={`https://bafybeiahztecs7irzovvdohc3enk5v7wwvypfi66diskhwjqu6zbddeg3q.ipfs.nftstorage.link/${token}.png`}
+                                                    src={`https://app.ebisusbay.com/files/0xbabdfdd5f88035c9fba58be1b5c76dcfc6a847f3/images/${token}.webp`}
                                                     alt={`miCRObes id ${token}`}
                                                 />
                                             ))}
