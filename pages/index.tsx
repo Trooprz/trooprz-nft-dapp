@@ -563,8 +563,8 @@ const Home: React.FC<IProps> = () => {
                                                     key={token}
                                                     boxSize='150px'
                                                     objectFit='cover'
-                                                    src={`https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
-                                                    alt={`trooprz id ${token}`}
+                                                    src={`https://metadata.trooprz.army/series-1/${token}.png`}
+                                                    alt={`microbes id ${token}`}
                                                 />))}
                                             )
                                         </SimpleGrid>
@@ -573,8 +573,10 @@ const Home: React.FC<IProps> = () => {
                                         <>
                                             <Center>
                                                 <Text color={"white"}>
-                                                    You have to <b>one-time approve</b> the burning of your
-                                                    miCRObes. This only happens when spawning for the first time.
+                                                    Step 1: Click 'Validate Burn' (Only required once)
+                                                </Text>
+                                                <Text color={"white"}>
+                                                    Step 2: Click 'Spawn Mutantz' to spawn
                                                 </Text>
                                             </Center>
                                             <Center>
@@ -589,7 +591,7 @@ const Home: React.FC<IProps> = () => {
                                                     getApproval();
                                                     setIsApproved(state.queryResults.approved);
                                                 }}>
-                                                    Burn miCRObes
+                                                    Validate Burn
                                                 </Button>
                                             </Center><br/></>}
                                     {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && !isSpawning && state.queryResults.approved &&
