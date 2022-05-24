@@ -5,13 +5,10 @@ import SuperTrooprz from "../artifacts/SuperTrooprz.json";
 import Trooprz from "../artifacts/Trooprz.json"
 import Mutantz from "../artifacts/Mutantz.json"
 
-const microbesAddress = '0x96628048830a499b156aBdC04cC169C18c3A17f2'
-const trooprzAddress = '0x140559b57C6e8C178ddeA899146E7a199624B340'
 const microbesAbi = Microbes.abi
 const trooprzAbi = Trooprz.abi
 const mutantzAbi = Mutantz.abi
 let tokensInWallet = [];
-let goldenMicrobesInWallet = [];
 let ineligibleTokensInWallet = [];
 let trooprzInWallet = [];
 
@@ -39,21 +36,6 @@ export const getCroBalance = async (
             .toNumber() / 100
     );
 };
-
-export const getTokenBalance = async (
-    serverWeb3Provider,
-): Promise<number> => {
-    const contract = new ethers.Contract(
-        microbesAddress,
-        microbesAbi,
-        serverWeb3Provider
-    )
-    await serverWeb3Provider.send("eth_requestAccounts", []);
-    const signer = serverWeb3Provider.getSigner();
-    const address = await signer.getAddress();
-    const contractWithSigner = contract.connect(signer);
-    return await contractWithSigner.balanceOf(address);
-}
 
 export const getMicrobesBalance = async (
     serverWeb3Provider,
@@ -112,7 +94,7 @@ export const getMicrobesInWallet = async (
         serverWeb3Provider
     );
     for (let i = 0; i < amount; i++) {
-        tokensInWallet[i] = BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
+        tokensInWallet[i] = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
     }
     // for (let i = 0; i < tokensInWallet.length; i++) {
     //     if (await readMicrobesContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
@@ -151,7 +133,7 @@ export const getOGTrooprzInWallet = async (
         serverWeb3Provider
     )
     for (let i = 0; i < amount; i++) {
-        let currentToken = BigNumber.from(await readTrooprzContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
+        let currentToken = ethers.BigNumber.from(await readTrooprzContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
         if (currentToken <= 2222) {
             trooprzInWallet[i] = currentToken;
         }

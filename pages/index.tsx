@@ -74,8 +74,6 @@ const Home: React.FC<IProps> = () => {
             message: "Sending transaction...",
         });
 
-        console.log("AMOUNT OF MICROBES: " + state.queryResults.microbesBalance)
-
         const data = await utils.getMicrobesInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.microbesBalance);
 
         updateRefreshingAction(dispatch, {
@@ -92,7 +90,6 @@ const Home: React.FC<IProps> = () => {
             status: true,
             message: "Sending transaction...",
         });
-        console.log(state.queryResults.trooprzBalance);
 
         const data = await utils.getOGTrooprzInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.trooprzBalance);
 
@@ -107,10 +104,8 @@ const Home: React.FC<IProps> = () => {
 
     const addToMicrobesList = (token) => {
         if (microbesList.size === 0) {
-            console.log("List is empty, adding " + token);
             microbesList.add(token);
         } else if (microbesList.has(token)) {
-            console.log("removing " + token);
             microbesList.delete(token);
         } else {
             microbesList.add(token);
@@ -119,10 +114,8 @@ const Home: React.FC<IProps> = () => {
 
     const addToTrooprzList = (token) => {
         if (trooprzList.size === 0) {
-            console.log("List is empty, adding " + token);
             trooprzList.add(token);
         } else if (trooprzList.has(token)) {
-            console.log("removing " + token);
             trooprzList.delete(token);
         } else {
             trooprzList.add(token);
@@ -186,6 +179,10 @@ const Home: React.FC<IProps> = () => {
         const trooprz = JSON.parse(sessionStorage.getItem('trooprzList'));
         trooprzArray = Array.from(trooprz);
         return trooprzArray;
+    }
+
+    const checkTrooprz = () => {
+        return tokensInWallet.length > 0;
     }
 
     const checkAmountOfTrooprzSelected = () => {
@@ -376,7 +373,6 @@ const Home: React.FC<IProps> = () => {
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            console.log(state.walletWeb3Modal.address);
                                             setIsTrooprzFlow(true);
                                             fetchAmountOfOGTrooprzInWallet().then(r => setTokensInWallet(r))
                                         }}>
@@ -399,7 +395,14 @@ const Home: React.FC<IProps> = () => {
                                 <Box w={'100%'}>
                                     <Center>
                                         <Text color={"white"}>Select max 5 OG Trooprz per turn</Text>
-                                    </Center>
+                                    </Center><br/>
+                                    {state.walletWeb3Modal.connected && !state.refreshing.status && isTrooprzFlow && !isMicrobesFlow && !isSummary && !checkTrooprz() &&
+                                        <Center>
+                                            <Text color={"white"}>
+                                                You don&lsquo;t seem to have any OG Trooprz.
+                                            </Text>
+                                        </Center>
+                                    }
                                     <Center>
                                         <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                             {tokensInWallet.map((token) => (
@@ -408,7 +411,6 @@ const Home: React.FC<IProps> = () => {
                                                     key={token}
                                                     onClick={(e) => {
                                                         addToTrooprzList(token);
-                                                        console.log("Clicked token " + token);
                                                         selected(e);
                                                     }}
                                                     boxSize='150px'
@@ -429,8 +431,6 @@ const Home: React.FC<IProps> = () => {
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             sessionStorage.setItem("trooprzList", JSON.stringify(Array.from(trooprzList)));
                                             checkAmountOfTrooprzSelected();
-                                            console.log(sessionStorage.getItem('trooprzList'))
-                                            console.log(state.queryResults.microbesBalance)
                                         }}>
                                             Continue
                                         </Button>
@@ -485,7 +485,6 @@ const Home: React.FC<IProps> = () => {
                                                     onClick={(e) => {
                                                         addToMicrobesList(token);
                                                         selected(e);
-                                                        console.log("Clicked token " + token)
                                                     }}
                                                     boxSize='150px'
                                                     objectFit='cover'
@@ -510,8 +509,6 @@ const Home: React.FC<IProps> = () => {
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             sessionStorage.setItem("microbesList", JSON.stringify(Array.from(microbesList)));
                                             validateAmount();
-                                            console.log(microbesList);
-                                            console.log(state.queryResults.approved);
                                         }}>
                                             Continue
                                         </Button>
@@ -591,8 +588,6 @@ const Home: React.FC<IProps> = () => {
                                                     setIsSpawning(true);
                                                     getApproval();
                                                     setIsApproved(state.queryResults.approved);
-                                                    console.log(getMicrobesFromStorage());
-                                                    console.log(getTrooprzFromStorage());
                                                 }}>
                                                     Burn miCRObes
                                                 </Button>
@@ -617,8 +612,6 @@ const Home: React.FC<IProps> = () => {
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             setIsSpawning(true);
                                             spawnMutantz();
-                                            console.log(getMicrobesFromStorage());
-                                            console.log(getTrooprzFromStorage())
                                         }}>
                                             Spawn Mutantz
                                         </Button>

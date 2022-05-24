@@ -58,7 +58,6 @@ const Header: React.FC<IProps> = () => {
                 newWallet.address,
                 config.configVars.erc20.address);
 
-
             updateWalletWeb3ModalAction(dispatch, newWallet);
             updateQueryResultsAction(dispatch, {
                 ...defaultQueryResults,
