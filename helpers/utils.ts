@@ -133,10 +133,7 @@ export const getOGTrooprzInWallet = async (
         serverWeb3Provider
     )
     for (let i = 0; i < amount; i++) {
-        let currentToken = ethers.BigNumber.from(await readTrooprzContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
-        if (currentToken <= 2222) {
-            trooprzInWallet[i] = currentToken;
-        }
+        trooprzInWallet[i] = ethers.BigNumber.from(await readTrooprzContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
     }
     for (let i = 0; i < trooprzInWallet.length; i++) {
         if (await readMutantzContractInstance["checkIfOGTrooprUsedBefore"]([trooprzInWallet[i]]) == true) {
