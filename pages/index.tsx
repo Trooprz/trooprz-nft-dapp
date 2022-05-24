@@ -647,7 +647,7 @@ const Home: React.FC<IProps> = () => {
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             window.location.reload()
                                         }}>
-                                            Disconnect
+                                            Spawn Again
                                         </Button>
                                     </Center>}
                             </Box>
