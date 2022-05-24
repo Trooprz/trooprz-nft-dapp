@@ -413,7 +413,7 @@ const Home: React.FC<IProps> = () => {
                                                     }}
                                                     boxSize='150px'
                                                     objectFit='cover'
-                                                    src={`https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
+                                                    src={`https://metadata.trooprz.army/series-1/${token}.png`}
                                                     alt={`trooprz id ${token}`}
                                                 />
                                             ))}
