@@ -220,7 +220,7 @@ const Home: React.FC<IProps> = () => {
         );
 
         try {
-            const tx = await microbesWriteContractInstance["setApprovalForAll"]("0x8042414529898330a5be01870F7dfd4De9C4F803", true);
+            const tx = await microbesWriteContractInstance["setApprovalForAll"]("0x96628048830a499b156aBdC04cC169C18c3A17f2", true);
 
             await tx.wait();
             toast({
@@ -573,7 +573,9 @@ const Home: React.FC<IProps> = () => {
                                             <Center>
                                                 <Text color={"white"}>
                                                     Step 1: Click &lsquo;Validate Burn&lsquo; (Only required once)
-                                                </Text><br/>
+                                                </Text>
+                                            </Center><br/>
+                                            <Center>
                                                 <Text color={"white"}>
                                                     Step 2: Click &lsquo;Spawn Mutantz&lsquo; to spawn
                                                 </Text>
