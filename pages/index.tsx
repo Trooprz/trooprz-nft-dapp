@@ -588,7 +588,6 @@ const Home: React.FC<IProps> = () => {
                                                         bg='#C2DCA5'
                                                         borderColor='#4E6840'
                                                         _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                                    setIsSpawning(true);
                                                     getApproval();
                                                     setIsApproved(state.queryResults.approved);
                                                 }}>
@@ -621,7 +620,7 @@ const Home: React.FC<IProps> = () => {
                                     </Center><br/>
                                 </Box>
                             }
-                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning && state.queryResults.approved &&
+                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning &&
                                 <Box>
                                     <Center>
                                         <Text color={"white"}>Hang tight, your Mutantz are spawning!!</Text>
