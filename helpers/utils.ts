@@ -71,18 +71,6 @@ export const getTrooprzBalance = async (
     );
 };
 
-export const getTotalSupplyLeft = async (
-    serverWeb3Provider,
-): Promise<number> => {
-    const contractAbi = Microbes.abi;
-    const readContractInstance = new ethers.Contract(
-        config.configVars.erc20.address,
-        contractAbi,
-        serverWeb3Provider
-    );
-    return BigNumber.from(await readContractInstance["totalSupply"]()).toNumber();
-};
-
 export const getMicrobesInWallet = async (
     serverWeb3Provider,
     address: string,
@@ -96,11 +84,6 @@ export const getMicrobesInWallet = async (
     for (let i = 0; i < amount; i++) {
         tokensInWallet[i] = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
     }
-    // for (let i = 0; i < tokensInWallet.length; i++) {
-    //     if (await readMicrobesContractInstance["checkIfTokenUsedBefore"](tokensInWallet[i])) {
-    //         tokensInWallet[i] = null;
-    //     }
-    // }
     return tokensInWallet;
 };
 
@@ -147,13 +130,20 @@ export const checkIfTokenIsEligible = async (
     serverWeb3Provider,
     id
 ): Promise<Boolean> => {
-    const contractAbi = Microbes.abi;
-    const readMicrobesContractInstance = new ethers.Contract(
+    const readMutantzContractInstance = new ethers.Contract(
         config.configVars.erc20.address,
-        contractAbi,
+        mutantzAbi,
         serverWeb3Provider
     );
-    return (await readMicrobesContractInstance["checkIfTokenUsedBefore"](id));
+    let isUsed = false;
+    id = ethers.BigNumber.from(id).toNumber();
+    if (await readMutantzContractInstance["checkIfOGTrooprUsedBefore"]([id]) == true) {
+        isUsed = true;
+        // break;
+    } else if (await readMutantzContractInstance["checkIfOGTrooprUsedBefore"]([id]) == false) {
+        isUsed = false;
+    }
+    return isUsed;
 };
 
 export const getIneligibleTokens = async (

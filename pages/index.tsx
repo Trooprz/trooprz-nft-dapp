@@ -8,7 +8,7 @@ import {
     Button,
     Center,
     Image,
-    ListItem,
+    ListItem, NumberInput, NumberInputField,
     SimpleGrid,
     Spinner,
     Text,
@@ -22,6 +22,7 @@ import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import Link from "next/link";
+import {checkIfTokenIsEligible} from "../helpers/utils";
 
 interface IProps {
 }
@@ -35,6 +36,8 @@ const Home: React.FC<IProps> = () => {
     const [isSpawning, setIsSpawning] = useState(false);
     const [validated, setValidated] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
+    const [trooprzId, setTrooprzId] = useState('');
+    const [isCheckOGTrooprzFlow, setIsCheckOGTrooprzFlow] = useState(false);
 
     const toast = useToast();
     let web3Modal;
@@ -84,6 +87,26 @@ const Home: React.FC<IProps> = () => {
         return data;
 
     }
+
+    const isTokenEligible = async (id) => {
+        if (!await checkIfTokenIsEligible(state.walletWeb3Modal.provider, id)) {
+            toast({
+                title: 'Eligible',
+                description: "This Troopr has not been used before. Go get some Mutantz!",
+                status: "success",
+                duration: 9000,
+                isClosable: true
+            })
+        } else {
+            toast({
+                title: 'Not Eligible',
+                description: "This Troopr has been used before to spawn Mutantz.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+        }
+    };
 
     const fetchAmountOfOGTrooprzInWallet = async () => {
         updateRefreshingAction(dispatch, {
@@ -360,10 +383,10 @@ const Home: React.FC<IProps> = () => {
                                             </UnorderedList></Center>
                                     </>
                                 </Box>}
-                            {state.walletWeb3Modal.connected && !isMicrobesFlow && !isTrooprzFlow && !isSummary &&
+                            {state.walletWeb3Modal.connected && !isMicrobesFlow && !isTrooprzFlow && !isSummary && !isCheckOGTrooprzFlow &&
                                 <Box>
                                     <Center>
-                                        <Text color={"white"}>Start spawning Mutantz</Text>
+                                        <Text color={"white"}>What do you want to do?</Text>
                                     </Center>
                                     <Center>
                                         <Button size='md'
@@ -376,11 +399,64 @@ const Home: React.FC<IProps> = () => {
                                             setIsTrooprzFlow(true);
                                             fetchAmountOfOGTrooprzInWallet().then(r => setTokensInWallet(r))
                                         }}>
-                                            Select OG Trooprz
+                                            Start spawning Mutantz
+                                        </Button></Center><br/>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setIsCheckOGTrooprzFlow(true);
+                                        }}>
+                                            Check OG Troopr ID
                                         </Button></Center><br/>
                                 </Box>
                             }
 
+                            {state.walletWeb3Modal.connected && isCheckOGTrooprzFlow && !isMicrobesFlow && !isTrooprzFlow && !isSummary &&
+                                <Box>
+                                    <Center>
+                                        <Text color={"white"}>Enter an OG Trooprz ID here to check if it has already
+                                            been used to spawn Mutantz with. A popup will appear showing the
+                                            result.</Text>
+                                    </Center><br/>
+                                    <Center>
+                                        <NumberInput bg='white' width="200px">
+                                            <NumberInputField value={trooprzId}
+                                                              onChange={(e) => {
+                                                                  setTrooprzId(e.target.value);
+                                                              }}/>
+                                        </NumberInput><br/><br/>
+                                    </Center><br/>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            isTokenEligible(trooprzId);
+                                        }}>
+                                            Check Troopr
+                                        </Button></Center><br/>
+                                    <Center>
+                                        <Button size='md'
+                                                height='48px'
+                                                width='220px'
+                                                border='2px'
+                                                bg='#C2DCA5'
+                                                borderColor='#4E6840'
+                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                            setIsCheckOGTrooprzFlow(false);
+                                        }}>
+                                            Back
+                                        </Button></Center><br/>
+                                </Box>
+                            }
                             {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && isTrooprzFlow &&
                                 <Box>
                                     <Center>
@@ -630,22 +706,23 @@ const Home: React.FC<IProps> = () => {
                                     </Center>
                                 </Box>
                             }
-                            <Box>
-                                {state.walletWeb3Modal.connected &&
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            window.location.reload()
-                                        }}>
-                                            Spawn Again
-                                        </Button>
-                                    </Center>}
-                            </Box>
+                            {state.walletWeb3Modal.connected && !isCheckOGTrooprzFlow || isMicrobesFlow || isTrooprzFlow || isSummary &&
+                                <Box>
+                                    {state.walletWeb3Modal.connected &&
+                                        <Center>
+                                            <Button size='md'
+                                                    height='48px'
+                                                    width='220px'
+                                                    border='2px'
+                                                    bg='#C2DCA5'
+                                                    borderColor='#4E6840'
+                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                window.location.reload()
+                                            }}>
+                                                Spawn Again
+                                            </Button>
+                                        </Center>}
+                                </Box>}
                         </VStack>
                     </Center>
                 </main>
