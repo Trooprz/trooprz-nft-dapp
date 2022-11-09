@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateQueryResultsAction, updateRefreshingAction, updateWalletWeb3ModalAction} from "../store/actions";
 import {
@@ -8,7 +8,7 @@ import {
     Button,
     Center,
     Image,
-    ListItem, NumberInput, NumberInputField,
+    ListItem,
     SimpleGrid,
     Spinner,
     Text,
@@ -21,8 +21,7 @@ import Header from "./mint/Header";
 import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
-import Link from "next/link";
-import {checkIfTokenIsEligible} from "../helpers/utils";
+import * as config from "../config/config";
 
 interface IProps {
 }
@@ -33,16 +32,15 @@ const Home: React.FC<IProps> = () => {
     const [isMicrobesFlow, setIsMicrobesFlow] = useState(false);
     const [isTrooprzFlow, setIsTrooprzFlow] = useState(false);
     const [isSummary, setIsSummary] = useState(false);
-    const [isSpawning, setIsSpawning] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const [validated, setValidated] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
-    const [trooprzId, setTrooprzId] = useState('');
     const [isCheckOGTrooprzFlow, setIsCheckOGTrooprzFlow] = useState(false);
+    const [isMutantzFlow, setIsMutantzFlow] = useState(false);
 
     const toast = useToast();
     let web3Modal;
-    let microbesList = new Set();
-    let trooprzList = new Set();
+    let mutantzList = new Set();
 
     function selected(e) {
         let target = e.currentTarget;
@@ -59,168 +57,58 @@ const Home: React.FC<IProps> = () => {
         return state.queryResults.approved;
     }
 
-    const getMicrobesBalance = async () => {
-        const microbesBalance = await utils.getMicrobesBalance(state.walletWeb3Modal.provider, state.walletWeb3Modal.address);
-        updateQueryResultsAction(dispatch, {
-            ...defaultQueryResults,
-            trooprzBalance: state.queryResults.trooprzBalance,
-            approved: state.queryResults.approved,
-            provider: state.walletWeb3Modal.provider,
-            signer: state.walletWeb3Modal.signer,
-            microbesBalance: microbesBalance
-        });
-    }
-
-    const fetchAmountOfMicrobesInWallet = async () => {
+    const fetchAmountOfMutantzInWallet = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
         });
 
-        const data = await utils.getMicrobesInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.microbesBalance);
+        const data = await utils.getMutantzInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.mutantzBalance);
 
         updateRefreshingAction(dispatch, {
             status: false,
             message: "Complete",
         });
-
-        return data;
-
-    }
-
-    const isTokenEligible = async (id) => {
-        if (!await checkIfTokenIsEligible(state.walletWeb3Modal.provider, id)) {
-            toast({
-                title: 'Eligible',
-                description: "This Troopr has not been used before. Go get some Mutantz!",
-                status: "success",
-                duration: 9000,
-                isClosable: true
-            })
-        } else {
-            toast({
-                title: 'Not Eligible',
-                description: "This Troopr has been used before to spawn Mutantz.",
-                status: "error",
-                duration: 9000,
-                isClosable: true
-            })
-        }
-    };
-
-    const fetchAmountOfOGTrooprzInWallet = async () => {
-        updateRefreshingAction(dispatch, {
-            status: true,
-            message: "Sending transaction...",
-        });
-
-        const data = await utils.getOGTrooprzInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.trooprzBalance);
-
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
+        console.log(data)
 
         return data;
     }
 
 
-    const addToMicrobesList = (token) => {
-        if (microbesList.size === 0) {
-            microbesList.add(token);
-        } else if (microbesList.has(token)) {
-            microbesList.delete(token);
+    const addToMutantzList = (token) => {
+        if (mutantzList.size === 0) {
+            mutantzList.add(token);
+        } else if (mutantzList.has(token)) {
+            mutantzList.delete(token);
         } else {
-            microbesList.add(token);
+            mutantzList.add(token);
         }
     }
 
-    const addToTrooprzList = (token) => {
-        if (trooprzList.size === 0) {
-            trooprzList.add(token);
-        } else if (trooprzList.has(token)) {
-            trooprzList.delete(token);
-        } else {
-            trooprzList.add(token);
-        }
+    const getMutantzFromStorage = () => {
+        let mutantzArray = [];
+        const microbes = JSON.parse(sessionStorage.getItem('mutantzList'));
+        mutantzArray = Array.from(microbes);
+        return mutantzArray;
     }
 
-    const getMicrobesFromStorage = () => {
-        let microbesArray = [];
-        const microbes = JSON.parse(sessionStorage.getItem('microbesList'));
-        microbesArray = Array.from(microbes);
-        return microbesArray;
-    }
-
-    const getTrooprzSize = () => {
-        const trooprz = JSON.parse(sessionStorage.getItem('trooprzList'));
-        let trooprzList = Array.from(trooprz);
-        return trooprzList.length;
-    }
-
-    const validateAmount = () => {
-        let trooprzSize = getTrooprzSize();
-        const microbes = JSON.parse(sessionStorage.getItem('microbesList'));
-        let microbesList = Array.from(microbes);
-        for (let i = 0; i < microbesList.length; i++) {
-            if (microbesList[i] <= 222) {
-                trooprzSize = trooprzSize - 1;
-            } else {
-                trooprzSize = trooprzSize - 0.25;
-            }
-        }
-        if (trooprzSize < 0) {
-            toast({
-                title: 'Fail',
-                description: "Amounts are incorrect. You selected too many miCRObes",
-                status: "error",
-                duration: 9000,
-                isClosable: true
-            })
-        } else if (trooprzSize > 0) {
-            toast({
-                title:
-                    'Fail',
-                description:
-                    "Amounts are incorrect. You need " + trooprzSize * 4 + " more regular miCRObes or " + trooprzSize + " more golden miCRObes.",
-                status:
-                    "error",
-                duration: 9000,
-                isClosable: true
-            })
-        } else {
-            setTokensInWallet([]);
-            setIsTrooprzFlow(false);
-            setIsMicrobesFlow(false);
-            setIsSummary(true);
-        }
-    }
-
-
-    const getTrooprzFromStorage = () => {
-        let trooprzArray = [];
-        const trooprz = JSON.parse(sessionStorage.getItem('trooprzList'));
-        trooprzArray = Array.from(trooprz);
-        return trooprzArray;
-    }
-
-    const checkTrooprz = () => {
+    const checkMutantz = () => {
         return tokensInWallet.length > 0;
     }
 
-    const checkAmountOfTrooprzSelected = () => {
-        if (trooprzList.size === 0) {
+    const checkAmountOfMutantzSelected = () => {
+        if (mutantzList.size === 0) {
             toast({
                 title: 'Fail',
-                description: "You have to select at least one Troopr.",
+                description: "You have to select at least one Mutant.",
                 status: "error",
                 duration: 9000,
                 isClosable: true
             })
-        } else if (trooprzList.size > 5) {
+        } else if (mutantzList.size > 5) {
             toast({
                 title: 'Fail',
-                description: "Due to performance issues, you can not mint more than 5 Mutantz per turn. You can't select more than 5 OG Trooprz.",
+                description: "Due to performance issues, you can not send more than 5 Mutantz per turn. You can't select more than 5 Mutantz.",
                 status: "error",
                 duration: 9000,
                 isClosable: true
@@ -229,7 +117,7 @@ const Home: React.FC<IProps> = () => {
             setTokensInWallet([]);
             setIsTrooprzFlow(false);
             setIsMicrobesFlow(true);
-            fetchAmountOfMicrobesInWallet().then(r => setTokensInWallet(r));
+            fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r));
         }
     }
 
@@ -279,7 +167,7 @@ const Home: React.FC<IProps> = () => {
         });
     }
 
-    const spawnMutantz = async () => {
+    const sendMutantz = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
@@ -289,12 +177,15 @@ const Home: React.FC<IProps> = () => {
         );
 
         try {
-            const tx = await mutantzWriteContractInstance["spawn"](getMicrobesFromStorage(), getTrooprzFromStorage(), state.walletWeb3Modal.address);
+            let mutantzArray = getMutantzFromStorage()
+            for (let i = 0; i < mutantzList.size; i++) {
+                const tx = await mutantzWriteContractInstance["safeTransferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantzArray[i]);
 
-            await tx.wait();
+                await tx.wait();
+            }
             toast({
-                title: 'Mutantz spawned!',
-                description: 'Your Mutantz have been spawned!',
+                title: 'Mutantz sent!',
+                description: 'Your Mutantz have been sent!',
                 status: 'success',
                 duration: 9000,
                 isClosable: true
@@ -370,20 +261,11 @@ const Home: React.FC<IProps> = () => {
                                     </Text></Center>
                                         <Center>
                                             <UnorderedList color={"white"}>
-                                                <ListItem>miCRObes have SOLD OUT!</ListItem>
-                                                <ListItem>MUTANTZ SPAWN is LIVE!</ListItem>
-                                                <ListItem>You will need <b>1 OG Trooprz</b> + <b>4
-                                                    miCRObes</b> or <b>1 golden miCRObe</b> to
-                                                    SPAWN Mutantz</ListItem>
-                                                <ListItem>Due to chain performance reasons, you can spawn a max
-                                                    of <b>5
-                                                        Mutantz</b> per turn</ListItem>
-                                                <ListItem><Link
-                                                    href="https://app.ebisusbay.com/collection/trooprz">https://app.ebisusbay.com/collection/trooprz</Link></ListItem>
+                                                <ListItem>Select Mutantz you want to use to attack!</ListItem>
                                             </UnorderedList></Center>
                                     </>
                                 </Box>}
-                            {state.walletWeb3Modal.connected && !isMicrobesFlow && !isTrooprzFlow && !isSummary && !isCheckOGTrooprzFlow &&
+                            {state.walletWeb3Modal.connected && !isMutantzFlow && !isSummary &&
                                 <Box>
                                     <Center>
                                         <Text color={"white"}>What do you want to do?</Text>
@@ -396,86 +278,33 @@ const Home: React.FC<IProps> = () => {
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsTrooprzFlow(true);
-                                            fetchAmountOfOGTrooprzInWallet().then(r => setTokensInWallet(r))
+                                            setIsMutantzFlow(true);
+                                            fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r))
                                         }}>
-                                            Start spawning Mutantz
-                                        </Button></Center><br/>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsCheckOGTrooprzFlow(true);
-                                        }}>
-                                            Check OG Troopr ID
+                                            Start selecting Mutantz
                                         </Button></Center><br/>
                                 </Box>
                             }
 
-                            {state.walletWeb3Modal.connected && isCheckOGTrooprzFlow && !isMicrobesFlow && !isTrooprzFlow && !isSummary &&
+                            {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow &&
                                 <Box>
                                     <Center>
-                                        <Text color={"white"}>Enter an OG Trooprz ID here to check if it has already
-                                            been used to spawn Mutantz with. A popup will appear showing the
-                                            result.</Text>
-                                    </Center><br/>
-                                    <Center>
-                                        <NumberInput bg='white' width="200px">
-                                            <NumberInputField value={trooprzId}
-                                                              onChange={(e) => {
-                                                                  setTrooprzId(e.target.value);
-                                                              }}/>
-                                        </NumberInput><br/><br/>
-                                    </Center><br/>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            isTokenEligible(trooprzId);
-                                        }}>
-                                            Check Troopr
-                                        </Button></Center><br/>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsCheckOGTrooprzFlow(false);
-                                        }}>
-                                            Back
-                                        </Button></Center><br/>
-                                </Box>
-                            }
-                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && isTrooprzFlow &&
-                                <Box>
-                                    <Center>
-                                        <Text color={"white"}>Please be patient while we load your eligible OG
-                                            Trooprz</Text>
+                                        <Text color={"white"}>Please be patient while we load your eligible
+                                            Mutantz</Text>
                                     </Center><br/>
                                     <Center>
                                         <Spinner color={"white"}>
                                         </Spinner></Center>
                                 </Box>}
-                            {state.walletWeb3Modal.connected && isTrooprzFlow && !isMicrobesFlow && !isSummary &&
+                            {state.walletWeb3Modal.connected && isMutantzFlow &&
                                 <Box w={'100%'}>
                                     <Center>
-                                        <Text color={"white"}>Select max 5 OG Trooprz per turn</Text>
+                                        <Text color={"white"}>Select max 5 Mutantz per turn</Text>
                                     </Center><br/>
-                                    {state.walletWeb3Modal.connected && !state.refreshing.status && isTrooprzFlow && !isMicrobesFlow && !isSummary && !checkTrooprz() &&
+                                    {state.walletWeb3Modal.connected && !state.refreshing.status && isMutantzFlow && !isSummary && !checkMutantz() &&
                                         <Center>
                                             <Text color={"white"}>
-                                                You don&lsquo;t seem to have any OG Trooprz.
+                                                You don&lsquo;t seem to have any Mutantz.
                                             </Text>
                                         </Center>
                                     }
@@ -486,13 +315,13 @@ const Home: React.FC<IProps> = () => {
                                                     className="clickable"
                                                     key={token}
                                                     onClick={(e) => {
-                                                        addToTrooprzList(token);
+                                                        addToMutantzList(token);
                                                         selected(e);
                                                     }}
                                                     boxSize='150px'
                                                     objectFit='cover'
-                                                    src={`https://app.ebisusbay.com/files/0x51112bf32b9a1c64716df2e6b82e63a04bd384fd/images/${token}.webp`}
-                                                    alt={`trooprz id ${token}`}
+                                                    src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
+                                                    alt={`Mutantz id ${token}`}
                                                 />
                                             ))}
                                         </SimpleGrid></Center><br/>
@@ -505,8 +334,8 @@ const Home: React.FC<IProps> = () => {
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            sessionStorage.setItem("trooprzList", JSON.stringify(Array.from(trooprzList)));
-                                            checkAmountOfTrooprzSelected();
+                                            sessionStorage.setItem("mutantzList", JSON.stringify(Array.from(mutantzList)));
+                                            checkAmountOfMutantzSelected();
                                         }}>
                                             Continue
                                         </Button>
@@ -529,131 +358,38 @@ const Home: React.FC<IProps> = () => {
                                 </Box>
                             }
 
-                            {state.walletWeb3Modal.connected && state.refreshing.status && !isTrooprzFlow && isMicrobesFlow && !isSummary &&
+                            {state.walletWeb3Modal.connected && isSummary && !isMutantzFlow &&
                                 <Box>
                                     <Center>
-                                        <Text color={"white"}>Please be patient while we load your miCRObes</Text>
-                                    </Center><br/>
-                                    <Center>
-                                        <Spinner color={"white"}>
-                                        </Spinner></Center>
-                                </Box>}
-
-
-                            {state.walletWeb3Modal.connected && isMicrobesFlow && !isTrooprzFlow && !isSummary &&
-                                <Box>
-                                    <Center>
-                                        <Text color={"white"}>Select your miCRObes</Text>
-                                    </Center><br/>
-                                    <Center>
-                                        <Text color={'white'}>You have selected <b>{getTrooprzSize()} Trooprz</b>.
-                                            You
-                                            need <b>{getTrooprzSize() * 4} miCRObes</b> or <b>{getTrooprzSize()} golden
-                                                miCRObes</b>.</Text>
-                                    </Center><br/>
-
-                                    <Center>
-                                        <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
-                                            {tokensInWallet.map((token) => (
-                                                <Image
-                                                    className="clickable"
-                                                    key={token}
-                                                    onClick={(e) => {
-                                                        addToMicrobesList(token);
-                                                        selected(e);
-                                                    }}
-                                                    boxSize='150px'
-                                                    objectFit='cover'
-                                                    src={`https://app.ebisusbay.com/files/0xbabdfdd5f88035c9fba58be1b5c76dcfc6a847f3/images/${token}.webp`}
-                                                    alt={`miCRObes id ${token}`}
-                                                />
-                                            ))}
-                                        </SimpleGrid></Center><br/>
-                                    <Center>
-                                        <Text color={"white"}>
-                                            Press <b>Continue</b> to check if your amount of provided miCRObes is
-                                            correct. If it is not, a message will pop up telling you how to fix it.
-                                        </Text>
-                                    </Center><br/>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            sessionStorage.setItem("microbesList", JSON.stringify(Array.from(microbesList)));
-                                            validateAmount();
-                                        }}>
-                                            Continue
-                                        </Button>
-                                    </Center><br/>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsMicrobesFlow(false);
-                                            setIsTrooprzFlow(true);
-                                            setIsSummary(false);
-                                            setValidated(false);
-                                            setTokensInWallet([]);
-                                            fetchAmountOfOGTrooprzInWallet().then(r => setTokensInWallet(r))
-                                        }}>
-                                            Back
-                                        </Button>
-                                    </Center><br/>
-                                </Box>
-                            }
-
-                            {state.walletWeb3Modal.connected && isSummary && !isTrooprzFlow && !isMicrobesFlow &&
-                                <Box>
-                                    <Center>
-                                        <Text color={"white"}>You are about to spawn Mutantz!</Text><br/>
+                                        <Text color={"white"}>You are about to send Mutantz off to attack!</Text><br/>
                                     </Center>
                                     <Center>
-                                        <Text color={"white"}>Here&lsquo;s an overview of OG Trooprz and miCRObes
+                                        <Text color={"white"}>Here&lsquo;s an overview of Mutantz
                                             used for this:</Text>
                                     </Center>
                                     <Center>
                                         <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
-                                            {getMicrobesFromStorage().map((token) => (
+                                            {getMutantzFromStorage().map((token) => (
                                                 <Image
                                                     key={token}
                                                     boxSize='150px'
                                                     objectFit='cover'
-                                                    src={`https://app.ebisusbay.com/files/0xbabdfdd5f88035c9fba58be1b5c76dcfc6a847f3/images/${token}.webp`}
-                                                    alt={`microbes id ${token}`}
+                                                    src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
+                                                    alt={`Mutantz id ${token}`}
                                                 />))}
                                         </SimpleGrid>
                                     </Center><br/>
-                                    <Center>
-                                        <SimpleGrid columns={[2, 5]} spacing={10}>
-                                            {getTrooprzFromStorage().map((token) => (
-                                                <Image
-                                                    key={token}
-                                                    boxSize='150px'
-                                                    objectFit='cover'
-                                                    src={`https://app.ebisusbay.com/files/0x51112bf32b9a1c64716df2e6b82e63a04bd384fd/images/${token}.webp`}
-                                                    alt={`trooprz id ${token}`}
-                                                />))}
-                                            )
-                                        </SimpleGrid>
-                                    </Center><br/>
+
                                     {state.walletWeb3Modal.connected && !state.queryResults.approved &&
                                         <>
                                             <Center>
                                                 <Text color={"white"}>
-                                                    Step 1: Click &lsquo;Validate Burn&lsquo; (Only required once)
+                                                    Step 1: Click &lsquo;Validate Send&lsquo; (Only required once)
                                                 </Text>
                                             </Center><br/>
                                             <Center>
                                                 <Text color={"white"}>
-                                                    Step 2: Click &lsquo;Spawn Mutantz&lsquo; to spawn
+                                                    Step 2: Click &lsquo;Send Mutantz&lsquo;
                                                 </Text>
                                             </Center>
                                             <Center>
@@ -670,10 +406,10 @@ const Home: React.FC<IProps> = () => {
                                                     Validate Burn
                                                 </Button>
                                             </Center><br/></>}
-                                    {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && !isSpawning && state.queryResults.approved &&
+                                    {state.walletWeb3Modal.connected && state.refreshing.status && !isMutantzFlow && !isSending && state.queryResults.approved &&
                                         <Box>
                                             <Center>
-                                                <Text color={"white"}>Approving miCRObes burn</Text>
+                                                <Text color={"white"}>Approving Mutantz send</Text>
                                             </Center><br/>
                                             <Center>
                                                 <Spinner color={"white"}></Spinner>
@@ -688,18 +424,19 @@ const Home: React.FC<IProps> = () => {
                                                 bg='#C2DCA5'
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsSpawning(true);
-                                            spawnMutantz();
+                                            setIsSending(true);
+                                            sendMutantz();
                                         }}>
-                                            Spawn Mutantz
+                                            Send Mutantz
                                         </Button>
                                     </Center><br/>
                                 </Box>
                             }
-                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSpawning &&
+                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSending &&
                                 <Box>
                                     <Center>
-                                        <Text color={"white"}>Hang tight, your Mutantz are spawning!!</Text>
+                                        <Text color={"white"}>Hang tight, your Mutantz are being sent off to
+                                            attack!!</Text>
                                     </Center><br/>
                                     <Center>
                                         <Spinner color={"white"}></Spinner>
@@ -719,7 +456,7 @@ const Home: React.FC<IProps> = () => {
                                                     _hover={{bg: '#D6E9CF'}} onClick={() => {
                                                 window.location.reload()
                                             }}>
-                                                Spawn Again
+                                                Send more Mutantz
                                             </Button>
                                         </Center>}
                                 </Box>}

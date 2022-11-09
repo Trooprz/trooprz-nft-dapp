@@ -54,6 +54,24 @@ export const getMicrobesBalance = async (
     );
 };
 
+export const getMutantzBalance = async (
+    serverWeb3Provider,
+    address: string
+): Promise<number> => {
+    // Create ethers.Contract object using the smart contract's ABI
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.mutantzAddress,
+        mutantzAbi,
+        serverWeb3Provider
+    );
+    const contractResponse = await readContractInstance["balanceOf"](address);
+    // Balance is rounded at 2 decimals instead of 18, to simplify UI
+    console.log(ethers.BigNumber.from(contractResponse).toNumber())
+    return (
+        ethers.BigNumber.from(contractResponse).toNumber()
+    );
+};
+
 export const getTrooprzBalance = async (
     serverWeb3Provider,
     address: string
@@ -84,6 +102,24 @@ export const getMicrobesInWallet = async (
     for (let i = 0; i < amount; i++) {
         tokensInWallet[i] = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
     }
+    return tokensInWallet;
+};
+
+export const getMutantzInWallet = async (
+    serverWeb3Provider,
+    address: string,
+    amount
+): Promise<String[]> => {
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.mutantzAddress,
+        mutantzAbi,
+        serverWeb3Provider
+    );
+    for (let i = 0; i < amount; i++) {
+        tokensInWallet[i] = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
+    }
+    console.log(address)
+    console.log(tokensInWallet)
     return tokensInWallet;
 };
 

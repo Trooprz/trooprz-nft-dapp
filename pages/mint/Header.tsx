@@ -53,6 +53,10 @@ const Header: React.FC<IProps> = () => {
                 newWallet.provider,
                 newWallet.address
             );
+            const mutantzBalance = await utils.getMutantzBalance(
+                newWallet.provider,
+                newWallet.address
+            );
             const approved = await utils.checkIfApprovedForAll(
                 newWallet.provider,
                 newWallet.address,
@@ -63,6 +67,7 @@ const Header: React.FC<IProps> = () => {
                 ...defaultQueryResults,
                 trooprzBalance: trooprzBalance,
                 microbesBalance: microbesBalance,
+                mutantzBalance: mutantzBalance,
                 provider: newWallet.provider,
                 signer: newWallet.signer,
                 approved: approved
