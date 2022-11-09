@@ -126,12 +126,12 @@ const Home: React.FC<IProps> = () => {
             status: true,
             message: "Sending transaction...",
         });
-        const microbesWriteContractInstance = await utils.getMicrobesWriteContractInstance(
+        const mutantzWriteContractInstance = await utils.getMicrobesWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
 
         try {
-            const tx = await microbesWriteContractInstance["setApprovalForAll"]("0x96628048830a499b156aBdC04cC169C18c3A17f2", true);
+            const tx = await mutantzWriteContractInstance["setApprovalForAll"]("0x96628048830a499b156aBdC04cC169C18c3A17f2", true);
 
             await tx.wait();
             toast({
@@ -335,6 +335,8 @@ const Home: React.FC<IProps> = () => {
                                                 borderColor='#4E6840'
                                                 _hover={{bg: '#D6E9CF'}} onClick={() => {
                                             sessionStorage.setItem("mutantzList", JSON.stringify(Array.from(mutantzList)));
+                                            setIsSummary(true);
+                                            setIsMutantzFlow(false);
                                             checkAmountOfMutantzSelected();
                                         }}>
                                             Continue
