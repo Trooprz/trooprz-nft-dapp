@@ -12,22 +12,26 @@ a {
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .grayscale {
-  filter: grayscale(1);
+    filter: grayscale(1);
 }
 
 .selected {
-  border: 5px solid #93C01F;
+    border: 5px solid #93C01F;
+}
+
+.selectedSuperTroopr {
+    border: 5px solid #FBEC42;
 }
 
 .image-container-mutantz {
-  position: relative;
-  background-image: url("../public/images/Mutantz-tile.png");
-  background-repeat: repeat;
-  width: 100%;
+    position: relative;
+    background-image: url("../public/images/Mutantz-tile.png");
+    background-repeat: repeat;
+    width: 100%;
 }
 
 .image-container-microbes {
@@ -46,7 +50,6 @@ a {
 
 .clickable {
   cursor: pointer;
-
 }
 
 .clickable.active {

@@ -49,6 +49,11 @@ const Home: React.FC<IProps> = () => {
         target.classList.toggle('selected')
     }
 
+    function selectedSuperTroopr(e) {
+        let target = e.currentTarget;
+        target.classList.toggle('selectedSuperTroopr')
+    }
+
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
             providerOptions
@@ -145,6 +150,7 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
+            setIsSummary(false);
         } else if (mutantzList.size > 1) {
             toast({
                 title: 'Fail',
@@ -153,11 +159,7 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
-        } else {
-            setTokensInWallet([]);
-            setIsTrooprzFlow(false);
-            setIsMicrobesFlow(true);
-            fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r));
+            setIsSummary(false);
         }
     }
 
@@ -178,11 +180,6 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
-        } else {
-            setTokensInWallet([]);
-            setIsTrooprzFlow(false);
-            setIsMicrobesFlow(true);
-            fetchAmountOfSuperTrooprzInWallet().then(r => setTokensInWallet(r));
         }
     }
 
@@ -336,15 +333,16 @@ const Home: React.FC<IProps> = () => {
                             </Box>
                                 <Center>
                                     <Box p='6'>
-                                        <Image src="/images/Mutant-Invasion-Graphic-Choice.png" onClick={() => {
-                                            setIsMutantzFlow(true);
-                                            setIsAttack(true);
-                                            setIsChoosing(false);
-                                            fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r));
-                                        }}/>
+                                        <Image className='clickable' src="/images/Mutant-Invasion-Graphic-Choice.png"
+                                               onClick={() => {
+                                                   setIsMutantzFlow(true);
+                                                   setIsAttack(true);
+                                                   setIsChoosing(false);
+                                                   fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r));
+                                               }}/>
                                     </Box>
                                     <Box p='6'>
-                                        <Image src="/images/Super-Trooprz-Graphic-Choice.png"
+                                        <Image className='clickable' src="/images/Super-Trooprz-Graphic-Choice.png"
                                                onClick={() => {
                                                    setIsTrooprzFlow(true);
                                                    setIsDefense(true);
@@ -427,9 +425,6 @@ const Home: React.FC<IProps> = () => {
                                                 setIsMutantzFlow(false);
                                                 setIsChoosing(false);
                                                 checkAmountOfMutantzSelected();
-                                                console.log("isMutantzFlow" + isMutantzFlow);
-                                                console.log("isChoosing" + isChoosing);
-                                                console.log("isSummary" + isSummary);
                                             }}>
                                                 Continue
                                             </Button>
@@ -571,7 +566,7 @@ const Home: React.FC<IProps> = () => {
                                                         key={token}
                                                         onClick={(e) => {
                                                             addToSuperTrooprzList(token);
-                                                            selected(e);
+                                                            selectedSuperTroopr(e);
                                                         }}
                                                         boxSize='150px'
                                                         objectFit='cover'
