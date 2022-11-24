@@ -7,6 +7,7 @@ import Mutantz from "../artifacts/Mutantz.json"
 
 const microbesAbi = Microbes.abi
 const trooprzAbi = Trooprz.abi
+const supertrooprzAbi = Mutantz.abi
 const mutantzAbi = Mutantz.abi
 let tokensInWallet = [];
 let ineligibleTokensInWallet = [];
@@ -89,6 +90,23 @@ export const getTrooprzBalance = async (
     );
 };
 
+export const getSuperTrooprzBalance = async (
+    serverWeb3Provider,
+    address: string
+): Promise<number> => {
+    // Create ethers.Contract object using the smart contract's ABI
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.superTrooprzAddress,
+        supertrooprzAbi,
+        serverWeb3Provider
+    );
+    const contractResponse = await readContractInstance["balanceOf"](address);
+    // Balance is rounded at 2 decimals instead of 18, to simplify UI
+    return (
+        ethers.BigNumber.from(contractResponse).toNumber()
+    );
+};
+
 export const getMicrobesInWallet = async (
     serverWeb3Provider,
     address: string,
@@ -113,6 +131,24 @@ export const getMutantzInWallet = async (
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.mutantzAddress,
         mutantzAbi,
+        serverWeb3Provider
+    );
+    for (let i = 0; i < amount; i++) {
+        tokensInWallet[i] = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
+    }
+    console.log(address)
+    console.log(tokensInWallet)
+    return tokensInWallet;
+};
+
+export const getSuperTrooprzInWallet = async (
+    serverWeb3Provider,
+    address: string,
+    amount
+): Promise<String[]> => {
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.superTrooprzAddress,
+        supertrooprzAbi,
         serverWeb3Provider
     );
     for (let i = 0; i < amount; i++) {
@@ -216,6 +252,19 @@ export const getMutantzWriteContractInstance = async (
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.address,
         mutantzAbi,
+        browserWeb3Provider
+    );
+    const signer = browserWeb3Provider.getSigner();
+
+    return readContractInstance.connect(signer);
+};
+
+export const getSuperTrooprzWriteContractInstance = async (
+    browserWeb3Provider: any,
+): Promise<ethers.Contract> => {
+    const readContractInstance = new ethers.Contract(
+        config.configVars.erc20.address,
+        supertrooprzAbi,
         browserWeb3Provider
     );
     const signer = browserWeb3Provider.getSigner();

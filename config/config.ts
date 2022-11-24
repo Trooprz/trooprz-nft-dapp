@@ -31,6 +31,7 @@ export const configVars = {
     address: "0x96628048830a499b156aBdC04cC169C18c3A17f2", // Mutantz on Cronos Mainnet
     microbesAddress: "0xbabdFDD5f88035C9FbA58Be1b5c76DcFC6A847f3", // miCRObes on Mainnet
     mutantzAddress: "0x96628048830a499b156aBdC04cC169C18c3A17f2", // mutantz on Mainnet
+    superTrooprzAddress: "0xea4DF145322ec9dFCE037b062b08083141c6af8f", // superTrooprz on Mainnet
     trooprzAddres: "0x51112Bf32B9a1C64716DF2e6b82e63a04Bd384Fd", // trooprz on Mainnet
     attackAddress: "0xb6e04eB89EdDD46690C779c9124178747101Adda", // Mutantz attack wallet on CRO mainnet
     protectAddress: "0x35767F21F8aa03EA5782116ff165D5081af65255", // SuperTrooprz protect wallet on CRO mainnet

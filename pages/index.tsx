@@ -22,6 +22,7 @@ import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import * as config from "../config/config";
+import {over} from "lodash";
 
 interface IProps {
 }
@@ -31,16 +32,17 @@ const Home: React.FC<IProps> = () => {
     const [tokensInWallet, setTokensInWallet] = useState([]);
     const [isMicrobesFlow, setIsMicrobesFlow] = useState(false);
     const [isTrooprzFlow, setIsTrooprzFlow] = useState(false);
+    const [isDefense, setIsDefense] = useState(false);
+    const [isAttack, setIsAttack] = useState(false);
     const [isSummary, setIsSummary] = useState(false);
     const [isSending, setIsSending] = useState(false);
-    const [validated, setValidated] = useState(false);
-    const [isApproved, setIsApproved] = useState(false);
-    const [isCheckOGTrooprzFlow, setIsCheckOGTrooprzFlow] = useState(false);
     const [isMutantzFlow, setIsMutantzFlow] = useState(false);
+    const [isChoosing, setIsChoosing] = useState(true);
 
     const toast = useToast();
     let web3Modal;
     let mutantzList = new Set();
+    let superTrooprzList = new Set();
 
     function selected(e) {
         let target = e.currentTarget;
@@ -55,6 +57,23 @@ const Home: React.FC<IProps> = () => {
 
     const checkIsApproved = () => {
         return state.queryResults.approved;
+    }
+
+    const fetchAmountOfSuperTrooprzInWallet = async () => {
+        updateRefreshingAction(dispatch, {
+            status: true,
+            message: "Sending transaction...",
+        });
+
+        const data = await utils.getSuperTrooprzInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.superTrooprzBalance);
+
+        updateRefreshingAction(dispatch, {
+            status: false,
+            message: "Complete",
+        });
+        console.log(data)
+
+        return data;
     }
 
     const fetchAmountOfMutantzInWallet = async () => {
@@ -85,14 +104,35 @@ const Home: React.FC<IProps> = () => {
         }
     }
 
+    const addToSuperTrooprzList = (token) => {
+        if (superTrooprzList.size === 0) {
+            superTrooprzList.add(token);
+        } else if (superTrooprzList.has(token)) {
+            superTrooprzList.delete(token);
+        } else {
+            superTrooprzList.add(token);
+        }
+    }
+
     const getMutantzFromStorage = () => {
         let mutantzArray = [];
-        const microbes = JSON.parse(sessionStorage.getItem('mutantzList'));
-        mutantzArray = Array.from(microbes);
+        const mutantz = JSON.parse(sessionStorage.getItem('mutantzList'));
+        mutantzArray = Array.from(mutantz);
         return mutantzArray;
     }
 
+    const getSuperTrooprzFromStorage = () => {
+        let superTrooprzArray = [];
+        const superTrooprz = JSON.parse(sessionStorage.getItem('superTrooprzList'));
+        superTrooprzArray = Array.from(superTrooprz);
+        return superTrooprzArray;
+    }
+
     const checkMutantz = () => {
+        return tokensInWallet.length > 0;
+    }
+
+    const checkSuperTrooprz = () => {
         return tokensInWallet.length > 0;
     }
 
@@ -105,10 +145,10 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
-        } else if (mutantzList.size > 5) {
+        } else if (mutantzList.size > 1) {
             toast({
                 title: 'Fail',
-                description: "Due to performance issues, you can not send more than 5 Mutantz per turn. You can't select more than 5 Mutantz.",
+                description: "Due to performance issues, you can not send more than 1 Mutant per turn. You can't select more than 1 Mutant.",
                 status: "error",
                 duration: 9000,
                 isClosable: true
@@ -121,21 +161,50 @@ const Home: React.FC<IProps> = () => {
         }
     }
 
-    const getApproval = async () => {
+    const checkAmountOfSuperTrooprzSelected = () => {
+        if (superTrooprzList.size === 0) {
+            toast({
+                title: 'Fail',
+                description: "You have to select at least one SuperTroopr.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+        } else if (superTrooprzList.size > 1) {
+            toast({
+                title: 'Fail',
+                description: "Due to performance issues, you can not send more than 1 SuperTroopr per turn. You can't select more than 1 SuperTroopr.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+        } else {
+            setTokensInWallet([]);
+            setIsTrooprzFlow(false);
+            setIsMicrobesFlow(true);
+            fetchAmountOfSuperTrooprzInWallet().then(r => setTokensInWallet(r));
+        }
+    }
+
+    const sendMutantz = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
         });
-        const mutantzWriteContractInstance = await utils.getMicrobesWriteContractInstance(
+        const mutantzWriteContractInstance = await utils.getMutantzWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
 
         try {
-            const tx = await mutantzWriteContractInstance["setApprovalForAll"]("0x96628048830a499b156aBdC04cC169C18c3A17f2", true);
-
-            await tx.wait();
+            let mutantzArray = getMutantzFromStorage()
+            console.log(mutantzArray.length)
+            for (let i = 0; i < mutantzArray.length; i++) {
+                const tx = await mutantzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantzArray[i]);
+                await tx.wait();
+            }
             toast({
-                title: 'Approval succesful',
+                title: 'Mutantz sent!',
+                description: 'Your Mutantz have been sent!',
                 status: 'success',
                 duration: 9000,
                 isClosable: true
@@ -147,7 +216,7 @@ const Home: React.FC<IProps> = () => {
                 toast({
                     title: 'Error!',
                     status: 'error',
-                    description: 'Error: ' + error.data.message,
+                    description: 'Error: ' + error.message,
                     duration: 9000,
                     isClosable: true
                 })
@@ -165,27 +234,27 @@ const Home: React.FC<IProps> = () => {
             status: false,
             message: "Complete",
         });
-    }
+    };
 
-    const sendMutantz = async () => {
+    const sendSuperTrooprz = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
         });
-        const mutantzWriteContractInstance = await utils.getMutantzWriteContractInstance(
+        const superTrooprzWriteContractInstance = await utils.getSuperTrooprzWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
 
         try {
-            let mutantzArray = getMutantzFromStorage()
-            for (let i = 0; i < mutantzList.size; i++) {
-                const tx = await mutantzWriteContractInstance["safeTransferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantzArray[i]);
-
+            let superTrooprzArray = getMutantzFromStorage()
+            console.log(superTrooprzArray.length)
+            for (let i = 0; i < superTrooprzArray.length; i++) {
+                const tx = await superTrooprzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, superTrooprzArray[i]);
                 await tx.wait();
             }
             toast({
-                title: 'Mutantz sent!',
-                description: 'Your Mutantz have been sent!',
+                title: 'SuperTrooprz sent!',
+                description: 'Your SuperTrooprz have been sent!',
                 status: 'success',
                 duration: 9000,
                 isClosable: true
@@ -234,220 +303,117 @@ const Home: React.FC<IProps> = () => {
     };
 
     return (
-        <>
-            <div className={'image-container'}>
-                <Head>
-                    <title>Troopz dApp</title>
-                    <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-                    <meta httpEquiv="Pragma" content="no-cache"/>
-                    <meta httpEquiv="Expires" content="0"/>
-                    <meta name="description" content="Troopz dApp"/>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-                    <link rel="icon" href="/favicon.ico"/>
-                </Head>
-                <main className={styles.main}>
-                    <Center>
-                        <VStack>
-                            <Box w="60%">
-                                <Image src="/images/Mutantz-Logo.png"/>
+        <><>
+
+            {/*Choose your side flow*/}
+
+            {isChoosing &&
+                <div className={'image-container-microbes'}>
+                    <Head>
+                        <title>Troopz dApp</title>
+                        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+                        <meta httpEquiv="Pragma" content="no-cache"/>
+                        <meta httpEquiv="Expires" content="0"/>
+                        <meta name="description" content="Troopz dApp"/>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                        <link rel="icon" href="/favicon.ico"/>
+                    </Head>
+                    <main className={styles.main}>
+                        {!state.walletWeb3Modal.connected &&
+                            <Header/>}
+                        {state.walletWeb3Modal.connected && isChoosing &&
+                            <><Box w="100%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
+
+
+                                <><Center><Text fontSize="5xl" color={"black"}>
+                                    Pew! Pew! Pew!
+                                </Text></Center>
+                                    <Center>
+                                        <UnorderedList color={"black"}>
+                                            <ListItem>Select your team!</ListItem>
+                                        </UnorderedList></Center>
+                                </>
                             </Box>
-                            <Header/>
-                            {state.walletWeb3Modal.connected &&
-                                <Box w="100%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
-
-
-                                    <><Center><Text fontSize="5xl" color={"white"}>
-                                        Pew! Pew! Pew!
-                                    </Text></Center>
-                                        <Center>
-                                            <UnorderedList color={"white"}>
-                                                <ListItem>Select Mutantz you want to use to attack!</ListItem>
-                                            </UnorderedList></Center>
-                                    </>
-                                </Box>}
-                            {state.walletWeb3Modal.connected && !isMutantzFlow && !isSummary &&
-                                <Box>
-                                    <Center>
-                                        <Text color={"white"}>What do you want to do?</Text>
-                                    </Center>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                <Center>
+                                    <Box p='6'>
+                                        <Image src="/images/Mutant-Invasion-Graphic-Choice.png" onClick={() => {
                                             setIsMutantzFlow(true);
-                                            fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r))
-                                        }}>
-                                            Start selecting Mutantz
-                                        </Button></Center><br/>
-                                </Box>
-                            }
+                                            setIsAttack(true);
+                                            setIsChoosing(false);
+                                            fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r));
+                                        }}/>
+                                    </Box>
+                                    <Box p='6'>
+                                        <Image src="/images/Super-Trooprz-Graphic-Choice.png"
+                                               onClick={() => {
+                                                   setIsTrooprzFlow(true);
+                                                   setIsDefense(true);
+                                                   setIsChoosing(false);
+                                                   fetchAmountOfSuperTrooprzInWallet().then(r => setTokensInWallet(r));
+                                               }}/>
+                                    </Box></Center></>}
+                    </main>
+                </div>}
 
-                            {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow &&
-                                <Box>
-                                    <Center>
-                                        <Text color={"white"}>Please be patient while we load your eligible
-                                            Mutantz</Text>
-                                    </Center><br/>
-                                    <Center>
-                                        <Spinner color={"white"}>
-                                        </Spinner></Center>
-                                </Box>}
-                            {state.walletWeb3Modal.connected && isMutantzFlow &&
-                                <Box w={'100%'}>
-                                    <Center>
-                                        <Text color={"white"}>Select max 5 Mutantz per turn</Text>
-                                    </Center><br/>
-                                    {state.walletWeb3Modal.connected && !state.refreshing.status && isMutantzFlow && !isSummary && !checkMutantz() &&
+            {/*Mutantz Attack Flow*/}
+
+            {state.walletWeb3Modal.connected && !isChoosing && isAttack &&
+                <div className={'image-container-mutantz'}>
+                    <Head>
+                        <title>Troopz dApp</title>
+                        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+                        <meta httpEquiv="Pragma" content="no-cache"/>
+                        <meta httpEquiv="Expires" content="0"/>
+                        <meta name="description" content="Troopz dApp"/>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                        <link rel="icon" href="/favicon.ico"/>
+                    </Head>
+                    <main className={styles.main}>
+                        <Center>
+                            <VStack>
+
+                                <Box w="60%">
+                                    <Image src="/images/Mutant-Invasion-Graphic.png"/>
+                                </Box>
+
+                                {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && !isChoosing && isAttack &&
+                                    <Box>
                                         <Center>
-                                            <Text color={"white"}>
-                                                You don&lsquo;t seem to have any Mutantz.
-                                            </Text>
-                                        </Center>
-                                    }
-                                    <Center>
-                                        <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
-                                            {tokensInWallet.map((token) => (
-                                                <Image
-                                                    className="clickable"
-                                                    key={token}
-                                                    onClick={(e) => {
-                                                        addToMutantzList(token);
-                                                        selected(e);
-                                                    }}
-                                                    boxSize='150px'
-                                                    objectFit='cover'
-                                                    src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
-                                                    alt={`Mutantz id ${token}`}
-                                                />
-                                            ))}
-                                        </SimpleGrid></Center><br/>
-
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            sessionStorage.setItem("mutantzList", JSON.stringify(Array.from(mutantzList)));
-                                            setIsSummary(true);
-                                            setIsMutantzFlow(false);
-                                            checkAmountOfMutantzSelected();
-                                        }}>
-                                            Continue
-                                        </Button>
-                                    </Center>
-                                    <br/>
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsTrooprzFlow(false);
-                                            setTokensInWallet([])
-                                        }}>
-                                            Back
-                                        </Button>
-                                    </Center><br/>
-                                </Box>
-                            }
-
-                            {state.walletWeb3Modal.connected && isSummary && !isMutantzFlow &&
-                                <Box>
-                                    <Center>
-                                        <Text color={"white"}>You are about to send Mutantz off to attack!</Text><br/>
-                                    </Center>
-                                    <Center>
-                                        <Text color={"white"}>Here&lsquo;s an overview of Mutantz
-                                            used for this:</Text>
-                                    </Center>
-                                    <Center>
-                                        <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
-                                            {getMutantzFromStorage().map((token) => (
-                                                <Image
-                                                    key={token}
-                                                    boxSize='150px'
-                                                    objectFit='cover'
-                                                    src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
-                                                    alt={`Mutantz id ${token}`}
-                                                />))}
-                                        </SimpleGrid>
-                                    </Center><br/>
-
-                                    {state.walletWeb3Modal.connected && !state.queryResults.approved &&
-                                        <>
+                                            <Text color={"white"}>Please be patient while we load your eligible
+                                                Mutantz</Text>
+                                        </Center><br/>
+                                        <Center>
+                                            <Spinner color={"white"}>
+                                            </Spinner></Center>
+                                    </Box>}
+                                {state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && isAttack &&
+                                    <Box w={'100%'}>
+                                        <Center>
+                                            <Text color={"white"}>Select max 5 Mutantz per turn</Text>
+                                        </Center><br/>
+                                        {state.walletWeb3Modal.connected && !state.refreshing.status && isMutantzFlow && !isSummary && !checkMutantz() &&
                                             <Center>
                                                 <Text color={"white"}>
-                                                    Step 1: Click &lsquo;Validate Send&lsquo; (Only required once)
+                                                    You don&lsquo;t seem to have any Mutantz.
                                                 </Text>
-                                            </Center><br/>
-                                            <Center>
-                                                <Text color={"white"}>
-                                                    Step 2: Click &lsquo;Send Mutantz&lsquo;
-                                                </Text>
-                                            </Center>
-                                            <Center>
-                                                <Button size='md'
-                                                        height='48px'
-                                                        width='220px'
-                                                        border='2px'
-                                                        bg='#C2DCA5'
-                                                        borderColor='#4E6840'
-                                                        _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                                    getApproval();
-                                                    setIsApproved(state.queryResults.approved);
-                                                }}>
-                                                    Validate Burn
-                                                </Button>
-                                            </Center><br/></>}
-                                    {state.walletWeb3Modal.connected && state.refreshing.status && !isMutantzFlow && !isSending && state.queryResults.approved &&
-                                        <Box>
-                                            <Center>
-                                                <Text color={"white"}>Approving Mutantz send</Text>
-                                            </Center><br/>
-                                            <Center>
-                                                <Spinner color={"white"}></Spinner>
-                                            </Center><br/>
-                                        </Box>
-                                    }
-                                    <Center>
-                                        <Button size='md'
-                                                height='48px'
-                                                width='220px'
-                                                border='2px'
-                                                bg='#C2DCA5'
-                                                borderColor='#4E6840'
-                                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                            setIsSending(true);
-                                            sendMutantz();
-                                        }}>
-                                            Send Mutantz
-                                        </Button>
-                                    </Center><br/>
-                                </Box>
-                            }
-                            {state.walletWeb3Modal.connected && state.refreshing.status && !isMicrobesFlow && !isTrooprzFlow && isSending &&
-                                <Box>
-                                    <Center>
-                                        <Text color={"white"}>Hang tight, your Mutantz are being sent off to
-                                            attack!!</Text>
-                                    </Center><br/>
-                                    <Center>
-                                        <Spinner color={"white"}></Spinner>
-                                    </Center>
-                                </Box>
-                            }
-                            {state.walletWeb3Modal.connected && !isCheckOGTrooprzFlow || isMicrobesFlow || isTrooprzFlow || isSummary &&
-                                <Box>
-                                    {state.walletWeb3Modal.connected &&
+                                            </Center>}
+                                        <Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {tokensInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            addToMutantzList(token);
+                                                            selected(e);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
+                                                        alt={`Mutantz id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/>
+
                                         <Center>
                                             <Button size='md'
                                                     height='48px'
@@ -456,28 +422,282 @@ const Home: React.FC<IProps> = () => {
                                                     bg='#C2DCA5'
                                                     borderColor='#4E6840'
                                                     _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                                window.location.reload()
+                                                sessionStorage.setItem("mutantzList", JSON.stringify(Array.from(mutantzList)));
+                                                setIsSummary(true);
+                                                setIsMutantzFlow(false);
+                                                setIsChoosing(false);
+                                                checkAmountOfMutantzSelected();
+                                                console.log("isMutantzFlow" + isMutantzFlow);
+                                                console.log("isChoosing" + isChoosing);
+                                                console.log("isSummary" + isSummary);
                                             }}>
-                                                Send more Mutantz
+                                                Continue
                                             </Button>
-                                        </Center>}
-                                </Box>}
-                        </VStack>
-                    </Center>
-                </main>
-                <footer className={styles.footer}>
-                    <a
-                        href="https://trooprz.army"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Powered by{' '}
-                        <span className={styles.logo}>
-                            <Image src="/images/trooprz-logo.svg" alt="Trooprz Logo" width={180} height={55}/>
-                        </span>
-                    </a>
-                </footer>
-            </div>
+                                        </Center>
+                                        <br/>
+                                        <Center>
+                                            <Button size='md'
+                                                    height='48px'
+                                                    width='220px'
+                                                    border='2px'
+                                                    bg='#C2DCA5'
+                                                    borderColor='#4E6840'
+                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                setIsMutantzFlow(false);
+                                                setIsAttack(false);
+                                                setIsChoosing(true);
+                                                setTokensInWallet([]);
+                                            }}>
+                                                Back
+                                            </Button>
+                                        </Center><br/>
+                                    </Box>}
+
+                                {state.walletWeb3Modal.connected && isSummary && !isMutantzFlow && !isChoosing && isAttack &&
+                                    <Box>
+                                        <Center>
+                                            <Text color={"white"}>You are about to send Mutantz off to
+                                                attack!</Text><br/>
+                                        </Center>
+                                        <Center>
+                                            <Text color={"white"}>Here&lsquo;s an overview of Mutantz
+                                                used for this:</Text>
+                                        </Center>
+                                        <Center>
+                                            <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
+                                                {getMutantzFromStorage().map((token) => (
+                                                    <Image
+                                                        key={token}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
+                                                        alt={`Mutantz id ${token}`}/>))}
+                                            </SimpleGrid>
+                                        </Center><br/>
+                                        <Center>
+                                            <Button size='md'
+                                                    height='48px'
+                                                    width='220px'
+                                                    border='2px'
+                                                    bg='#C2DCA5'
+                                                    borderColor='#4E6840'
+                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                setIsSending(true);
+                                                sendMutantz();
+                                            }}>
+                                                Send Mutantz
+                                            </Button>
+                                        </Center><br/>
+                                    </Box>}
+                                {state.walletWeb3Modal.connected && state.refreshing.status && !isMutantzFlow && isSending && isAttack &&
+                                    <Box>
+                                        <Center>
+                                            <Text color={"white"}>Hang tight, your Mutantz are being sent off to
+                                                attack!!</Text>
+                                        </Center><br/>
+                                        <Center>
+                                            <Spinner color={"white"}></Spinner>
+                                        </Center>
+                                    </Box>}
+                                {state.walletWeb3Modal.connected && !isMutantzFlow && isSummary && isAttack &&
+                                    <Box>
+                                        {state.walletWeb3Modal.connected &&
+                                            <Center>
+                                                <Button size='md'
+                                                        height='48px'
+                                                        width='220px'
+                                                        border='2px'
+                                                        bg='#C2DCA5'
+                                                        borderColor='#4E6840'
+                                                        _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                    window.location.reload();
+                                                }}>
+                                                    Send more Mutantz
+                                                </Button>
+                                            </Center>}
+                                    </Box>}
+                            </VStack>
+                        </Center>
+                    </main>
+                </div>}
+
+            {/*SuperTrooprz defend flow*/}
+
+            {state.walletWeb3Modal.connected && !isChoosing && isDefense &&
+                <div className={'image-container-super-trooprz'}>
+                    <Head>
+                        <title>Troopz dApp</title>
+                        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+                        <meta httpEquiv="Pragma" content="no-cache"/>
+                        <meta httpEquiv="Expires" content="0"/>
+                        <meta name="description" content="Troopz dApp"/>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                        <link rel="icon" href="/favicon.ico"/>
+                    </Head>
+                    <main className={styles.main}>
+                        <Center>
+                            <VStack>
+
+                                <Box w="60%">
+                                    <Image src="/images/Superz-Protect.png"/>
+                                </Box>
+
+                                {state.walletWeb3Modal.connected && state.refreshing.status && isTrooprzFlow && !isChoosing && isDefense &&
+                                    <Box>
+                                        <Center>
+                                            <Text color={"white"}>Please be patient while we load your eligible
+                                                SuperTrooprz</Text>
+                                        </Center><br/>
+                                        <Center>
+                                            <Spinner color={"white"}>
+                                            </Spinner></Center>
+                                    </Box>}
+                                {state.walletWeb3Modal.connected && isTrooprzFlow && !isChoosing && isDefense &&
+                                    <Box w={'100%'}>
+                                        <Center>
+                                            <Text color={"white"}>Select max 1 SuperTroopr per turn</Text>
+                                        </Center><br/>
+                                        {state.walletWeb3Modal.connected && !state.refreshing.status && isTrooprzFlow && !isSummary && !checkSuperTrooprz() && isDefense &&
+                                            <Center>
+                                                <Text color={"white"}>
+                                                    You don&lsquo;t seem to have any SuperTrooprz.
+                                                </Text>
+                                            </Center>}
+                                        <Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {tokensInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            addToSuperTrooprzList(token);
+                                                            selected(e);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/proxy/https://metadata.trooprz.army/super-trooprz/${token}.png`}
+                                                        alt={`SuperTrooprz id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/>
+
+                                        <Center>
+                                            <Button size='md'
+                                                    height='48px'
+                                                    width='220px'
+                                                    border='2px'
+                                                    bg='#C2DCA5'
+                                                    borderColor='#4E6840'
+                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                sessionStorage.setItem("superTrooprzList", JSON.stringify(Array.from(superTrooprzList)));
+                                                setIsSummary(true);
+                                                setIsTrooprzFlow(false);
+                                                setIsChoosing(false);
+                                                checkAmountOfSuperTrooprzSelected();
+                                            }}>
+                                                Continue
+                                            </Button>
+                                        </Center>
+                                        <br/>
+                                        <Center>
+                                            <Button size='md'
+                                                    height='48px'
+                                                    width='220px'
+                                                    border='2px'
+                                                    bg='#C2DCA5'
+                                                    borderColor='#4E6840'
+                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                setIsTrooprzFlow(false);
+                                                setIsDefense(false);
+                                                setIsChoosing(true);
+                                                setTokensInWallet([]);
+                                            }}>
+                                                Back
+                                            </Button>
+                                        </Center><br/>
+                                    </Box>}
+
+                                {state.walletWeb3Modal.connected && isSummary && !isTrooprzFlow && !isChoosing && isDefense &&
+                                    <Box>
+                                        <Center>
+                                            <Text color={"white"}>You are about to send SuperTrooprz off to
+                                                defend!</Text><br/>
+                                        </Center>
+                                        <Center>
+                                            <Text color={"white"}>Here&lsquo;s an overview of SuperTrooprz
+                                                used for this:</Text>
+                                        </Center>
+                                        <Center>
+                                            <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
+                                                {getSuperTrooprzFromStorage().map((token) => (
+                                                    <Image
+                                                        key={token}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/proxy/https://metadata.trooprz.army/super-trooprz/${token}.png`}
+                                                        alt={`SuperTrooprz id ${token}`}/>))}
+                                            </SimpleGrid>
+                                        </Center><br/>
+                                        <Center>
+                                            <Button size='md'
+                                                    height='48px'
+                                                    width='220px'
+                                                    border='2px'
+                                                    bg='#C2DCA5'
+                                                    borderColor='#4E6840'
+                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                setIsSending(true);
+                                                sendSuperTrooprz();
+                                            }}>
+                                                Send SuperTrooprz
+                                            </Button>
+                                        </Center><br/>
+                                    </Box>}
+                                {state.walletWeb3Modal.connected && state.refreshing.status && !isTrooprzFlow && isSending && isDefense &&
+                                    <Box>
+                                        <Center>
+                                            <Text color={"white"}>Hang tight, your SuperTrooprz are being sent off to
+                                                defend!!</Text>
+                                        </Center><br/>
+                                        <Center>
+                                            <Spinner color={"white"}></Spinner>
+                                        </Center>
+                                    </Box>}
+                                {state.walletWeb3Modal.connected && !isTrooprzFlow && isSummary && isDefense &&
+                                    <Box>
+                                        {state.walletWeb3Modal.connected &&
+                                            <Center>
+                                                <Button size='md'
+                                                        height='48px'
+                                                        width='220px'
+                                                        border='2px'
+                                                        bg='#C2DCA5'
+                                                        borderColor='#4E6840'
+                                                        _hover={{bg: '#D6E9CF'}} onClick={() => {
+                                                    window.location.reload();
+                                                }}>
+                                                    Send more SuperTrooprz
+                                                </Button>
+                                            </Center>}
+                                    </Box>}
+                            </VStack>
+                        </Center>
+                    </main>
+                </div>}
+        </>
+
+
+            <footer className={styles.footer}>
+                <a
+                    href="https://trooprz.army"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Powered by{' '}
+                    <span className={styles.logo}>
+                        <Image src="/images/trooprz-logo.svg" alt="Trooprz Logo" width={180} height={55}/>
+                    </span>
+                </a>
+            </footer>
         </>
     );
 }

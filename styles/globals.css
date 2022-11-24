@@ -23,9 +23,23 @@ a {
   border: 5px solid #93C01F;
 }
 
-.image-container {
+.image-container-mutantz {
   position: relative;
   background-image: url("../public/images/Mutantz-tile.png");
+  background-repeat: repeat;
+  width: 100%;
+}
+
+.image-container-microbes {
+  position: relative;
+  background-image: url("../public/images/miCRObe-tile_background.png");
+  background-repeat: repeat;
+  width: 100%;
+}
+
+.image-container-super-trooprz {
+  position: relative;
+  background-image: url("../public/images/super-trooprz-tile.png");
   background-repeat: repeat;
   width: 100%;
 }

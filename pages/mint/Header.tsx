@@ -13,8 +13,9 @@ import {
 } from "../../store/actions";
 import {defaultQueryResults} from "../../store/interfaces";
 import {
+    Box,
     Button,
-    Center,
+    Center, Image,
 } from '@chakra-ui/react'
 
 import Web3Modal from "web3modal";
@@ -57,6 +58,10 @@ const Header: React.FC<IProps> = () => {
                 newWallet.provider,
                 newWallet.address
             );
+            const superTrooprzBalance = await utils.getSuperTrooprzBalance(
+                newWallet.provider,
+                newWallet.address
+            );
             const approved = await utils.checkIfApprovedForAll(
                 newWallet.provider,
                 newWallet.address,
@@ -68,6 +73,7 @@ const Header: React.FC<IProps> = () => {
                 trooprzBalance: trooprzBalance,
                 microbesBalance: microbesBalance,
                 mutantzBalance: mutantzBalance,
+                superTrooprzBalance: superTrooprzBalance,
                 provider: newWallet.provider,
                 signer: newWallet.signer,
                 approved: approved
@@ -84,6 +90,15 @@ const Header: React.FC<IProps> = () => {
             return (
                 <div>
                     <Center>
+                        <Box p='6'>
+                            <Image src="/images/Mutant-Invasion-Graphic-Choice.png"/>
+                        </Box>
+                        <Box p='6'>
+                            <Image src="/images/Super-Trooprz-Graphic-Choice.png"/>
+                        </Box>
+                    </Center>
+                    <Center>
+
                         <Button size='md'
                                 height='48px'
                                 width='200px'
