@@ -49,6 +49,7 @@ const Home: React.FC<IProps> = () => {
         target.classList.toggle('selected')
     }
 
+
     function selectedSuperTroopr(e) {
         let target = e.currentTarget;
         target.classList.toggle('selectedSuperTroopr')
