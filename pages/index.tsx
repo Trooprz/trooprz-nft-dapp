@@ -151,6 +151,9 @@ const Home: React.FC<IProps> = () => {
                 isClosable: true
             })
             setIsSummary(false);
+            setIsMutantzFlow(true);
+            setIsChoosing(false);
+            setIsAttack(true);
         } else if (mutantzList.size > 1) {
             toast({
                 title: 'Fail',
@@ -160,6 +163,9 @@ const Home: React.FC<IProps> = () => {
                 isClosable: true
             })
             setIsSummary(false);
+            setIsMutantzFlow(true);
+            setIsChoosing(false);
+            setIsAttack(true);
         }
     }
 
@@ -172,6 +178,10 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
+            setIsSummary(false);
+            setIsTrooprzFlow(true);
+            setIsChoosing(false);
+            setIsDefense(true);
         } else if (superTrooprzList.size > 1) {
             toast({
                 title: 'Fail',
@@ -180,6 +190,10 @@ const Home: React.FC<IProps> = () => {
                 duration: 9000,
                 isClosable: true
             })
+            setIsSummary(false);
+            setIsTrooprzFlow(true);
+            setIsChoosing(false);
+            setIsDefense(true);
         }
     }
 
@@ -387,7 +401,7 @@ const Home: React.FC<IProps> = () => {
                                 {state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && isAttack &&
                                     <Box w={'100%'}>
                                         <Center>
-                                            <Text color={"white"}>Select max 5 Mutantz per turn</Text>
+                                            <Text color={"white"}>Select max 1 Mutantz per turn</Text>
                                         </Center><br/>
                                         {state.walletWeb3Modal.connected && !state.refreshing.status && isMutantzFlow && !isSummary && !checkMutantz() &&
                                             <Center>
