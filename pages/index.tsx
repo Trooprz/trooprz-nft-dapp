@@ -8,7 +8,7 @@ import {
     Button,
     Center,
     Image,
-    ListItem,
+    ListItem, NumberInput, NumberInputField,
     SimpleGrid,
     Spinner,
     Text,
@@ -23,6 +23,7 @@ import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import * as config from "../config/config";
 import {over} from "lodash";
+import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible, checkIfTokenIsEligible} from "../helpers/utils";
 
 interface IProps {
 }
@@ -36,6 +37,8 @@ const Home: React.FC<IProps> = () => {
     const [isAttack, setIsAttack] = useState(false);
     const [isSummary, setIsSummary] = useState(false);
     const [isSending, setIsSending] = useState(false);
+    const [trooprzId, setTrooprzId] = useState('');
+    const [mutantzId, setMutantzId] = useState('');
     const [isMutantzFlow, setIsMutantzFlow] = useState(false);
     const [isChoosing, setIsChoosing] = useState(true);
 
@@ -248,6 +251,46 @@ const Home: React.FC<IProps> = () => {
         });
     };
 
+    const isSuperTrooprzTokenEligible = async (id) => {
+        if (await checkIfSuperTrooprzIsEligible(id)) {
+            toast({
+                title: 'Eligible',
+                description: "This SuperTroopr is eligible for defense. Get him into the fray!",
+                status: "success",
+                duration: 9000,
+                isClosable: true
+            })
+        } else {
+            toast({
+                title: 'Not Eligible',
+                description: "This SuperTroopr is tired. Can't send it to the front right now!",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+        }
+    };
+
+    const isMutantzTokenEligible = async (id) => {
+        if (await checkIfMutantzIsEligible(id)) {
+            toast({
+                title: 'Eligible',
+                description: "This Mutant is eligible for attack. Get him into the fray!",
+                status: "success",
+                duration: 9000,
+                isClosable: true
+            })
+        } else {
+            toast({
+                title: 'Not Eligible',
+                description: "This Mutant is tired. Can't send it to the front right now!",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+        }
+    };
+
     const sendSuperTrooprz = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
@@ -348,7 +391,7 @@ const Home: React.FC<IProps> = () => {
                             </Box>
                                 <Center>
                                     <Box p='6'>
-                                        <Image className='clickable' src="/images/Mutant-Invasion-Graphic-Choice.png"
+                                        <Image className='clickable' src="/images/Mutantz-Attack.png"
                                                onClick={() => {
                                                    setIsMutantzFlow(true);
                                                    setIsAttack(true);
@@ -357,7 +400,7 @@ const Home: React.FC<IProps> = () => {
                                                }}/>
                                     </Box>
                                     <Box p='6'>
-                                        <Image className='clickable' src="/images/Super-Trooprz-Graphic-Choice.png"
+                                        <Image className='clickable' src="/images/Superz-Protect.png"
                                                onClick={() => {
                                                    setIsTrooprzFlow(true);
                                                    setIsDefense(true);
@@ -693,6 +736,64 @@ const Home: React.FC<IProps> = () => {
                         </Center>
                     </main>
                 </div>}
+
+            {/*check id flow*/}
+            {state.walletWeb3Modal.connected && isMutantzFlow &&
+                <Box>
+                    <Center>
+                        <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A popup will appear showing the
+                            result.</Text>
+                    </Center><br/>
+                    <Center>
+                        <NumberInput bg='white' width="200px">
+                            <NumberInputField value={mutantzId}
+                                              onChange={(e) => {
+                                                  setMutantzId(e.target.value);
+                                              }}/>
+                        </NumberInput><br/><br/>
+                    </Center><br/>
+                    <Center>
+                        <Button size='md'
+                                height='48px'
+                                width='220px'
+                                border='2px'
+                                bg='#C2DCA5'
+                                borderColor='#4E6840'
+                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                            isMutantzTokenEligible(mutantzId);
+                        }}>
+                            Check id
+                        </Button></Center><br/>
+                </Box>
+            }
+            {state.walletWeb3Modal.connected && isTrooprzFlow &&
+                <Box>
+                    <Center>
+                        <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to defend. A popup will appear showing the
+                            result.</Text>
+                    </Center><br/>
+                    <Center>
+                        <NumberInput bg='white' width="200px">
+                            <NumberInputField value={trooprzId}
+                                              onChange={(e) => {
+                                                  setTrooprzId(e.target.value);
+                                              }}/>
+                        </NumberInput><br/><br/>
+                    </Center><br/>
+                    <Center>
+                        <Button size='md'
+                                height='48px'
+                                width='220px'
+                                border='2px'
+                                bg='#C2DCA5'
+                                borderColor='#4E6840'
+                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                            isSuperTrooprzTokenEligible(trooprzId);
+                        }}>
+                            Check id
+                        </Button></Center><br/>
+                </Box>
+            }
         </>
 
 

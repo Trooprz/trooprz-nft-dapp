@@ -91,10 +91,10 @@ const Header: React.FC<IProps> = () => {
                 <div>
                     <Center>
                         <Box p='6'>
-                            <Image src="/images/Mutant-Invasion-Graphic-Choice.png"/>
+                            <Image src="/images/Mutantz-Attack.png"/>
                         </Box>
                         <Box p='6'>
-                            <Image src="/images/Super-Trooprz-Graphic-Choice.png"/>
+                            <Image src="/images/Superz-Protect.png"/>
                         </Box>
                     </Center>
                     <Center>
