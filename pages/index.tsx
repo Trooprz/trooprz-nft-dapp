@@ -22,8 +22,7 @@ import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import * as config from "../config/config";
-import {over} from "lodash";
-import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible, checkIfTokenIsEligible} from "../helpers/utils";
+import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible} from "../helpers/utils";
 
 interface IProps {
 }
