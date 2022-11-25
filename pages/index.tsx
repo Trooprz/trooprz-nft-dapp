@@ -40,6 +40,7 @@ const Home: React.FC<IProps> = () => {
     const [mutantzId, setMutantzId] = useState('');
     const [isMutantzFlow, setIsMutantzFlow] = useState(false);
     const [isChoosing, setIsChoosing] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
     const toast = useToast();
     let web3Modal;
@@ -212,18 +213,17 @@ const Home: React.FC<IProps> = () => {
         try {
             let mutantzArray = getMutantzFromStorage()
             console.log(mutantzArray.length)
-            for (let i = 0; i < mutantzArray.length; i++) {
-                const tx = await mutantzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantzArray[i]);
-                await tx.wait();
-            }
-            toast({
-                title: 'Mutantz sent!',
-                description: 'Your Mutantz have been sent!',
-                status: 'success',
-                duration: 9000,
-                isClosable: true
-            })
-
+                for (let i = 0; i < mutantzArray.length; i++) {
+                    const tx = await mutantzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantzArray[i]);
+                    await tx.wait();
+                }
+                toast({
+                    title: 'Mutantz sent!',
+                    description: 'Your Mutantz have been sent!',
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true
+                })
         } catch (error) {
             console.log(error);
             if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
@@ -380,12 +380,8 @@ const Home: React.FC<IProps> = () => {
 
 
                                 <><Center><Text fontSize="5xl" color={"black"}>
-                                    Pew! Pew! Pew!
+                                    Select your team!
                                 </Text></Center>
-                                    <Center>
-                                        <UnorderedList color={"black"}>
-                                            <ListItem>Select your team!</ListItem>
-                                        </UnorderedList></Center>
                                 </>
                             </Box>
                                 <Center>
@@ -395,6 +391,7 @@ const Home: React.FC<IProps> = () => {
                                                    setIsMutantzFlow(true);
                                                    setIsAttack(true);
                                                    setIsChoosing(false);
+                                                   setIsLoading(true);
                                                    fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r));
                                                }}/>
                                     </Box>
@@ -404,6 +401,7 @@ const Home: React.FC<IProps> = () => {
                                                    setIsTrooprzFlow(true);
                                                    setIsDefense(true);
                                                    setIsChoosing(false);
+                                                   setIsLoading(true);
                                                    fetchAmountOfSuperTrooprzInWallet().then(r => setTokensInWallet(r));
                                                }}/>
                                     </Box></Center></>}
@@ -431,7 +429,7 @@ const Home: React.FC<IProps> = () => {
                                     <Image src="/images/Mutant-Invasion-Graphic.png"/>
                                 </Box>
 
-                                {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && !isChoosing && isAttack &&
+                                {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && !isChoosing && isAttack && isLoading &&
                                     <Box>
                                         <Center>
                                             <Text color={"white"}>Please be patient while we load your eligible
@@ -478,13 +476,15 @@ const Home: React.FC<IProps> = () => {
                                                     borderColor='#4E6840'
                                                     _hover={{bg: '#D6E9CF'}} onClick={() => {
                                                 sessionStorage.setItem("mutantzList", JSON.stringify(Array.from(mutantzList)));
-                                                setIsSummary(true);
-                                                setIsMutantzFlow(false);
-                                                setIsChoosing(false);
                                                 checkAmountOfMutantzSelected();
+                                                setIsSending(true);
+                                                setIsLoading(false);
+                                                sendMutantz();
+                                                setIsChoosing(false);
                                             }}>
-                                                Continue
+                                                Send Mutantz
                                             </Button>
+
                                         </Center>
                                         <br/>
                                         <Center>
@@ -504,44 +504,7 @@ const Home: React.FC<IProps> = () => {
                                             </Button>
                                         </Center><br/>
                                     </Box>}
-
-                                {state.walletWeb3Modal.connected && isSummary && !isMutantzFlow && !isChoosing && isAttack &&
-                                    <Box>
-                                        <Center>
-                                            <Text color={"white"}>You are about to send Mutantz off to
-                                                attack!</Text><br/>
-                                        </Center>
-                                        <Center>
-                                            <Text color={"white"}>Here&lsquo;s an overview of Mutantz
-                                                used for this:</Text>
-                                        </Center>
-                                        <Center>
-                                            <SimpleGrid columns={[2, 5]} spacing={[5, 10]}>
-                                                {getMutantzFromStorage().map((token) => (
-                                                    <Image
-                                                        key={token}
-                                                        boxSize='150px'
-                                                        objectFit='cover'
-                                                        src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
-                                                        alt={`Mutantz id ${token}`}/>))}
-                                            </SimpleGrid>
-                                        </Center><br/>
-                                        <Center>
-                                            <Button size='md'
-                                                    height='48px'
-                                                    width='220px'
-                                                    border='2px'
-                                                    bg='#C2DCA5'
-                                                    borderColor='#4E6840'
-                                                    _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                                setIsSending(true);
-                                                sendMutantz();
-                                            }}>
-                                                Send Mutantz
-                                            </Button>
-                                        </Center><br/>
-                                    </Box>}
-                                {state.walletWeb3Modal.connected && state.refreshing.status && !isMutantzFlow && isSending && isAttack &&
+                                {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && isSending && isAttack &&
                                     <Box>
                                         <Center>
                                             <Text color={"white"}>Hang tight, your Mutantz are being sent off to
@@ -550,23 +513,6 @@ const Home: React.FC<IProps> = () => {
                                         <Center>
                                             <Spinner color={"white"}></Spinner>
                                         </Center>
-                                    </Box>}
-                                {state.walletWeb3Modal.connected && !isMutantzFlow && isSummary && isAttack &&
-                                    <Box>
-                                        {state.walletWeb3Modal.connected &&
-                                            <Center>
-                                                <Button size='md'
-                                                        height='48px'
-                                                        width='220px'
-                                                        border='2px'
-                                                        bg='#C2DCA5'
-                                                        borderColor='#4E6840'
-                                                        _hover={{bg: '#D6E9CF'}} onClick={() => {
-                                                    window.location.reload();
-                                                }}>
-                                                    Send more Mutantz
-                                                </Button>
-                                            </Center>}
                                     </Box>}
                             </VStack>
                         </Center>
@@ -594,7 +540,7 @@ const Home: React.FC<IProps> = () => {
                                     <Image src="/images/Superz-Protect.png"/>
                                 </Box>
 
-                                {state.walletWeb3Modal.connected && state.refreshing.status && isTrooprzFlow && !isChoosing && isDefense &&
+                                {state.walletWeb3Modal.connected && state.refreshing.status && isTrooprzFlow && !isChoosing && isDefense && isLoading &&
                                     <Box>
                                         <Center>
                                             <Text color={"white"}>Please be patient while we load your eligible
@@ -641,12 +587,13 @@ const Home: React.FC<IProps> = () => {
                                                     borderColor='#4E6840'
                                                     _hover={{bg: '#D6E9CF'}} onClick={() => {
                                                 sessionStorage.setItem("superTrooprzList", JSON.stringify(Array.from(superTrooprzList)));
-                                                setIsSummary(true);
-                                                setIsTrooprzFlow(false);
-                                                setIsChoosing(false);
                                                 checkAmountOfSuperTrooprzSelected();
+                                                setIsSending(true);
+                                                setIsLoading(false);
+                                                sendSuperTrooprz();
+                                                setIsChoosing(false);
                                             }}>
-                                                Continue
+                                                Send SuperTrooprz
                                             </Button>
                                         </Center>
                                         <br/>
