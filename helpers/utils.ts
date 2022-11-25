@@ -4385,6 +4385,8 @@ export const getCroBalance = async (
     );
 };
 
+
+
 export const getMicrobesBalance = async (
     serverWeb3Provider,
     address: string
@@ -4513,6 +4515,16 @@ export const getSuperTrooprzInWallet = async (
     console.log(tokensInWallet)
     return tokensInWallet;
 };
+
+export const checkIfMutantzIsEligible = async (id: number): Promise<Boolean> => {
+    console.log(id);
+    console.log(nonEligibleMutantzIds.includes(id))
+    return !nonEligibleMutantzIds.includes(id);
+}
+
+export const checkIfSuperTrooprzIsEligible = async (id: number): Promise<Boolean> => {
+    return !nonEligibleSuperTrooprzIds.includes(id);
+}
 
 export const checkIfApprovedForAll = async (
     serverWeb3Provider,
