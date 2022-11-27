@@ -8,21 +8,21 @@ import {
     Button,
     Center,
     Image,
-    ListItem, NumberInput, NumberInputField,
+    NumberInput,
+    NumberInputField,
     SimpleGrid,
     Spinner,
     Text,
-    UnorderedList,
     useToast,
     VStack
 } from '@chakra-ui/react';
 import * as utils from "../helpers/utils";
+import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible} from "../helpers/utils";
 import Header from "./mint/Header";
 import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import * as config from "../config/config";
-import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible, getSuperTrooprzBalance} from "../helpers/utils";
 
 interface IProps {
 }
@@ -30,6 +30,8 @@ interface IProps {
 const Home: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
     const [tokensInWallet, setTokensInWallet] = useState([]);
+    const [mutantzInWallet, setMutantzInWallet] = useState([]);
+    const [superTrooprzInWallet, setSuperTrooprzInWallet] = useState([]);
     const [isMicrobesFlow, setIsMicrobesFlow] = useState(false);
     const [isTrooprzFlow, setIsTrooprzFlow] = useState(false);
     const [isDefense, setIsDefense] = useState(false);
@@ -46,26 +48,58 @@ const Home: React.FC<IProps> = () => {
     let web3Modal;
     let mutantzList = new Set();
     let superTrooprzList = new Set();
+    let tokenId = 0;
+    let selectedToken = false;
 
-    function selected(e) {
+    function selected(e, token) {
         let target = e.currentTarget;
-        target.classList.toggle('selected')
+        if (tokenId === 0 && selectedToken === false) {
+            target.classList.toggle('selected')
+            selectedToken = true;
+            tokenId = token
+        } else if (token === tokenId) {
+            target.classList.toggle('selected')
+            tokenId = 0;
+            selectedToken = false;
+        } else {
+            toast({
+                title: 'Fail',
+                description: "Due to performance issues, you can not send more than 1 Mutant per turn. You can't select more than 1 Mutant.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+            selectedToken = false;
+        }
     }
 
 
-    function selectedSuperTroopr(e) {
+    function selectedSuperTroopr(e, token) {
         let target = e.currentTarget;
-        target.classList.toggle('selectedSuperTroopr')
+        if (tokenId === 0 && selectedToken === false) {
+            target.classList.toggle('selectedSuperTroopr')
+            selectedToken = true;
+            tokenId = token
+        } else if (token === tokenId) {
+            target.classList.toggle('selectedSuperTroopr')
+            tokenId = 0;
+            selectedToken = false;
+        } else {
+            toast({
+                title: 'Fail',
+                description: "Due to performance issues, you can not send more than 1 SuperTroopr per turn. You can't select more than 1 Mutant.",
+                status: "error",
+                duration: 9000,
+                isClosable: true
+            })
+            selectedToken = false;
+        }
     }
 
     if (typeof window !== 'undefined') {
         web3Modal = new Web3Modal({
             providerOptions
         })
-    }
-
-    const checkIsApproved = () => {
-        return state.queryResults.approved;
     }
 
     const fetchAmountOfSuperTrooprzInWallet = async () => {
@@ -102,25 +136,12 @@ const Home: React.FC<IProps> = () => {
         return data;
     }
 
-
-    const addToMutantzList = (token) => {
-        if (mutantzList.size === 0) {
-            mutantzList.add(token);
-        } else if (mutantzList.has(token)) {
-            mutantzList.delete(token);
-        } else {
-            mutantzList.add(token);
-        }
+    const checkMutantz = () => {
+        return mutantzInWallet.length > 0;
     }
 
-    const addToSuperTrooprzList = (token) => {
-        if (superTrooprzList.size === 0) {
-            superTrooprzList.add(token);
-        } else if (superTrooprzList.has(token)) {
-            superTrooprzList.delete(token);
-        } else {
-            superTrooprzList.add(token);
-        }
+    const checkSuperTrooprz = () => {
+        return superTrooprzInWallet.length > 0;
     }
 
     const getMutantzFromStorage = () => {
@@ -137,16 +158,8 @@ const Home: React.FC<IProps> = () => {
         return superTrooprzArray;
     }
 
-    const checkMutantz = () => {
-        return tokensInWallet.length > 0;
-    }
-
-    const checkSuperTrooprz = () => {
-        return tokensInWallet.length > 0;
-    }
-
     const checkAmountOfMutantzSelected = () => {
-        if (mutantzList.size === 0) {
+        if (tokenId === 0) {
             toast({
                 title: 'Fail',
                 description: "You have to select at least one Mutant.",
@@ -158,23 +171,13 @@ const Home: React.FC<IProps> = () => {
             setIsMutantzFlow(true);
             setIsChoosing(false);
             setIsAttack(true);
-        } else if (mutantzList.size > 1) {
-            toast({
-                title: 'Fail',
-                description: "Due to performance issues, you can not send more than 1 Mutant per turn. You can't select more than 1 Mutant.",
-                status: "error",
-                duration: 9000,
-                isClosable: true
-            })
-            setIsSummary(false);
-            setIsMutantzFlow(true);
-            setIsChoosing(false);
-            setIsAttack(true);
+            return false;
         }
+        return true
     }
 
     const checkAmountOfSuperTrooprzSelected = () => {
-        if (superTrooprzList.size === 0) {
+        if (tokenId === 0) {
             toast({
                 title: 'Fail',
                 description: "You have to select at least one SuperTroopr.",
@@ -186,19 +189,9 @@ const Home: React.FC<IProps> = () => {
             setIsTrooprzFlow(true);
             setIsChoosing(false);
             setIsDefense(true);
-        } else if (superTrooprzList.size > 1) {
-            toast({
-                title: 'Fail',
-                description: "Due to performance issues, you can not send more than 1 SuperTroopr per turn. You can't select more than 1 SuperTroopr.",
-                status: "error",
-                duration: 9000,
-                isClosable: true
-            })
-            setIsSummary(false);
-            setIsTrooprzFlow(true);
-            setIsChoosing(false);
-            setIsDefense(true);
+            return false;
         }
+        return true;
     }
 
     const sendMutantz = async () => {
@@ -209,45 +202,45 @@ const Home: React.FC<IProps> = () => {
         const mutantzWriteContractInstance = await utils.getMutantzWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
-
-        try {
-            let mutantzArray = getMutantzFromStorage()
-            let mutantId = mutantzArray[0]
-            console.log(mutantzArray.length)
-            const tx = await mutantzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantId);
-            await tx.wait();
-            toast({
-                title: 'Mutantz sent!',
-                description: 'Your Mutantz have been sent!',
-                status: 'success',
-                duration: 9000,
-                isClosable: true
-            })
-        } catch (error) {
-            console.log(error);
-            if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
+        if (checkAmountOfMutantzSelected()) {
+            try {
+                const tx = await mutantzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, tokenId);
+                await tx.wait();
                 toast({
-                    title: 'Error!',
-                    status: 'error',
-                    description: 'Error: ' + error.message,
+                    title: 'Mutantz sent!',
+                    description: 'Your Mutantz have been sent!',
+                    status: 'success',
                     duration: 9000,
                     isClosable: true
                 })
-            } else {
-                toast({
-                    title: 'Error!',
-                    status: 'error',
-                    description: 'Error: ' + error.message,
-                    duration: 9000,
-                    isClosable: true
-                })
+            } catch (error) {
+                console.log(error);
+                if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
+                    toast({
+                        title: 'Error!',
+                        status: 'error',
+                        description: 'Error: ' + error.message,
+                        duration: 9000,
+                        isClosable: true
+                    })
+                    setIsChoosing(true)
+                } else {
+                    toast({
+                        title: 'Error!',
+                        status: 'error',
+                        description: 'Error: ' + error.message,
+                        duration: 9000,
+                        isClosable: true
+                    })
+                    setIsChoosing(true)
+                }
             }
+            updateRefreshingAction(dispatch, {
+                status: false,
+                message: "Complete",
+            });
         }
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-    };
+    }
 
     const isSuperTrooprzTokenEligible = async (id) => {
         if (await checkIfSuperTrooprzIsEligible(id)) {
@@ -259,6 +252,7 @@ const Home: React.FC<IProps> = () => {
                 isClosable: true
             })
         } else {
+            console.log(id)
             toast({
                 title: 'Not Eligible',
                 description: "This SuperTroopr is tired. Can't send it to the front right now!",
@@ -297,63 +291,47 @@ const Home: React.FC<IProps> = () => {
         const superTrooprzWriteContractInstance = await utils.getSuperTrooprzWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
-
-        try {
-            let superTrooprzArray = getSuperTrooprzFromStorage()
-            let superTrooprId = superTrooprzArray[0]
-            console.log(superTrooprzArray.length)
-            console.log("SuperTroopr: " + superTrooprId)
-            const tx = await superTrooprzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.protectAddress, superTrooprId);
-            await tx.wait();
-            toast({
-                title: 'SuperTrooprz sent!',
-                description: 'Your SuperTrooprz have been sent!',
-                status: 'success',
-                duration: 9000,
-                isClosable: true
-            })
-
-        } catch
-            (error) {
-            console.log(error);
-            if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
+        if (checkAmountOfSuperTrooprzSelected()) {
+            try {
+                const tx = await superTrooprzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.protectAddress, tokenId);
+                await tx.wait();
+                setIsChoosing(true);
                 toast({
-                    title: 'Error!',
-                    status: 'error',
-                    description: 'Error: ' + error.message,
+                    title: 'SuperTrooprz sent!',
+                    description: 'Your SuperTrooprz have been sent!',
+                    status: 'success',
                     duration: 9000,
                     isClosable: true
                 })
-            } else {
-                toast({
-                    title: 'Error!',
-                    status: 'error',
-                    description: 'Error: ' + error.message,
-                    duration: 9000,
-                    isClosable: true
-                })
+
+            } catch
+                (error) {
+                console.log(error);
+                if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
+                    toast({
+                        title: 'Error!',
+                        status: 'error',
+                        description: 'Error: ' + error.message,
+                        duration: 9000,
+                        isClosable: true
+                    })
+                    setIsChoosing(true);
+                } else {
+                    toast({
+                        title: 'Error!',
+                        status: 'error',
+                        description: 'Error: ' + error.message,
+                        duration: 9000,
+                        isClosable: true
+                    })
+                    setIsChoosing(true);
+                }
             }
+            updateRefreshingAction(dispatch, {
+                status: false,
+                message: "Complete",
+            });
         }
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-    };
-
-
-    const disconnectWallet = async () => {
-        setTokensInWallet([]);
-        updateRefreshingAction(dispatch, {
-            status: true,
-            message: "Disconnecting wallet...",
-        });
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-        updateWalletWeb3ModalAction(dispatch, {...defaultWalletWeb3Modal});
-        updateQueryResultsAction(dispatch, {...defaultQueryResults});
-        web3Modal.clearCachedProvider();
     };
 
     return (
@@ -377,8 +355,6 @@ const Home: React.FC<IProps> = () => {
                             <Header/>}
                         {state.walletWeb3Modal.connected && isChoosing &&
                             <><Box w="100%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
-
-
                                 <><Center><Text fontSize="5xl" color={"black"}>
                                     Select your team!
                                 </Text></Center>
@@ -392,7 +368,7 @@ const Home: React.FC<IProps> = () => {
                                                    setIsAttack(true);
                                                    setIsChoosing(false);
                                                    setIsLoading(true);
-                                                   fetchAmountOfMutantzInWallet().then(r => setTokensInWallet(r));
+                                                   fetchAmountOfMutantzInWallet().then(r => setMutantzInWallet(r));
                                                }}/>
                                     </Box>
                                     <Box p='6'>
@@ -402,7 +378,7 @@ const Home: React.FC<IProps> = () => {
                                                    setIsDefense(true);
                                                    setIsChoosing(false);
                                                    setIsLoading(true);
-                                                   fetchAmountOfSuperTrooprzInWallet().then(r => setTokensInWallet(r));
+                                                   fetchAmountOfSuperTrooprzInWallet().then(r => setSuperTrooprzInWallet(r));
                                                }}/>
                                     </Box></Center></>}
                     </main>
@@ -410,7 +386,7 @@ const Home: React.FC<IProps> = () => {
 
             {/*Mutantz Attack Flow*/}
 
-            {state.walletWeb3Modal.connected && !isChoosing && isAttack &&
+            {state.walletWeb3Modal.connected && !isChoosing && isAttack && isMutantzFlow && !isTrooprzFlow && !isDefense &&
                 <div className={'image-container-mutantz'}>
                     <Head>
                         <title>Troopz dApp</title>
@@ -452,13 +428,12 @@ const Home: React.FC<IProps> = () => {
                                             </Center>}
                                         <Center>
                                             <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
-                                                {tokensInWallet.map((token) => (
+                                                {mutantzInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
                                                         key={token}
                                                         onClick={(e) => {
-                                                            addToMutantzList(token);
-                                                            selected(e);
+                                                            selected(e, token);
                                                         }}
                                                         boxSize='150px'
                                                         objectFit='cover'
@@ -499,12 +474,13 @@ const Home: React.FC<IProps> = () => {
                                                 setIsAttack(false);
                                                 setIsChoosing(true);
                                                 setTokensInWallet([]);
+
                                             }}>
                                                 Back
                                             </Button>
                                         </Center><br/>
                                     </Box>}
-                                {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && isSending && isAttack &&
+                                {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && isSending && isAttack && !isMutantzFlow && !isAttack &&
                                     <Box>
                                         <Center>
                                             <Text color={"white"}>Hang tight, your Mutantz are being sent off to
@@ -521,7 +497,7 @@ const Home: React.FC<IProps> = () => {
 
             {/*SuperTrooprz defend flow*/}
 
-            {state.walletWeb3Modal.connected && !isChoosing && isDefense &&
+            {state.walletWeb3Modal.connected && !isChoosing && isDefense && isTrooprzFlow &&
                 <div className={'image-container-super-trooprz'}>
                     <Head>
                         <title>Troopz dApp</title>
@@ -563,13 +539,12 @@ const Home: React.FC<IProps> = () => {
                                             </Center>}
                                         <Center>
                                             <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
-                                                {tokensInWallet.map((token) => (
+                                                {superTrooprzInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
                                                         key={token}
                                                         onClick={(e) => {
-                                                            addToSuperTrooprzList(token);
-                                                            selectedSuperTroopr(e);
+                                                            selectedSuperTroopr(e, token);
                                                         }}
                                                         boxSize='150px'
                                                         objectFit='cover'
@@ -587,11 +562,9 @@ const Home: React.FC<IProps> = () => {
                                                     borderColor='#4E6840'
                                                     _hover={{bg: '#D6E9CF'}} onClick={() => {
                                                 sessionStorage.setItem("superTrooprzList", JSON.stringify(Array.from(superTrooprzList)));
-                                                checkAmountOfSuperTrooprzSelected();
                                                 setIsSending(true);
                                                 setIsLoading(false);
                                                 sendSuperTrooprz();
-                                                setIsChoosing(false);
                                             }}>
                                                 Send SuperTrooprz
                                             </Button>
@@ -654,7 +627,8 @@ const Home: React.FC<IProps> = () => {
                                 {state.walletWeb3Modal.connected && state.refreshing.status && !isTrooprzFlow && isSending && isDefense &&
                                     <Box>
                                         <Center>
-                                            <Text color={"white"}>Hang tight, your SuperTrooprz are being sent off to
+                                            <Text color={"white"}>Hang tight, your SuperTrooprz are being sent
+                                                off to
                                                 defend!!</Text>
                                         </Center><br/>
                                         <Center>
@@ -684,65 +658,67 @@ const Home: React.FC<IProps> = () => {
                 </div>}
 
             {/*check id flow*/}
-            {state.walletWeb3Modal.connected && isMutantzFlow &&
-                <Box>
-                    <Center>
-                        <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A popup will
-                            appear showing the
-                            result.</Text>
-                    </Center><br/>
-                    <Center>
-                        <NumberInput bg='white' width="200px">
-                            <NumberInputField value={mutantzId}
-                                              onChange={(e) => {
-                                                  setMutantzId(e.target.value);
-                                              }}/>
-                        </NumberInput><br/><br/>
-                    </Center><br/>
-                    <Center>
-                        <Button size='md'
-                                height='48px'
-                                width='220px'
-                                border='2px'
-                                bg='#C2DCA5'
-                                borderColor='#4E6840'
-                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                            isMutantzTokenEligible(mutantzId);
-                        }}>
-                            Check id
-                        </Button></Center><br/>
-                </Box>
-            }
-            {state.walletWeb3Modal.connected && isTrooprzFlow &&
-                <Box>
-                    <Center>
-                        <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to defend. A
-                            popup
-                            will appear showing the
-                            result.</Text>
-                    </Center><br/>
-                    <Center>
-                        <NumberInput bg='white' width="200px">
-                            <NumberInputField value={trooprzId}
-                                              onChange={(e) => {
-                                                  setTrooprzId(e.target.value);
-                                              }}/>
-                        </NumberInput><br/><br/>
-                    </Center><br/>
-                    <Center>
-                        <Button size='md'
-                                height='48px'
-                                width='220px'
-                                border='2px'
-                                bg='#C2DCA5'
-                                borderColor='#4E6840'
-                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                            isSuperTrooprzTokenEligible(trooprzId);
-                        }}>
-                            Check id
-                        </Button></Center><br/>
-                </Box>
-            }
+            {/*{state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && !isDefense &&*/}
+            {/*    <Box>*/}
+            {/*        <Center>*/}
+            {/*            <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A*/}
+            {/*                popup will*/}
+            {/*                appear showing the*/}
+            {/*                result.</Text>*/}
+            {/*        </Center><br/>*/}
+            {/*        <Center>*/}
+            {/*            <NumberInput bg='white' width="200px">*/}
+            {/*                <NumberInputField value={mutantzId}*/}
+            {/*                                  onChange={(e) => {*/}
+            {/*                                      setMutantzId(e.target.value);*/}
+            {/*                                  }}/>*/}
+            {/*            </NumberInput><br/><br/>*/}
+            {/*        </Center><br/>*/}
+            {/*        <Center>*/}
+            {/*            <Button size='md'*/}
+            {/*                    height='48px'*/}
+            {/*                    width='220px'*/}
+            {/*                    border='2px'*/}
+            {/*                    bg='#C2DCA5'*/}
+            {/*                    borderColor='#4E6840'*/}
+            {/*                    _hover={{bg: '#D6E9CF'}} onClick={() => {*/}
+            {/*                isMutantzTokenEligible(mutantzId);*/}
+            {/*            }}>*/}
+            {/*                Check id*/}
+            {/*            </Button></Center><br/>*/}
+            {/*    </Box>*/}
+            {/*}*/}
+            {/*{state.walletWeb3Modal.connected && isTrooprzFlow && !isChoosing && isDefense &&*/}
+            {/*    <Box>*/}
+            {/*        <Center>*/}
+            {/*            <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to*/}
+            {/*                defend. A*/}
+            {/*                popup*/}
+            {/*                will appear showing the*/}
+            {/*                result.</Text>*/}
+            {/*        </Center><br/>*/}
+            {/*        <Center>*/}
+            {/*            <NumberInput bg='white' width="200px">*/}
+            {/*                <NumberInputField value={trooprzId}*/}
+            {/*                                  onChange={(e) => {*/}
+            {/*                                      setTrooprzId(e.target.value);*/}
+            {/*                                  }}/>*/}
+            {/*            </NumberInput><br/><br/>*/}
+            {/*        </Center><br/>*/}
+            {/*        <Center>*/}
+            {/*            <Button size='md'*/}
+            {/*                    height='48px'*/}
+            {/*                    width='220px'*/}
+            {/*                    border='2px'*/}
+            {/*                    bg='#C2DCA5'*/}
+            {/*                    borderColor='#4E6840'*/}
+            {/*                    _hover={{bg: '#D6E9CF'}} onClick={() => {*/}
+            {/*                isSuperTrooprzTokenEligible(trooprzId);*/}
+            {/*            }}>*/}
+            {/*                Check id*/}
+            {/*            </Button></Center><br/>*/}
+            {/*    </Box>*/}
+            {/*}*/}
         </>
 
 
@@ -761,4 +737,5 @@ const Home: React.FC<IProps> = () => {
         </>
     );
 }
+
 export default Home;

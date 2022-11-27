@@ -13,9 +13,7 @@ let tokensInWallet = [];
 let ineligibleTokensInWallet = [];
 let trooprzInWallet = [];
 
-const nonEligibleMutantzIds = [];
-const nonEligibleSuperTrooprzIds = [];
-nonEligibleSuperTrooprzIds.push(2,
+const nonEligibleMutantzIds = [2,
     3,
     4,
     8,
@@ -1611,7 +1609,6 @@ nonEligibleSuperTrooprzIds.push(2,
     2020,
     2021,
     2022,
-    2023,
     2024,
     2025,
     2026,
@@ -2547,8 +2544,8 @@ nonEligibleSuperTrooprzIds.push(2,
     3325,
     3332,
     3333
-)
-nonEligibleMutantzIds.push(1,
+]
+const nonEligibleSuperTrooprzIds = [1,
     2,
     3,
     4,
@@ -4103,7 +4100,6 @@ nonEligibleMutantzIds.push(1,
     1730,
     1731,
     1732,
-    1733,
     1734,
     1735,
     1736,
@@ -4358,7 +4354,7 @@ nonEligibleMutantzIds.push(1,
     2047,
     2048,
     2049
-)
+]
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 export const hexToInt = (s: string) => {
@@ -4478,6 +4474,7 @@ export const getMutantzInWallet = async (
     amount
 ): Promise<String[]> => {
     let tokenId;
+    tokensInWallet = [];
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.mutantzAddress,
         mutantzAbi,
@@ -4500,6 +4497,7 @@ export const getSuperTrooprzInWallet = async (
     amount
 ): Promise<String[]> => {
     let tokenId;
+    tokensInWallet = [];
     const readContractInstance = new ethers.Contract(
         config.configVars.erc20.superTrooprzAddress,
         supertrooprzAbi,
@@ -4517,13 +4515,14 @@ export const getSuperTrooprzInWallet = async (
 };
 
 export const checkIfMutantzIsEligible = async (id: number): Promise<Boolean> => {
-    console.log(id);
-    console.log(nonEligibleMutantzIds.includes(id))
-    return !nonEligibleMutantzIds.includes(id);
+    let idToCheck = id
+    return !nonEligibleMutantzIds.includes(idToCheck);
 }
 
 export const checkIfSuperTrooprzIsEligible = async (id: number): Promise<Boolean> => {
-    return !nonEligibleSuperTrooprzIds.includes(id);
+    console.log(!nonEligibleSuperTrooprzIds.includes(5)) // dit geeft false, correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
+    console.log(!nonEligibleSuperTrooprzIds.includes(id)) // dit geeft true, niet correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
+    return !nonEligibleSuperTrooprzIds.includes(id); // dit geeft ook false, niet correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
 }
 
 export const checkIfApprovedForAll = async (
