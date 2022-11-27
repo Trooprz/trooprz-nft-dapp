@@ -22,7 +22,7 @@ import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import * as config from "../config/config";
-import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible} from "../helpers/utils";
+import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible, getSuperTrooprzBalance} from "../helpers/utils";
 
 interface IProps {
 }
@@ -212,18 +212,17 @@ const Home: React.FC<IProps> = () => {
 
         try {
             let mutantzArray = getMutantzFromStorage()
+            let mutantId = mutantzArray[0]
             console.log(mutantzArray.length)
-                for (let i = 0; i < mutantzArray.length; i++) {
-                    const tx = await mutantzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantzArray[i]);
-                    await tx.wait();
-                }
-                toast({
-                    title: 'Mutantz sent!',
-                    description: 'Your Mutantz have been sent!',
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true
-                })
+            const tx = await mutantzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, mutantId);
+            await tx.wait();
+            toast({
+                title: 'Mutantz sent!',
+                description: 'Your Mutantz have been sent!',
+                status: 'success',
+                duration: 9000,
+                isClosable: true
+            })
         } catch (error) {
             console.log(error);
             if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
@@ -300,12 +299,12 @@ const Home: React.FC<IProps> = () => {
         );
 
         try {
-            let superTrooprzArray = getMutantzFromStorage()
+            let superTrooprzArray = getSuperTrooprzFromStorage()
+            let superTrooprId = superTrooprzArray[0]
             console.log(superTrooprzArray.length)
-            for (let i = 0; i < superTrooprzArray.length; i++) {
-                const tx = await superTrooprzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.attackAddress, superTrooprzArray[i]);
-                await tx.wait();
-            }
+            console.log("SuperTroopr: " + superTrooprId)
+            const tx = await superTrooprzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.protectAddress, superTrooprId);
+            await tx.wait();
             toast({
                 title: 'SuperTrooprz sent!',
                 description: 'Your SuperTrooprz have been sent!',
@@ -314,7 +313,8 @@ const Home: React.FC<IProps> = () => {
                 isClosable: true
             })
 
-        } catch (error) {
+        } catch
+            (error) {
             console.log(error);
             if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
                 toast({
@@ -687,7 +687,8 @@ const Home: React.FC<IProps> = () => {
             {state.walletWeb3Modal.connected && isMutantzFlow &&
                 <Box>
                     <Center>
-                        <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A popup will appear showing the
+                        <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A popup will
+                            appear showing the
                             result.</Text>
                     </Center><br/>
                     <Center>
@@ -715,7 +716,9 @@ const Home: React.FC<IProps> = () => {
             {state.walletWeb3Modal.connected && isTrooprzFlow &&
                 <Box>
                     <Center>
-                        <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to defend. A popup will appear showing the
+                        <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to defend. A
+                            popup
+                            will appear showing the
                             result.</Text>
                     </Center><br/>
                     <Center>

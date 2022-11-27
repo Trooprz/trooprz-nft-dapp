@@ -7,7 +7,7 @@ import Mutantz from "../artifacts/Mutantz.json"
 
 const microbesAbi = Microbes.abi
 const trooprzAbi = Trooprz.abi
-const supertrooprzAbi = Mutantz.abi
+const supertrooprzAbi = SuperTrooprz.abi
 const mutantzAbi = Mutantz.abi
 let tokensInWallet = [];
 let ineligibleTokensInWallet = [];
@@ -4630,21 +4630,8 @@ export const getSuperTrooprzWriteContractInstance = async (
     browserWeb3Provider: any,
 ): Promise<ethers.Contract> => {
     const readContractInstance = new ethers.Contract(
-        config.configVars.erc20.address,
+        config.configVars.erc20.superTrooprzAddress,
         supertrooprzAbi,
-        browserWeb3Provider
-    );
-    const signer = browserWeb3Provider.getSigner();
-
-    return readContractInstance.connect(signer);
-};
-
-export const getMicrobesWriteContractInstance = async (
-    browserWeb3Provider: any,
-): Promise<ethers.Contract> => {
-    const readContractInstance = new ethers.Contract(
-        config.configVars.erc20.microbesAddress,
-        microbesAbi,
         browserWeb3Provider
     );
     const signer = browserWeb3Provider.getSigner();
