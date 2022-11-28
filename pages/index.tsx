@@ -657,68 +657,68 @@ const Home: React.FC<IProps> = () => {
                     </main>
                 </div>}
 
-            {/*check id flow*/}
-            {/*{state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && !isDefense &&*/}
-            {/*    <Box>*/}
-            {/*        <Center>*/}
-            {/*            <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A*/}
-            {/*                popup will*/}
-            {/*                appear showing the*/}
-            {/*                result.</Text>*/}
-            {/*        </Center><br/>*/}
-            {/*        <Center>*/}
-            {/*            <NumberInput bg='white' width="200px">*/}
-            {/*                <NumberInputField value={mutantzId}*/}
-            {/*                                  onChange={(e) => {*/}
-            {/*                                      setMutantzId(e.target.value);*/}
-            {/*                                  }}/>*/}
-            {/*            </NumberInput><br/><br/>*/}
-            {/*        </Center><br/>*/}
-            {/*        <Center>*/}
-            {/*            <Button size='md'*/}
-            {/*                    height='48px'*/}
-            {/*                    width='220px'*/}
-            {/*                    border='2px'*/}
-            {/*                    bg='#C2DCA5'*/}
-            {/*                    borderColor='#4E6840'*/}
-            {/*                    _hover={{bg: '#D6E9CF'}} onClick={() => {*/}
-            {/*                isMutantzTokenEligible(mutantzId);*/}
-            {/*            }}>*/}
-            {/*                Check id*/}
-            {/*            </Button></Center><br/>*/}
-            {/*    </Box>*/}
-            {/*}*/}
-            {/*{state.walletWeb3Modal.connected && isTrooprzFlow && !isChoosing && isDefense &&*/}
-            {/*    <Box>*/}
-            {/*        <Center>*/}
-            {/*            <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to*/}
-            {/*                defend. A*/}
-            {/*                popup*/}
-            {/*                will appear showing the*/}
-            {/*                result.</Text>*/}
-            {/*        </Center><br/>*/}
-            {/*        <Center>*/}
-            {/*            <NumberInput bg='white' width="200px">*/}
-            {/*                <NumberInputField value={trooprzId}*/}
-            {/*                                  onChange={(e) => {*/}
-            {/*                                      setTrooprzId(e.target.value);*/}
-            {/*                                  }}/>*/}
-            {/*            </NumberInput><br/><br/>*/}
-            {/*        </Center><br/>*/}
-            {/*        <Center>*/}
-            {/*            <Button size='md'*/}
-            {/*                    height='48px'*/}
-            {/*                    width='220px'*/}
-            {/*                    border='2px'*/}
-            {/*                    bg='#C2DCA5'*/}
-            {/*                    borderColor='#4E6840'*/}
-            {/*                    _hover={{bg: '#D6E9CF'}} onClick={() => {*/}
-            {/*                isSuperTrooprzTokenEligible(trooprzId);*/}
-            {/*            }}>*/}
-            {/*                Check id*/}
-            {/*            </Button></Center><br/>*/}
-            {/*    </Box>*/}
-            {/*}*/}
+            check id flow
+            {state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && !isDefense &&
+                <Box>
+                    <Center>
+                        <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A
+                            popup will
+                            appear showing the
+                            result.</Text>
+                    </Center><br/>
+                    <Center>
+                        <NumberInput bg='white' width="200px">
+                            <NumberInputField value={mutantzId}
+                                              onChange={(e) => {
+                                                  setMutantzId(e.target.value);
+                                              }}/>
+                        </NumberInput><br/><br/>
+                    </Center><br/>
+                    <Center>
+                        <Button size='md'
+                                height='48px'
+                                width='220px'
+                                border='2px'
+                                bg='#C2DCA5'
+                                borderColor='#4E6840'
+                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                            isMutantzTokenEligible(mutantzId);
+                        }}>
+                            Check id
+                        </Button></Center><br/>
+                </Box>
+            }
+            {state.walletWeb3Modal.connected && isTrooprzFlow && !isChoosing && isDefense &&
+                <Box>
+                    <Center>
+                        <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to
+                            defend. A
+                            popup
+                            will appear showing the
+                            result.</Text>
+                    </Center><br/>
+                    <Center>
+                        <NumberInput bg='white' width="200px">
+                            <NumberInputField value={trooprzId}
+                                              onChange={(e) => {
+                                                  setTrooprzId(e.target.value);
+                                              }}/>
+                        </NumberInput><br/><br/>
+                    </Center><br/>
+                    <Center>
+                        <Button size='md'
+                                height='48px'
+                                width='220px'
+                                border='2px'
+                                bg='#C2DCA5'
+                                borderColor='#4E6840'
+                                _hover={{bg: '#D6E9CF'}} onClick={() => {
+                            isSuperTrooprzTokenEligible(trooprzId);
+                        }}>
+                            Check id
+                        </Button></Center><br/>
+                </Box>
+            }
         </>
 
 

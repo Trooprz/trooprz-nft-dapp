@@ -4515,14 +4515,13 @@ export const getSuperTrooprzInWallet = async (
 };
 
 export const checkIfMutantzIsEligible = async (id: number): Promise<Boolean> => {
-    let idToCheck = id
+    const idToCheck = parseInt(String(id))
     return !nonEligibleMutantzIds.includes(idToCheck);
 }
 
 export const checkIfSuperTrooprzIsEligible = async (id: number): Promise<Boolean> => {
-    console.log(!nonEligibleSuperTrooprzIds.includes(5)) // dit geeft false, correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
-    console.log(!nonEligibleSuperTrooprzIds.includes(id)) // dit geeft true, niet correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
-    return !nonEligibleSuperTrooprzIds.includes(id); // dit geeft ook false, niet correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
+    const idToCheck = parseInt(String(id))
+    return !nonEligibleSuperTrooprzIds.includes(idToCheck); // dit geeft ook false, niet correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
 }
 
 export const checkIfApprovedForAll = async (
