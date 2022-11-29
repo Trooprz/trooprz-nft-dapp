@@ -4412,7 +4412,6 @@ export const getMutantzBalance = async (
     );
     const contractResponse = await readContractInstance["balanceOf"](address);
     // Balance is rounded at 2 decimals instead of 18, to simplify UI
-    console.log(ethers.BigNumber.from(contractResponse).toNumber())
     return (
         ethers.BigNumber.from(contractResponse).toNumber()
     );
@@ -4486,8 +4485,6 @@ export const getMutantzInWallet = async (
             tokensInWallet[i] = tokenId;
         }
     }
-    console.log(address)
-    console.log(tokensInWallet)
     return tokensInWallet;
 };
 
@@ -4509,19 +4506,17 @@ export const getSuperTrooprzInWallet = async (
             tokensInWallet[i] = tokenId;
         }
     }
-    console.log(address)
-    console.log(tokensInWallet)
     return tokensInWallet;
 };
 
-export const checkIfMutantzIsEligible = async (id: number): Promise<Boolean> => {
-    const idToCheck = parseInt(String(id))
+export const checkIfMutantzIsEligible = async (id): Promise<Boolean> => {
+    const idToCheck = +id
     return !nonEligibleMutantzIds.includes(idToCheck);
 }
 
-export const checkIfSuperTrooprzIsEligible = async (id: number): Promise<Boolean> => {
-    const idToCheck = parseInt(String(id))
-    return !nonEligibleSuperTrooprzIds.includes(idToCheck); // dit geeft ook false, niet correct want in de array nonEligibleSuperTrooprzIds zit een element met als value 5
+export const checkIfSuperTrooprzIsEligible = async (id): Promise<Boolean> => {
+    const idToCheck = +id
+    return !nonEligibleSuperTrooprzIds.includes(idToCheck);
 }
 
 export const checkIfApprovedForAll = async (

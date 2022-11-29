@@ -114,8 +114,6 @@ const Home: React.FC<IProps> = () => {
             status: false,
             message: "Complete",
         });
-        console.log(data)
-
         return data;
     }
 
@@ -131,8 +129,6 @@ const Home: React.FC<IProps> = () => {
             status: false,
             message: "Complete",
         });
-        console.log(data)
-
         return data;
     }
 
@@ -214,7 +210,6 @@ const Home: React.FC<IProps> = () => {
                     isClosable: true
                 })
             } catch (error) {
-                console.log(error);
                 if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
                     toast({
                         title: 'Error!',
@@ -252,7 +247,6 @@ const Home: React.FC<IProps> = () => {
                 isClosable: true
             })
         } else {
-            console.log(id)
             toast({
                 title: 'Not Eligible',
                 description: "This SuperTroopr is tired. Can't send it to the front right now!",
@@ -306,7 +300,6 @@ const Home: React.FC<IProps> = () => {
 
             } catch
                 (error) {
-                console.log(error);
                 if (state.walletWeb3Modal.provider.connection.url === 'metamask') {
                     toast({
                         title: 'Error!',
