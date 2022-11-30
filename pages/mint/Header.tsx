@@ -15,7 +15,7 @@ import {defaultQueryResults} from "../../store/interfaces";
 import {
     Box,
     Button,
-    Center, Image,
+    Center, Image, Text,
 } from '@chakra-ui/react'
 
 import Web3Modal from "web3modal";
@@ -90,11 +90,8 @@ const Header: React.FC<IProps> = () => {
             return (
                 <div>
                     <Center>
-                        <Box p='6'>
-                            <Image src="/images/Mutantz-Attack.png"/>
-                        </Box>
-                        <Box p='6'>
-                            <Image src="/images/Superz-Protect.png"/>
+                        <Box>
+                            <Text fontSize={'6xl'} as={'b'}>IT&apos;S TIME FOR BATTLE!</Text>
                         </Box>
                     </Center>
                     <Center>
