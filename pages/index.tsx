@@ -19,7 +19,6 @@ import {
 import * as utils from "../helpers/utils";
 import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible} from "../helpers/utils";
 import Header from "./mint/Header";
-import {defaultQueryResults, defaultWalletWeb3Modal} from "../store/interfaces";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import * as config from "../config/config";

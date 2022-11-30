@@ -4,8 +4,8 @@ import Microbes from "../artifacts/Microbes.json";
 import SuperTrooprz from "../artifacts/SuperTrooprz.json";
 import Trooprz from "../artifacts/Trooprz.json"
 import Mutantz from "../artifacts/Mutantz.json"
-import {nonEligibleMutantzIds} from "../pages/attack-defend/MutantzStakedSnapshot";
-import {nonEligibleSuperTrooprzIds} from "../pages/attack-defend/SuperTrooprzStakedSnapshot";
+import {nonEligibleMutantzIds} from "./MutantzStakedSnapshot";
+import {nonEligibleSuperTrooprzIds} from "./SuperTrooprzStakedSnapshot";
 
 const microbesAbi = Microbes.abi
 const trooprzAbi = Trooprz.abi
