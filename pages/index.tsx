@@ -2,7 +2,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import React, {useState} from "react";
 import {Store} from "../store/store-reducer";
-import {updateQueryResultsAction, updateRefreshingAction, updateWalletWeb3ModalAction} from "../store/actions";
+import {updateRefreshingAction} from "../store/actions";
 import {
     Box,
     Button,
@@ -32,7 +32,6 @@ const Home: React.FC<IProps> = () => {
     const [tokensInWallet, setTokensInWallet] = useState([]);
     const [mutantzInWallet, setMutantzInWallet] = useState([]);
     const [superTrooprzInWallet, setSuperTrooprzInWallet] = useState([]);
-    const [isMicrobesFlow, setIsMicrobesFlow] = useState(false);
     const [isTrooprzFlow, setIsTrooprzFlow] = useState(false);
     const [isDefense, setIsDefense] = useState(false);
     const [isAttack, setIsAttack] = useState(false);
@@ -64,7 +63,7 @@ const Home: React.FC<IProps> = () => {
         } else {
             toast({
                 title: 'Fail',
-                description: "Due to performance issues, you can not send more than 1 Mutant per turn. You can't select more than 1 Mutant.",
+                description: "You can only send 1 NFT at a time into battle!",
                 status: "error",
                 duration: 9000,
                 isClosable: true
@@ -87,7 +86,7 @@ const Home: React.FC<IProps> = () => {
         } else {
             toast({
                 title: 'Fail',
-                description: "Due to performance issues, you can not send more than 1 SuperTroopr per turn. You can't select more than 1 Mutant.",
+                description: "You can only send 1 NFT at a time into battle!",
                 status: "error",
                 duration: 9000,
                 isClosable: true
@@ -218,7 +217,7 @@ const Home: React.FC<IProps> = () => {
                         duration: 9000,
                         isClosable: true
                     })
-                    setIsChoosing(true)
+                    window.location.reload()
                 } else {
                     toast({
                         title: 'Error!',
@@ -227,7 +226,7 @@ const Home: React.FC<IProps> = () => {
                         duration: 9000,
                         isClosable: true
                     })
-                    setIsChoosing(true)
+                    window.location.reload()
                 }
             }
             updateRefreshingAction(dispatch, {
@@ -249,7 +248,8 @@ const Home: React.FC<IProps> = () => {
         } else {
             toast({
                 title: 'Not Eligible',
-                description: "This SuperTroopr is tired. Can't send it to the front right now!",
+                description: "This Super Troopr has only just returned from battle. \n" +
+                    "(Unstaked after the Battlez snapshot!)",
                 status: "error",
                 duration: 9000,
                 isClosable: true
@@ -269,7 +269,8 @@ const Home: React.FC<IProps> = () => {
         } else {
             toast({
                 title: 'Not Eligible',
-                description: "This Mutant is tired. Can't send it to the front right now!",
+                description: "This Mutant has only just returned from battle. \n" +
+                    "(Unstaked after the Battlez snapshot!)",
                 status: "error",
                 duration: 9000,
                 isClosable: true
@@ -308,7 +309,7 @@ const Home: React.FC<IProps> = () => {
                         duration: 9000,
                         isClosable: true
                     })
-                    setIsChoosing(true);
+                    window.location.reload()
                 } else {
                     toast({
                         title: 'Error!',
@@ -317,7 +318,7 @@ const Home: React.FC<IProps> = () => {
                         duration: 9000,
                         isClosable: true
                     })
-                    setIsChoosing(true);
+                    window.location.reload()
                 }
             }
             updateRefreshingAction(dispatch, {
@@ -400,15 +401,16 @@ const Home: React.FC<IProps> = () => {
                                 </Box>
 
                                 {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && !isChoosing && isAttack && isLoading &&
-                                    <Box>
-                                        <Center>
-                                            <Text color={"white"}>Please be patient while we load your eligible
-                                                Mutantz</Text>
-                                        </Center><br/>
-                                        <Center>
-                                            <Spinner color={"white"}>
-                                            </Spinner></Center>
-                                    </Box>}
+                                    <Center>
+                                        <Box>
+                                            <Center>
+                                                <Text color={"white"}>Please be patient while we load your eligible
+                                                    Mutantz</Text>
+                                            </Center><br/>
+                                            <Center>
+                                                <Spinner color={"white"}>
+                                                </Spinner></Center>
+                                        </Box></Center>}
                                 {state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && isAttack &&
                                     <Box w={'100%'}>
                                         <Center>
@@ -511,15 +513,16 @@ const Home: React.FC<IProps> = () => {
                                 </Box>
 
                                 {state.walletWeb3Modal.connected && state.refreshing.status && isTrooprzFlow && !isChoosing && isDefense && isLoading &&
-                                    <Box>
-                                        <Center>
-                                            <Text color={"white"}>Please be patient while we load your eligible
-                                                SuperTrooprz</Text>
-                                        </Center><br/>
-                                        <Center>
-                                            <Spinner color={"white"}>
-                                            </Spinner></Center>
-                                    </Box>}
+                                    <Center>
+                                        <Box>
+                                            <Center>
+                                                <Text color={"white"}>Please be patient while we load your eligible
+                                                    SuperTrooprz</Text>
+                                            </Center><br/>
+                                            <Center>
+                                                <Spinner color={"white"}>
+                                                </Spinner></Center>
+                                        </Box></Center>}
                                 {state.walletWeb3Modal.connected && isTrooprzFlow && !isChoosing && isDefense &&
                                     <Box w={'100%'}>
                                         <Center>
@@ -731,5 +734,4 @@ const Home: React.FC<IProps> = () => {
         </>
     );
 }
-
 export default Home;
