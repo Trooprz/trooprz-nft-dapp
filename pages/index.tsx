@@ -404,7 +404,8 @@ const Home: React.FC<IProps> = () => {
                                     <Center>
                                         <Box>
                                             <Center>
-                                                <Text color={"white"}>Please be patient while we load your eligible
+                                                <Text align={"center"} color={"white"}>Please be patient while we load
+                                                    your eligible
                                                     Mutantz</Text>
                                             </Center><br/>
                                             <Center>
@@ -516,7 +517,8 @@ const Home: React.FC<IProps> = () => {
                                     <Center>
                                         <Box>
                                             <Center>
-                                                <Text color={"white"}>Please be patient while we load your eligible
+                                                <Text align={"center"} color={"white"}>Please be patient while we load
+                                                    your eligible
                                                     SuperTrooprz</Text>
                                             </Center><br/>
                                             <Center>
