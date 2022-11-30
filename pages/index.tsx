@@ -6,7 +6,7 @@ import {updateQueryResultsAction, updateRefreshingAction, updateWalletWeb3ModalA
 import {
     Box,
     Button,
-    Center,
+    Center, Grid, GridItem,
     Image,
     NumberInput,
     NumberInputField,
@@ -347,33 +347,34 @@ const Home: React.FC<IProps> = () => {
                         {!state.walletWeb3Modal.connected &&
                             <Header/>}
                         {state.walletWeb3Modal.connected && isChoosing &&
-                            <><Box w="100%" borderBottom='1px solid' borderColor='#4E6840' borderStyle='dashed'>
-                                <><Center><Text fontSize="5xl" color={"black"}>
-                                    Select your team!
-                                </Text></Center>
-                                </>
-                            </Box>
+                            <>
                                 <Center>
-                                    <Box p='6'>
-                                        <Image className='clickable' src="/images/Mutantz-Attack.png"
-                                               onClick={() => {
-                                                   setIsMutantzFlow(true);
-                                                   setIsAttack(true);
-                                                   setIsChoosing(false);
-                                                   setIsLoading(true);
-                                                   fetchAmountOfMutantzInWallet().then(r => setMutantzInWallet(r));
-                                               }}/>
-                                    </Box>
-                                    <Box p='6'>
-                                        <Image className='clickable' src="/images/Superz-Protect.png"
-                                               onClick={() => {
-                                                   setIsTrooprzFlow(true);
-                                                   setIsDefense(true);
-                                                   setIsChoosing(false);
-                                                   setIsLoading(true);
-                                                   fetchAmountOfSuperTrooprzInWallet().then(r => setSuperTrooprzInWallet(r));
-                                               }}/>
-                                    </Box></Center></>}
+                                    <Grid>
+                                        <GridItem>
+                                            <Box p='6'>
+                                                <Image className='clickable' src="/images/Mutantz-Attack.png"
+                                                       onClick={() => {
+                                                           setIsMutantzFlow(true);
+                                                           setIsAttack(true);
+                                                           setIsChoosing(false);
+                                                           setIsLoading(true);
+                                                           fetchAmountOfMutantzInWallet().then(r => setMutantzInWallet(r));
+                                                       }}/>
+                                            </Box>
+                                        </GridItem>
+                                        <GridItem>
+                                            <Box p='6'>
+                                                <Image className='clickable' src="/images/Superz-Protect.png"
+                                                       onClick={() => {
+                                                           setIsTrooprzFlow(true);
+                                                           setIsDefense(true);
+                                                           setIsChoosing(false);
+                                                           setIsLoading(true);
+                                                           fetchAmountOfSuperTrooprzInWallet().then(r => setSuperTrooprzInWallet(r));
+                                                       }}/>
+                                            </Box>
+                                        </GridItem>
+                                    </Grid></Center></>}
                     </main>
                 </div>}
 
@@ -650,7 +651,7 @@ const Home: React.FC<IProps> = () => {
                     </main>
                 </div>}
 
-            check id flow
+            {/*check id flow*/}
             {state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && !isDefense &&
                 <Box>
                     <Center>
