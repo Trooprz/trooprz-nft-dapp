@@ -91,7 +91,9 @@ const Header: React.FC<IProps> = () => {
                 <div>
                     <Center>
                         <Box>
-                            <Text align={"center"} fontSize={'6xl'} as={'b'}>IT&apos;S TIME FOR BATTLE!</Text>
+                            <Center>
+                                <Text align={"center"} fontSize={'6xl'} as={'b'}>IT&apos;S TIME FOR BATTLE!</Text>
+                            </Center>
                         </Box>
                     </Center>
                     <Center>
