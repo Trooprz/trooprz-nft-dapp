@@ -58,48 +58,50 @@ export const getRingsInWallet = async (
         let tokenId;
         if (color === 'obsidian') {
             tokenId = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
+            console.log(tokenId)
             if (tokenId >= 1 && tokenId <= 111) {
-                tokensInWallet[i] = tokenId
+                tokensInWallet[0] = tokenId
                 break;
             }
         } else if (color === 'icyWhite') {
             tokenId = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
             if (tokenId >= 112 && tokenId <= 222) {
-                tokensInWallet[i] = tokenId
+                tokensInWallet[0] = tokenId
                 break;
             }
         } else if (color === 'roseGold') {
             tokenId = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
             if (tokenId >= 223 && tokenId <= 333) {
-                tokensInWallet[i] = tokenId
+                tokensInWallet[0] = tokenId
                 break;
             }
         } else if (color === 'royalIndigo') {
             tokenId = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
             if (tokenId >= 334 && tokenId <= 444) {
-                tokensInWallet[i] = tokenId
+                tokensInWallet[0] = tokenId
                 break;
             }
         } else if (color === 'jadeGreen') {
             tokenId = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
             if (tokenId >= 445 && tokenId <= 555) {
-                tokensInWallet[i] = tokenId
+                tokensInWallet[0] = tokenId
                 break;
             }
         } else if (color === 'rubyRed') {
             tokenId = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
             if (tokenId >= 556 && tokenId <= 666) {
-                tokensInWallet[i] = tokenId
+                tokensInWallet[0] = tokenId
                 break;
             }
         } else if (color === 'midnightBlue') {
             tokenId = ethers.BigNumber.from(await readContractInstance["tokenOfOwnerByIndex"](address, i)).toNumber();
             if (tokenId >= 667 && tokenId <= 777) {
-                tokensInWallet[i] = tokenId
+                tokensInWallet[0] = tokenId
                 break;
             }
         }
     }
+    console.log(tokensInWallet)
     return tokensInWallet;
 };
 

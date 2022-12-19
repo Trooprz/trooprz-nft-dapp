@@ -112,8 +112,8 @@ const Home: React.FC<IProps> = () => {
             status: true,
             message: "Sending transaction...",
         });
-
-        const data = await utils.getRingsInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.superTrooprzBalance, ringColor);
+        console.log(ringColor)
+        const data = await utils.getRingsInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.ringsBalance, ringColor);
 
         updateRefreshingAction(dispatch, {
             status: false,
@@ -308,7 +308,10 @@ const Home: React.FC<IProps> = () => {
                                                            setIsAttack(true);
                                                            setIsChoosing(false);
                                                            setIsLoading(true);
-                                                           fetchAmountOfRingsInWallet('obsidian').then(r => setObsidianRingsInWallet(r));
+                                                           fetchAmountOfRingsInWallet('obsidian').then(r => {
+                                                               setObsidianRingsInWallet(r);
+                                                               console.log('RINGS: ' + obsidianRingsInWallet)
+                                                           });
                                                            fetchAmountOfRingsInWallet('icyWhite').then(r => setIcyWhiteRingsInWallet(r));
                                                            fetchAmountOfRingsInWallet('roseGold').then(r => setRosegoldRingsInWallet(r));
                                                            fetchAmountOfRingsInWallet('royalIndigo').then(r => setRoyalIndigoRingsInWallet(r));
@@ -362,7 +365,7 @@ const Home: React.FC<IProps> = () => {
                                                 </Text>
                                             </Center>}
                                         <Center>
-                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                            <SimpleGrid columns={[4, 4]} spacing={[5, 10]}>
                                                 {obsidianRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
@@ -375,8 +378,6 @@ const Home: React.FC<IProps> = () => {
                                                         src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/obsidian.mp4/ik-thumbnail.jpg`}
                                                         alt={`Rings id ${token}`}/>
                                                 ))}
-                                            </SimpleGrid></Center><br/><Center>
-                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                                 {icyWhiteRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
@@ -389,8 +390,6 @@ const Home: React.FC<IProps> = () => {
                                                         src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/icy.mp4/ik-thumbnail.jpg`}
                                                         alt={`Rings id ${token}`}/>
                                                 ))}
-                                            </SimpleGrid></Center><br/><Center>
-                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                                 {rosegoldRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
@@ -403,8 +402,6 @@ const Home: React.FC<IProps> = () => {
                                                         src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/rose.mp4/ik-thumbnail.jpg`}
                                                         alt={`Rings id ${token}`}/>
                                                 ))}
-                                            </SimpleGrid></Center><br/><Center>
-                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                                 {royalIndigoRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
@@ -417,8 +414,6 @@ const Home: React.FC<IProps> = () => {
                                                         src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/indigo.mp4/ik-thumbnail.jpg`}
                                                         alt={`Rings id ${token}`}/>
                                                 ))}
-                                            </SimpleGrid></Center><br/><Center>
-                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                                 {jadeGreenRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
@@ -431,8 +426,6 @@ const Home: React.FC<IProps> = () => {
                                                         src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/jade.mp4/ik-thumbnail.jpg`}
                                                         alt={`Rings id ${token}`}/>
                                                 ))}
-                                            </SimpleGrid></Center><br/><Center>
-                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                                 {rubyRedRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
@@ -445,9 +438,6 @@ const Home: React.FC<IProps> = () => {
                                                         src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/ruby.mp4/ik-thumbnail.jpg`}
                                                         alt={`Rings id ${token}`}/>
                                                 ))}
-                                            </SimpleGrid></Center><br/>
-                                        <Center>
-                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
                                                 {midnightBlueRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
@@ -678,69 +668,6 @@ const Home: React.FC<IProps> = () => {
                         </Center>
                     </main>
                 </div>}
-
-            {/*check id flow*/}
-            {state.walletWeb3Modal.connected && isMutantzFlow && !isChoosing && !isDefense &&
-                <Box>
-                    <Center>
-                        <Text color={"white"}>Enter a Mutantz ID here to check if it is eligible to attack. A
-                            popup will
-                            appear showing the
-                            result.</Text>
-                    </Center><br/>
-                    <Center>
-                        <NumberInput bg='white' width="200px">
-                            <NumberInputField value={mutantzId}
-                                              onChange={(e) => {
-                                                  setMutantzId(e.target.value);
-                                              }}/>
-                        </NumberInput><br/><br/>
-                    </Center><br/>
-                    <Center>
-                        <Button size='md'
-                                height='48px'
-                                width='220px'
-                                border='2px'
-                                bg='#C2DCA5'
-                                borderColor='#4E6840'
-                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                            isMutantzTokenEligible(mutantzId);
-                        }}>
-                            Check id
-                        </Button></Center><br/>
-                </Box>
-            }
-            {state.walletWeb3Modal.connected && isTrooprzFlow && !isChoosing && isDefense &&
-                <Box>
-                    <Center>
-                        <Text color={"white"}>Enter an SuperTrooprz ID here to check if it is eligible to
-                            defend. A
-                            popup
-                            will appear showing the
-                            result.</Text>
-                    </Center><br/>
-                    <Center>
-                        <NumberInput bg='white' width="200px">
-                            <NumberInputField value={trooprzId}
-                                              onChange={(e) => {
-                                                  setTrooprzId(e.target.value);
-                                              }}/>
-                        </NumberInput><br/><br/>
-                    </Center><br/>
-                    <Center>
-                        <Button size='md'
-                                height='48px'
-                                width='220px'
-                                border='2px'
-                                bg='#C2DCA5'
-                                borderColor='#4E6840'
-                                _hover={{bg: '#D6E9CF'}} onClick={() => {
-                            isSuperTrooprzTokenEligible(trooprzId);
-                        }}>
-                            Check id
-                        </Button></Center><br/>
-                </Box>
-            }
         </>
 
 
