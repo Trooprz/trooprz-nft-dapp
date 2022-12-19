@@ -46,22 +46,10 @@ const Header: React.FC<IProps> = () => {
         localStorage.clear();
         newWallet = await walletWeb3Modal.connect();
         if (newWallet.connected) {
-            const trooprzBalance = await utils.getTrooprzBalance(
+            const ringsBalance = await utils.getRingsBalance(
                 newWallet.provider,
                 newWallet.address
-            );
-            const microbesBalance = await utils.getMicrobesBalance(
-                newWallet.provider,
-                newWallet.address
-            );
-            const mutantzBalance = await utils.getMutantzBalance(
-                newWallet.provider,
-                newWallet.address
-            );
-            const superTrooprzBalance = await utils.getSuperTrooprzBalance(
-                newWallet.provider,
-                newWallet.address
-            );
+            )
             const approved = await utils.checkIfApprovedForAll(
                 newWallet.provider,
                 newWallet.address,
@@ -70,10 +58,7 @@ const Header: React.FC<IProps> = () => {
             updateWalletWeb3ModalAction(dispatch, newWallet);
             updateQueryResultsAction(dispatch, {
                 ...defaultQueryResults,
-                trooprzBalance: trooprzBalance,
-                microbesBalance: microbesBalance,
-                mutantzBalance: mutantzBalance,
-                superTrooprzBalance: superTrooprzBalance,
+                ringsBalance: ringsBalance,
                 provider: newWallet.provider,
                 signer: newWallet.signer,
                 approved: approved

@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Store} from "../store/store-reducer";
 import {updateRefreshingAction} from "../store/actions";
 import {
@@ -17,11 +17,11 @@ import {
     VStack
 } from '@chakra-ui/react';
 import * as utils from "../helpers/utils";
-import {checkIfMutantzIsEligible, checkIfSuperTrooprzIsEligible} from "../helpers/utils";
 import Header from "./mint/Header";
 import Web3Modal from "web3modal";
 import providerOptions from "../config/ProviderOptions";
 import * as config from "../config/config";
+import {string} from "prop-types";
 
 interface IProps {
 }
@@ -30,6 +30,13 @@ const Home: React.FC<IProps> = () => {
     const {state, dispatch} = React.useContext(Store);
     const [tokensInWallet, setTokensInWallet] = useState([]);
     const [mutantzInWallet, setMutantzInWallet] = useState([]);
+    const [obsidianRingsInWallet, setObsidianRingsInWallet] = useState([]);
+    const [icyWhiteRingsInWallet, setIcyWhiteRingsInWallet] = useState([]);
+    const [rosegoldRingsInWallet, setRosegoldRingsInWallet] = useState([]);
+    const [royalIndigoRingsInWallet, setRoyalIndigoRingsInWallet] = useState([]);
+    const [jadeGreenRingsInWallet, setJadeGreenRingsInWallet] = useState([]);
+    const [rubyRedRingsInWallet, setRubyRedRingsInWallet] = useState([]);
+    const [midnightBlueRingsInWallet, setMidnightBlueRingsInWallet] = useState([]);
     const [superTrooprzInWallet, setSuperTrooprzInWallet] = useState([]);
     const [isTrooprzFlow, setIsTrooprzFlow] = useState(false);
     const [isDefense, setIsDefense] = useState(false);
@@ -100,28 +107,13 @@ const Home: React.FC<IProps> = () => {
         })
     }
 
-    const fetchAmountOfSuperTrooprzInWallet = async () => {
+    const fetchAmountOfRingsInWallet = async (ringColor: string) => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
         });
 
-        const data = await utils.getSuperTrooprzInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.superTrooprzBalance);
-
-        updateRefreshingAction(dispatch, {
-            status: false,
-            message: "Complete",
-        });
-        return data;
-    }
-
-    const fetchAmountOfMutantzInWallet = async () => {
-        updateRefreshingAction(dispatch, {
-            status: true,
-            message: "Sending transaction...",
-        });
-
-        const data = await utils.getMutantzInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.mutantzBalance);
+        const data = await utils.getRingsInWallet(state.walletWeb3Modal.provider, state.walletWeb3Modal.address, state.queryResults.superTrooprzBalance, ringColor);
 
         updateRefreshingAction(dispatch, {
             status: false,
@@ -235,48 +227,6 @@ const Home: React.FC<IProps> = () => {
         }
     }
 
-    const isSuperTrooprzTokenEligible = async (id) => {
-        if (await checkIfSuperTrooprzIsEligible(id)) {
-            toast({
-                title: 'Eligible',
-                description: "This SuperTroopr is eligible for defense. Get him into the fray!",
-                status: "success",
-                duration: 9000,
-                isClosable: true
-            })
-        } else {
-            toast({
-                title: 'Not Eligible',
-                description: "This Super Troopr has only just returned from battle. \n" +
-                    "(Unstaked after the Battlez snapshot!)",
-                status: "error",
-                duration: 9000,
-                isClosable: true
-            })
-        }
-    };
-
-    const isMutantzTokenEligible = async (id) => {
-        if (await checkIfMutantzIsEligible(id)) {
-            toast({
-                title: 'Eligible',
-                description: "This Mutant is eligible for attack. Get him into the fray!",
-                status: "success",
-                duration: 9000,
-                isClosable: true
-            })
-        } else {
-            toast({
-                title: 'Not Eligible',
-                description: "This Mutant has only just returned from battle. \n" +
-                    "(Unstaked after the Battlez snapshot!)",
-                status: "error",
-                duration: 9000,
-                isClosable: true
-            })
-        }
-    };
-
     const sendSuperTrooprz = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
@@ -358,19 +308,13 @@ const Home: React.FC<IProps> = () => {
                                                            setIsAttack(true);
                                                            setIsChoosing(false);
                                                            setIsLoading(true);
-                                                           fetchAmountOfMutantzInWallet().then(r => setMutantzInWallet(r));
-                                                       }}/>
-                                            </Box>
-                                        </GridItem>
-                                        <GridItem>
-                                            <Box p='6'>
-                                                <Image className='clickable' src="/images/Superz-Protect.png"
-                                                       onClick={() => {
-                                                           setIsTrooprzFlow(true);
-                                                           setIsDefense(true);
-                                                           setIsChoosing(false);
-                                                           setIsLoading(true);
-                                                           fetchAmountOfSuperTrooprzInWallet().then(r => setSuperTrooprzInWallet(r));
+                                                           fetchAmountOfRingsInWallet('obsidian').then(r => setObsidianRingsInWallet(r));
+                                                           fetchAmountOfRingsInWallet('icyWhite').then(r => setIcyWhiteRingsInWallet(r));
+                                                           fetchAmountOfRingsInWallet('roseGold').then(r => setRosegoldRingsInWallet(r));
+                                                           fetchAmountOfRingsInWallet('royalIndigo').then(r => setRoyalIndigoRingsInWallet(r));
+                                                           fetchAmountOfRingsInWallet('jadeGreen').then(r => setJadeGreenRingsInWallet(r));
+                                                           fetchAmountOfRingsInWallet('rubyRed').then(r => setRubyRedRingsInWallet(r));
+                                                           fetchAmountOfRingsInWallet('midnightBlue').then(r => setMidnightBlueRingsInWallet(r));
                                                        }}/>
                                             </Box>
                                         </GridItem>
@@ -394,18 +338,13 @@ const Home: React.FC<IProps> = () => {
                     <main className={styles.main}>
                         <Center>
                             <VStack>
-
-                                <Box w="60%">
-                                    <Image src="/images/Mutant-Invasion-Graphic.png"/>
-                                </Box>
-
                                 {state.walletWeb3Modal.connected && state.refreshing.status && isMutantzFlow && !isChoosing && isAttack && isLoading &&
                                     <Center>
                                         <Box>
                                             <Center>
                                                 <Text align={"center"} color={"white"}>Please be patient while we load
                                                     your eligible
-                                                    Mutantz</Text>
+                                                    Rings</Text>
                                             </Center><br/>
                                             <Center>
                                                 <Spinner color={"white"}>
@@ -424,7 +363,7 @@ const Home: React.FC<IProps> = () => {
                                             </Center>}
                                         <Center>
                                             <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
-                                                {mutantzInWallet.map((token) => (
+                                                {obsidianRingsInWallet.map((token) => (
                                                     <Image
                                                         className="clickable"
                                                         key={token}
@@ -433,8 +372,93 @@ const Home: React.FC<IProps> = () => {
                                                         }}
                                                         boxSize='150px'
                                                         objectFit='cover'
-                                                        src={`https://cdn.ebisusbay.com/proxy/https://bafybeib2gmwun7cuksemlaxdlujbwqsm5k6b6h3vq42fmhr5c4y63xik2q.ipfs.nftstorage.link/${token}.png`}
-                                                        alt={`Mutantz id ${token}`}/>
+                                                        src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/obsidian.mp4/ik-thumbnail.jpg`}
+                                                        alt={`Rings id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/><Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {icyWhiteRingsInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            selected(e, token);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/icy.mp4/ik-thumbnail.jpg`}
+                                                        alt={`Rings id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/><Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {rosegoldRingsInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            selected(e, token);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/rose.mp4/ik-thumbnail.jpg`}
+                                                        alt={`Rings id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/><Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {royalIndigoRingsInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            selected(e, token);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/indigo.mp4/ik-thumbnail.jpg`}
+                                                        alt={`Rings id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/><Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {jadeGreenRingsInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            selected(e, token);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/jade.mp4/ik-thumbnail.jpg`}
+                                                        alt={`Rings id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/><Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {rubyRedRingsInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            selected(e, token);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/ruby.mp4/ik-thumbnail.jpg`}
+                                                        alt={`Rings id ${token}`}/>
+                                                ))}
+                                            </SimpleGrid></Center><br/>
+                                        <Center>
+                                            <SimpleGrid columns={[2, 4]} spacing={[5, 10]}>
+                                                {midnightBlueRingsInWallet.map((token) => (
+                                                    <Image
+                                                        className="clickable"
+                                                        key={token}
+                                                        onClick={(e) => {
+                                                            selected(e, token);
+                                                        }}
+                                                        boxSize='150px'
+                                                        objectFit='cover'
+                                                        src={`https://cdn.ebisusbay.com/QmfNrtmewoxCwKLqtjC5PnpPk8ssT5w1oqnYTHTNrbwhE4/blue.mp4/ik-thumbnail.jpg`}
+                                                        alt={`Rings id ${token}`}/>
                                                 ))}
                                             </SimpleGrid></Center><br/>
 
