@@ -227,17 +227,17 @@ const Home: React.FC<IProps> = () => {
         }
     }
 
-    const sendSuperTrooprz = async () => {
+    const sendRings = async () => {
         updateRefreshingAction(dispatch, {
             status: true,
             message: "Sending transaction...",
         });
-        const superTrooprzWriteContractInstance = await utils.getSuperTrooprzWriteContractInstance(
+        const ringsWriteContractInstance = await utils.getRingsWriteContractInstance(
             state.walletWeb3Modal.provider,
         );
         if (checkAmountOfSuperTrooprzSelected()) {
             try {
-                const tx = await superTrooprzWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.protectAddress, tokenId);
+                const tx = await ringsWriteContractInstance["transferFrom"](state.walletWeb3Modal.address, config.configVars.erc20.protectAddress, tokenId);
                 await tx.wait();
                 setIsChoosing(true);
                 toast({
@@ -467,7 +467,7 @@ const Home: React.FC<IProps> = () => {
                                                 sendMutantz();
                                                 setIsChoosing(false);
                                             }}>
-                                                Send Mutantz
+                                                Create Ring
                                             </Button>
 
                                         </Center>
